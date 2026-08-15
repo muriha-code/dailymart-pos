@@ -27,6 +27,53 @@ const VALID_PAYMENT_METHODS: PaymentMethod[] = [
   "TRANSFER",
 ];
 
+// GET /api/transactions -> Fetch transaction history
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const search = searchParams.get("search")?.toLowerCase();
+
+  try {
+    const snapshot = await adminDb
+      .collection("transactions")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    let transactions: any[] = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate
+          ? data.createdAt.toDate().toISOString()
+          : data.createdAt,
+      };
+    });
+
+    if (search) {
+      transactions = transactions.filter(
+        (trx) =>
+          trx.transactionNumber?.toLowerCase().includes(search) ||
+          trx.cashierId?.toLowerCase().includes(search)
+      );
+    }
+
+    return NextResponse.json(
+      { success: true, data: transactions },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error("[API /api/transactions GET Error]:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: error?.message || "Gagal mengambil daftar transaksi.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
 // POST /api/transactions -> Checkout Flow with Firestore Atomic Transaction
 export async function POST(req: NextRequest) {
   try {
