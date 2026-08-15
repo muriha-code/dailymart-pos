@@ -2,11 +2,11 @@ import { Product, GetProductsParams, ApiResponse } from "@/types/product.types";
 
 /**
  * Service Abstraction Layer for Products
- * Next.js Frontend -> /api/products Route Handlers -> Firestore
+ * Next.js Frontend -> /api/products Route Handlers -> Cloud Firestore
  */
 export const productService = {
   /**
-   * Fetch active products with optional search query & category filter
+   * Fetch products with optional search query, category filter, and status filter
    */
   async getProducts(params?: GetProductsParams): Promise<Product[]> {
     const searchParams = new URLSearchParams();
@@ -17,6 +17,10 @@ export const productService = {
 
     if (params?.categoryId && params.categoryId !== "all") {
       searchParams.append("categoryId", params.categoryId);
+    }
+
+    if (params?.status && params.status !== "all") {
+      searchParams.append("status", params.status);
     }
 
     const queryString = searchParams.toString();
@@ -50,5 +54,80 @@ export const productService = {
     }
 
     return result.data || [];
+  },
+
+  /**
+   * Create a new product in master catalog
+   */
+  async createProduct(productData: Omit<Product, "id">): Promise<Product> {
+    const response = await fetch("/api/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productData),
+    });
+
+    const result: ApiResponse<Product> = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Gagal membuat produk baru.");
+    }
+
+    if (!result.data) {
+      throw new Error("Data produk tidak dikembalikan dari server.");
+    }
+
+    return result.data;
+  },
+
+  /**
+   * Update existing product details by ID
+   */
+  async updateProduct(id: string, productData: Partial<Product>): Promise<Product> {
+    const response = await fetch(`/api/products/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productData),
+    });
+
+    const result: ApiResponse<Product> = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Gagal memperbarui data produk.");
+    }
+
+    if (!result.data) {
+      throw new Error("Data produk tidak dikembalikan dari server.");
+    }
+
+    return result.data;
+  },
+
+  /**
+   * Toggle product status ('active' | 'inactive')
+   */
+  async toggleProductStatus(id: string, newStatus: "active" | "inactive"): Promise<Product> {
+    const response = await fetch(`/api/products/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: newStatus }),
+    });
+
+    const result: ApiResponse<Product> = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Gagal mengubah status produk.");
+    }
+
+    if (!result.data) {
+      throw new Error("Data produk tidak dikembalikan dari server.");
+    }
+
+    return result.data;
   },
 };

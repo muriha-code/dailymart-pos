@@ -24,6 +24,7 @@ export interface Product {
 export interface GetProductsParams {
   search?: string;
   categoryId?: string;
+  status?: string;
 }
 
 export interface ApiResponse<T> {

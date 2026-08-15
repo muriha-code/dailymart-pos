@@ -273,14 +273,20 @@ const FALLBACK_PRODUCTS: Product[] = [
   },
 ];
 
-// GET /api/products -> Mengambil daftar produk
+// GET /api/products -> Mengambil daftar produk dengan filter search, categoryId, dan status
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get('search')?.toLowerCase();
   const categoryId = searchParams.get('categoryId');
+  const status = searchParams.get('status');
 
   try {
-    let query: Query = adminDb.collection('products').where('status', '==', 'active');
+    let query: Query = adminDb.collection('products');
+
+    // Filter status jika spesifik ('active' / 'inactive'). Jika 'all', ambil seluruh status.
+    if (status && status !== 'all') {
+      query = query.where('status', '==', status);
+    }
 
     if (categoryId && categoryId !== 'all') {
       query = query.where('categoryId', '==', categoryId);
@@ -299,9 +305,14 @@ export async function GET(req: NextRequest) {
       })) as Product[];
     }
 
-    // Filter kategori jika fallback
-    if (snapshot.empty && categoryId && categoryId !== 'all') {
-      products = products.filter((p) => p.categoryId === categoryId);
+    // Filter status & kategori jika fallback
+    if (snapshot.empty) {
+      if (status && status !== 'all') {
+        products = products.filter((p) => p.status === status);
+      }
+      if (categoryId && categoryId !== 'all') {
+        products = products.filter((p) => p.categoryId === categoryId);
+      }
     }
 
     // Filter nama/SKU/barcode manual di memori jika ada query search
@@ -320,6 +331,9 @@ export async function GET(req: NextRequest) {
 
     // Fallback jika Firestore belum diinisialisasi atau error kredensial
     let fallback = FALLBACK_PRODUCTS;
+    if (status && status !== 'all') {
+      fallback = fallback.filter((p) => p.status === status);
+    }
     if (categoryId && categoryId !== 'all') {
       fallback = fallback.filter((p) => p.categoryId === categoryId);
     }
