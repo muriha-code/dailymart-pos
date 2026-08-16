@@ -5,6 +5,10 @@ import { Product } from "@/types/product.types";
 import { StockInItem } from "@/types/inventory.types";
 import { productService } from "@/services/product.service";
 import { inventoryService } from "@/services/inventory.service";
+import {
+  SearchableSelect,
+  SearchableSelectOption,
+} from "@/components/common/SearchableSelect";
 
 // ==========================================
 // CONSTANTS & HELPERS
@@ -29,14 +33,14 @@ export default function WarehouseStockInPage() {
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(true);
 
   // Left Column Form State
-  const [supplierId, setSupplierId] = useState<string>("sup_indofood");
+  const [supplierId, setSupplierId] = useState<string>("");
   const [invoiceNumber, setInvoiceNumber] = useState<string>("");
-  const [receivedBy, setReceivedBy] = useState<string>("Budi (Staf Gudang)");
+  const [receivedBy, setReceivedBy] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
 
   // Right Column Selector State
   const [selectedProductId, setSelectedProductId] = useState<string>("");
-  const [inputQuantity, setInputQuantity] = useState<number>(10);
+  const [inputQuantity, setInputQuantity] = useState<number>(0);
   const [inputPurchasePrice, setInputPurchasePrice] = useState<number>(0);
 
   // Temporary Queue Items
@@ -51,16 +55,29 @@ export default function WarehouseStockInPage() {
     text: string;
   } | null>(null);
 
+  // Options mapped for SearchableSelect
+  const supplierOptions: SearchableSelectOption[] = useMemo(() => {
+    return SUPPLIERS.map((sup) => ({
+      value: sup.id,
+      label: sup.name,
+    }));
+  }, []);
+
+  const productOptions: SearchableSelectOption[] = useMemo(() => {
+    return products.map((p) => ({
+      value: p.id!,
+      label: p.name,
+      sublabel: `SKU: ${p.sku}`,
+      badge: `Stok: ${p.stock} ${p.unit || "Pcs"}`,
+    }));
+  }, [products]);
+
   // Load products from master catalog
   const loadProducts = useCallback(async () => {
     setIsLoadingProducts(true);
     try {
       const data = await productService.getProducts({ status: "active" });
       setProducts(data);
-      if (data.length > 0) {
-        setSelectedProductId(data[0].id || "");
-        setInputPurchasePrice(data[0].purchasePrice || 0);
-      }
     } catch (err: any) {
       console.error("Gagal memuat produk master:", err);
     } finally {
@@ -78,6 +95,10 @@ export default function WarehouseStockInPage() {
     const prod = products.find((p) => p.id === productId);
     if (prod) {
       setInputPurchasePrice(prod.purchasePrice || 0);
+      if (inputQuantity <= 0) setInputQuantity(10);
+    } else {
+      setInputPurchasePrice(0);
+      setInputQuantity(0);
     }
   };
 
@@ -174,6 +195,16 @@ export default function WarehouseStockInPage() {
 
   // Submit Stock-In Payload to Service Layer
   const handleSubmitStockIn = async () => {
+    if (!supplierId || !supplierId.trim()) {
+      alert("Pemasok / Supplier wajib dipilih!");
+      return;
+    }
+
+    if (!receivedBy || !receivedBy.trim()) {
+      alert("Petugas Penerima (Staf Gudang) wajib diisi!");
+      return;
+    }
+
     if (queueItems.length === 0) {
       alert("Antrean penerimaan barang masih kosong!");
       return;
@@ -293,17 +324,14 @@ export default function WarehouseStockInPage() {
                 <label className="block font-bold text-slate-700 mb-1">
                   Pemasok / Supplier <span className="text-red-500">*</span>
                 </label>
-                <select
+                <SearchableSelect
+                  options={supplierOptions}
                   value={supplierId}
-                  onChange={(e) => setSupplierId(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:bg-white focus:outline-none"
-                >
-                  {SUPPLIERS.map((sup) => (
-                    <option key={sup.id} value={sup.id}>
-                      {sup.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setSupplierId(val)}
+                  placeholder="Pilih Pemasok"
+                  searchPlaceholder="Cari nama PT / distributor..."
+                  emptyMessage="Supplier tidak ditemukan"
+                />
               </div>
 
               {/* Input No Faktur / Surat Jalan */}
@@ -333,7 +361,7 @@ export default function WarehouseStockInPage() {
                   required
                   value={receivedBy}
                   onChange={(e) => setReceivedBy(e.target.value)}
-                  placeholder="Nama staf gudang..."
+                  placeholder="Ketikan Nama Lengkap"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
                 />
               </div>
@@ -441,17 +469,14 @@ export default function WarehouseStockInPage() {
                     <label className="block font-bold text-slate-700 mb-1">
                       Pilih Produk Ritel
                     </label>
-                    <select
+                    <SearchableSelect
+                      options={productOptions}
                       value={selectedProductId}
-                      onChange={(e) => handleProductSelectChange(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-900 focus:bg-white focus:outline-none"
-                    >
-                      {products.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          [{p.sku}] {p.name} (Stok Saat Ini: {p.stock} {p.unit || "Pcs"})
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => handleProductSelectChange(val)}
+                      placeholder="Pilih Produk Ritel"
+                      searchPlaceholder="Cari SKU atau Nama (contoh: Indomie, SNK-002, Bimoli)..."
+                      emptyMessage="Produk tidak ditemukan"
+                    />
                   </div>
 
                   {/* Input Kuantitas & Harga Beli Baru */}
@@ -463,9 +488,10 @@ export default function WarehouseStockInPage() {
                       <input
                         type="number"
                         min="1"
+                        disabled={!selectedProductId}
                         value={inputQuantity}
                         onChange={(e) => setInputQuantity(Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
 
@@ -476,9 +502,10 @@ export default function WarehouseStockInPage() {
                       <input
                         type="number"
                         min="0"
+                        disabled={!selectedProductId}
                         value={inputPurchasePrice}
                         onChange={(e) => setInputPurchasePrice(Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
