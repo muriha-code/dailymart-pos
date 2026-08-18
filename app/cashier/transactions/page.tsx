@@ -461,7 +461,7 @@ export default function CashierTransactionsPage() {
   }, [grandTotal]);
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col bg-[#F8FAFC] text-[#0F172A] select-none font-sans">
+    <div className="flex-1 h-full w-full min-h-0 overflow-hidden flex flex-col bg-[#F8FAFC] text-[#0F172A] select-none font-sans">
       {/* ========================================================================= */}
       {/* 1. TOP NAVBAR HEADER (Clean Utility Bar)                                   */}
       {/* ========================================================================= */}

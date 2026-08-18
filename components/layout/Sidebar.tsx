@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { clientAuth } from "@/lib/firebase/client";
 import { AppUser, UserRole } from "@/types/auth.types";
+import { useSidebarContext } from "@/context/SidebarContext";
 
 /**
  * Generates 2-letter uppercase initials from display name or email.
@@ -35,9 +36,11 @@ interface MenuSection {
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { isCollapsed, toggleSidebar } = useSidebarContext();
 
   const [user, setUser] = useState<AppUser | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
 
   // Fetch session user info on mount
@@ -80,11 +83,9 @@ export default function Sidebar() {
     try {
       await fetch("/api/auth/session", { method: "DELETE" });
       await signOut(clientAuth);
-      router.push("/login");
-      router.refresh();
+      window.location.href = "/login";
     } catch (err) {
       console.error("Gagal melakukan logout:", err);
-    } finally {
       setIsLoggingOut(false);
     }
   };
@@ -237,131 +238,237 @@ export default function Sidebar() {
   const initials = getInitials(user?.displayName || user?.email);
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs">
-      
-      {/* ========================================== */}
-      {/* TOP BRANDING & LOGO */}
-      {/* ========================================== */}
-      <div>
-        <div className="p-5 border-b border-slate-100 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
-            D
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-1">
-              <span className="font-extrabold text-base text-slate-900 tracking-tight">DailyMart</span>
-              <span className="font-black text-base text-amber-600">POS</span>
+    <>
+      <aside
+        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs transition-all duration-300 ease-in-out ${
+          isCollapsed ? "w-20" : "w-64"
+        }`}
+      >
+        {/* ========================================== */}
+        {/* TOP BRANDING & LOGO + HAMBURGER TOGGLE */}
+        {/* ========================================== */}
+        <div>
+          <div className={`p-4 border-b border-slate-100 flex items-center ${
+            isCollapsed ? "justify-center flex-col gap-2" : "justify-between gap-3"
+          }`}>
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
+                D
+              </div>
+              {!isCollapsed && (
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1">
+                    <span className="font-extrabold text-base text-slate-900 tracking-tight">DailyMart</span>
+                    <span className="font-black text-base text-amber-600">POS</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block -mt-0.5">
+                    Smart Retail System
+                  </span>
+                </div>
+              )}
             </div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block -mt-0.5">
-              Smart Retail System
-            </span>
+
+            {/* Hamburger Collapse Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer shrink-0"
+              title={isCollapsed ? "Buka Sidebar (Expanded)" : "Kecilkan Sidebar (Collapsed)"}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isCollapsed ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                )}
+              </svg>
+            </button>
           </div>
+
+          {/* ========================================== */}
+          {/* DYNAMIC RBAC NAVIGATION MENU */}
+          {/* ========================================== */}
+          <nav className="p-3 space-y-5">
+            {activeMenuSections.map((section, idx) => (
+              <div key={section.sectionTitle} className="space-y-1.5">
+                {!isCollapsed ? (
+                  <h3 className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    {section.sectionTitle}
+                  </h3>
+                ) : (
+                  idx > 0 && <div className="h-px bg-slate-100 my-2"></div>
+                )}
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const active = isLinkActive(item.href);
+
+                    return (
+                      <Link
+                        key={item.href + item.title}
+                        href={item.href}
+                        title={item.title}
+                        className={`flex items-center text-xs transition-all ${
+                          isCollapsed
+                            ? `justify-center py-3 rounded-xl ${
+                                active
+                                  ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500"
+                                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium"
+                              }`
+                            : `gap-3 ${
+                                active
+                                  ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500 pl-3.5 pr-3 py-2.5 rounded-r-xl shadow-2xs"
+                                  : item.isQuickAccess
+                                  ? "text-slate-700 hover:bg-amber-50/50 hover:text-amber-900 font-medium px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50/50"
+                                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium px-4 py-2.5 rounded-xl"
+                              }`
+                        }`}
+                      >
+                        <span className={`${active ? "text-amber-600" : "text-slate-400"} shrink-0`}>
+                          {item.icon}
+                        </span>
+                        {!isCollapsed && <span className="truncate">{item.title}</span>}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </nav>
         </div>
 
         {/* ========================================== */}
-        {/* DYNAMIC RBAC NAVIGATION MENU */}
+        {/* FOOTER USER PROFILE & AVATAR */}
         {/* ========================================== */}
-        <nav className="p-3 space-y-6">
-          {activeMenuSections.map((section) => (
-            <div key={section.sectionTitle} className="space-y-1.5">
-              <h3 className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                {section.sectionTitle}
-              </h3>
-              <div className="space-y-1">
-                {section.items.map((item) => {
-                  const active = isLinkActive(item.href);
-
-                  return (
-                    <Link
-                      key={item.href + item.title}
-                      href={item.href}
-                      className={`flex items-center gap-3 text-xs transition-all ${
-                        active
-                          ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500 pl-3.5 pr-3 py-2.5 rounded-r-xl shadow-2xs"
-                          : item.isQuickAccess
-                          ? "text-slate-700 hover:bg-amber-50/50 hover:text-amber-900 font-medium px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50/50"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium px-4 py-2.5 rounded-xl"
-                      }`}
-                    >
-                      <span className={`${active ? "text-amber-600" : "text-slate-400"}`}>
-                        {item.icon}
-                      </span>
-                      <span className="truncate">{item.title}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+        <div className={`border-t border-slate-100 bg-slate-50/60 shrink-0 ${
+          isCollapsed ? "p-2 space-y-2 text-center" : "p-4 space-y-3"
+        }`}>
+          <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
+            {/* Avatar Container with Image or Initials Fallback */}
+            <div
+              className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-extrabold text-sm shadow-xs shrink-0 overflow-hidden border border-amber-300"
+              title={isCollapsed ? `${user?.displayName || "User"} (${userRole})` : undefined}
+            >
+              {user?.photoURL && !imageError ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName || "User"}
+                  className="w-full h-full object-cover"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <span>{initials}</span>
+              )}
             </div>
-          ))}
-        </nav>
-      </div>
 
-      {/* ========================================== */}
-      {/* FOOTER USER PROFILE & AVATAR */}
-      {/* ========================================== */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50/60 shrink-0 space-y-3">
-        <div className="flex items-center gap-3">
-          {/* Avatar Container with Image or Initials Fallback */}
-          <div className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-extrabold text-sm shadow-xs shrink-0 overflow-hidden border border-amber-300">
-            {user?.photoURL && !imageError ? (
-              <img
-                src={user.photoURL}
-                alt={user.displayName || "User"}
-                className="w-full h-full object-cover"
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <span>{initials}</span>
+            {/* User Name, Email, & Role Badge (Hidden when Collapsed) */}
+            {!isCollapsed && (
+              <div className="min-w-0 flex-1">
+                <h4 className="text-xs font-bold text-slate-900 truncate">
+                  {user?.displayName || "Pengguna POS"}
+                </h4>
+                <p className="text-[10px] text-slate-500 truncate">
+                  {user?.email || "user@dailymart.id"}
+                </p>
+                <div className="mt-1">
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                      userRole === "ADMIN"
+                        ? "bg-amber-100 text-amber-800 border border-amber-200"
+                        : userRole === "WAREHOUSE"
+                        ? "bg-blue-100 text-blue-800 border border-blue-200"
+                        : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                    }`}
+                  >
+                    {userRole}
+                  </span>
+                </div>
+              </div>
             )}
           </div>
 
-          {/* User Name, Email, & Role Badge */}
-          <div className="min-w-0 flex-1">
-            <h4 className="text-xs font-bold text-slate-900 truncate">
-              {user?.displayName || "Pengguna POS"}
-            </h4>
-            <p className="text-[10px] text-slate-500 truncate">
-              {user?.email || "user@dailymart.id"}
-            </p>
-            <div className="mt-1">
-              <span
-                className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
-                  userRole === "ADMIN"
-                    ? "bg-amber-100 text-amber-800 border border-amber-200"
-                    : userRole === "WAREHOUSE"
-                    ? "bg-blue-100 text-blue-800 border border-blue-200"
-                    : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                }`}
+          {/* Logout Action Button */}
+          <button
+            type="button"
+            onClick={() => setIsLogoutModalOpen(true)}
+            title={isCollapsed ? "Keluar Sesi (Logout)" : undefined}
+            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold text-xs border border-slate-200 hover:border-red-200 transition-all cursor-pointer group ${
+              isCollapsed ? "p-2.5" : "gap-2 px-3 py-2"
+            }`}
+          >
+            <svg
+              className="w-4 h-4 text-slate-400 group-hover:text-red-600 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+            {!isCollapsed && <span>Keluar Sesi (Logout)</span>}
+          </button>
+        </div>
+
+      </aside>
+
+      {/* ========================================== */}
+      {/* LOGOUT CONFIRMATION MODAL */}
+      {/* ========================================== */}
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+            {/* Warning Badge Icon */}
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-red-50 border border-red-100 text-red-600 flex items-center justify-center shrink-0">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+            </div>
+
+            {/* Title & Description */}
+            <div className="space-y-1">
+              <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">
+                Konfirmasi Keluar
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Sesi Anda akan diakhiri. Pastikan semua transaksi atau data barang telah tersimpan dengan benar sebelum keluar.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsLogoutModalOpen(false)}
+                disabled={isLoggingOut}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition-all cursor-pointer disabled:opacity-50"
               >
-                {userRole}
-              </span>
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                {isLoggingOut && (
+                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                )}
+                <span>{isLoggingOut ? "Mengeluarkan..." : "Ya, Keluar"}</span>
+              </button>
             </div>
           </div>
         </div>
-
-        {/* Logout Action Button */}
-        <button
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold text-xs border border-slate-200 hover:border-red-200 transition-all cursor-pointer disabled:opacity-50"
-        >
-          <svg
-            className={`w-4 h-4 ${isLoggingOut ? "animate-spin text-red-600" : "text-slate-400 group-hover:text-red-600"}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
-          <span>{isLoggingOut ? "Keluar..." : "Keluar Sesi (Logout)"}</span>
-        </button>
-      </div>
-
-    </aside>
+      )}
+    </>
   );
 }
