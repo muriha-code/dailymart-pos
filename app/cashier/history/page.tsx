@@ -106,16 +106,18 @@ export default function CashierHistoryPage() {
     loadTransactions();
   }, [loadTransactions]);
 
-  // Persentase Rekonsiliasi Tunai vs Non-Tunai
+  // Persentase Rekonsiliasi Tunai vs Non-Tunai dengan Safe Fallback
   const cashPercentage = useMemo(() => {
-    if (summary.totalRevenue === 0) return 0;
-    return Math.round((summary.cashTotal / summary.totalRevenue) * 100);
-  }, [summary.cashTotal, summary.totalRevenue]);
+    const total = (summary.cashTotal || 0) + (summary.nonCashTotal || 0);
+    if (!total || total === 0) return 0;
+    return Math.round((summary.cashTotal / total) * 100);
+  }, [summary.cashTotal, summary.nonCashTotal]);
 
   const nonCashPercentage = useMemo(() => {
-    if (summary.totalRevenue === 0) return 0;
+    const total = (summary.cashTotal || 0) + (summary.nonCashTotal || 0);
+    if (!total || total === 0) return 0;
     return 100 - cashPercentage;
-  }, [summary.totalRevenue, cashPercentage]);
+  }, [summary.cashTotal, summary.nonCashTotal, cashPercentage]);
 
   // Trigger Print Receipt
   const handlePrintReceipt = () => {
@@ -351,56 +353,67 @@ export default function CashierHistoryPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. MINI CASH RECONCILIATION BAR (SETORAN KAS AKHIR SHIFT)                 */}
+        {/* 3. REKONSILIASI SETORAN KAS SHIFT (MINI CASH RECONCILIATION BAR)           */}
         {/* ========================================================================= */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          {/* Header & Metric Summary Container - Anti Overflow Layout */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-3">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-800">
-                  💵 Cash Drawer Reconciliation Bar (Rekonsiliasi Setoran Kas Shift)
-                </span>
+                <span className="text-base">💵</span>
+                <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">
+                  Rekonsiliasi Setoran Kas Shift
+                </h2>
               </div>
-              <p className="text-xs text-slate-500">
-                Pembagian fisik uang tunai dalam laci kas vs penerimaan non-tunai (QRIS/Debit/Transfer).
+              <p className="text-xs text-slate-500 mt-0.5">
+                Pembagian fisik uang tunai dalam laci kas vs penerimaan non-tunai (QRIS / Debit / Transfer).
               </p>
             </div>
 
-            <div className="flex items-center gap-4 text-xs font-mono">
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" />
-                <span className="text-slate-600">Fisik Tunai:</span>
-                <span className="font-bold text-slate-900">{formatRupiah(summary.cashTotal)}</span>
+            {/* Indicator Badges */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs shrink-0">
+              <div className="flex items-center gap-2 bg-emerald-50/80 px-3 py-1.5 rounded-xl border border-emerald-100">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                <span className="text-slate-600 font-medium">Fisik Tunai:</span>
+                <span className="font-mono font-bold text-slate-900">{formatRupiah(summary.cashTotal)}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-blue-500 inline-block" />
-                <span className="text-slate-600">Digital / Non-Tunai:</span>
-                <span className="font-bold text-slate-900">{formatRupiah(summary.nonCashTotal)}</span>
+              <div className="flex items-center gap-2 bg-sky-50/80 px-3 py-1.5 rounded-xl border border-sky-100">
+                <span className="w-2.5 h-2.5 rounded-full bg-sky-500 shrink-0" />
+                <span className="text-slate-600 font-medium">Digital / Non-Tunai:</span>
+                <span className="font-mono font-bold text-slate-900">{formatRupiah(summary.nonCashTotal)}</span>
               </div>
             </div>
           </div>
 
-          {/* Visual Progress Ratio Bar */}
-          <div className="space-y-1">
-            <div className="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200">
+          {/* Pill Progress Bar Visualisation */}
+          <div className="space-y-1.5">
+            <div className="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200 p-0.5">
               <div
                 style={{ width: `${cashPercentage}%` }}
-                className="bg-emerald-500 h-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
+                className="bg-emerald-500 h-full rounded-l-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
                 title={`Tunai: ${cashPercentage}%`}
               >
                 {cashPercentage > 10 ? `${cashPercentage}%` : ""}
               </div>
               <div
                 style={{ width: `${nonCashPercentage}%` }}
-                className="bg-blue-500 h-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
+                className="bg-sky-500 h-full rounded-r-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
                 title={`Non-Tunai: ${nonCashPercentage}%`}
               >
                 {nonCashPercentage > 10 ? `${nonCashPercentage}%` : ""}
               </div>
             </div>
-            <div className="flex justify-between text-[11px] font-medium text-slate-400">
-              <span>Uang Fisik Laci (Cash): {cashPercentage}%</span>
-              <span>Uang Digital Bank/E-Wallet: {nonCashPercentage}%</span>
+
+            {/* Percentage Labels */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] font-semibold text-slate-500 gap-1 pt-0.5">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                Uang Fisik Laci (Tunai): <strong className="text-slate-800 font-mono">{cashPercentage}%</strong>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 inline-block" />
+                Uang Digital Bank/E-Wallet: <strong className="text-slate-800 font-mono">{nonCashPercentage}%</strong>
+              </span>
             </div>
           </div>
         </div>
