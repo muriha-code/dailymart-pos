@@ -15,7 +15,13 @@ export interface CashierHistoryData {
     uid: string;
     displayName: string;
     email: string;
+    role?: string;
   };
+  cashierList?: {
+    uid: string;
+    displayName: string;
+    email?: string;
+  }[];
 }
 
 export interface CashierHistoryResponse {
