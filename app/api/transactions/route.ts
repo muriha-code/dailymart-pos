@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase/admin";
+import { adminAuth, adminDb } from "@/lib/firebase/admin";
 import { CreateTransactionPayload, PaymentMethod } from "@/types/transaction.types";
 
 /**
@@ -53,7 +53,8 @@ export async function GET(req: NextRequest) {
       transactions = transactions.filter(
         (trx) =>
           trx.transactionNumber?.toLowerCase().includes(search) ||
-          trx.cashierId?.toLowerCase().includes(search)
+          trx.cashierId?.toLowerCase().includes(search) ||
+          trx.cashierName?.toLowerCase().includes(search)
       );
     }
 
@@ -86,8 +87,32 @@ export async function POST(req: NextRequest) {
       subtotal,
       discount,
       total,
-      cashierId,
+      cashierId: bodyCashierId,
+      cashierName: bodyCashierName,
     } = body;
+
+    // Resolving Stamped Cashier Identity from Session Cookie or Fallback Body Payload
+    let finalCashierId = bodyCashierId || "cashier_default";
+    let finalCashierName = bodyCashierName || "Kasir POS";
+
+    const sessionCookie = req.cookies.get("session")?.value;
+    if (sessionCookie) {
+      try {
+        const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
+        finalCashierId = decodedClaims.uid;
+        
+        // Fetch User Display Name from Firestore users/{uid}
+        const userDoc = await adminDb.collection("users").doc(decodedClaims.uid).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          finalCashierName = userData?.displayName || decodedClaims.name || decodedClaims.email?.split("@")[0] || "Kasir POS";
+        } else if (decodedClaims.name || decodedClaims.email) {
+          finalCashierName = decodedClaims.name || decodedClaims.email?.split("@")[0] || "Kasir POS";
+        }
+      } catch (authErr) {
+        console.warn("[API /api/transactions POST] Session cookie verify warning:", authErr);
+      }
+    }
 
     // 1. Validasi Payload Dasar
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -183,7 +208,8 @@ export async function POST(req: NextRequest) {
       // Formatting data transaksi dengan snapshot harga & subtotal
       const newTransactionData = {
         transactionNumber,
-        cashierId: String(cashierId || "cashier_default"),
+        cashierId: String(finalCashierId),
+        cashierName: String(finalCashierName),
         items: items.map((item) => ({
           productId: String(item.productId),
           productName: String(item.productName ?? ""),
@@ -225,7 +251,7 @@ export async function POST(req: NextRequest) {
           type: "SALE" as const,
           quantity: -Math.abs(Number(item.quantity)), // Nilai negatif untuk penjualan
           referenceId: transactionRef.id,
-          performedBy: String(cashierId || "cashier_default"),
+          performedBy: String(finalCashierId),
           createdAt: now,
         });
       }

@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Transaction } from "@/types/transaction.types";
-import { transactionService } from "@/services/transaction.service";
+import { CashierSummary } from "@/types/cashierHistory.types";
+import { cashierHistoryService } from "@/services/cashierHistory.service";
 
 // Helper Format Rupiah
 const formatRupiah = (amount: number): string => {
@@ -24,73 +25,104 @@ const formatDate = (dateInput: Date | string): string => {
   });
 };
 
+// Helper untuk format tanggal YYYY-MM-DD lokal
+const getTodayDateString = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function CashierHistoryPage() {
-  // State Utama Data Transaksi
+  // State Utama Data Transaksi & Summary dari Backend API
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [summary, setSummary] = useState<CashierSummary>({
+    totalTransactions: 0,
+    totalRevenue: 0,
+    averageBasketSize: 0,
+    cashTotal: 0,
+    nonCashTotal: 0,
+  });
+  const [cashierInfo, setCashierInfo] = useState<{
+    uid: string;
+    displayName: string;
+    email: string;
+    role?: string;
+  } | null>(null);
+  const [cashierList, setCashierList] = useState<{ uid: string; displayName: string; email?: string }[]>([]);
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Filter States
+  const [selectedDate, setSelectedDate] = useState<string>(getTodayDateString());
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("ALL");
+  const [selectedCashierFilter, setSelectedCashierFilter] = useState<string>("ALL");
 
   // Modal Detail & Struk State
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
-  // Load transactions from service layer
+  // Load transaction history via service layer
   const loadTransactions = useCallback(async () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const data = await transactionService.getTransactions({
+      const responseData = await cashierHistoryService.getCashierHistory({
+        date: selectedDate,
+        method: selectedPaymentMethod !== "ALL" ? selectedPaymentMethod as any : undefined,
         search: searchQuery,
+        cashierId: selectedCashierFilter !== "ALL" ? selectedCashierFilter : undefined,
       });
-      setTransactions(data);
+
+      setTransactions(responseData.transactions || []);
+      setSummary(
+        responseData.summary || {
+          totalTransactions: 0,
+          totalRevenue: 0,
+          averageBasketSize: 0,
+          cashTotal: 0,
+          nonCashTotal: 0,
+        }
+      );
+      if (responseData.cashierInfo) {
+        setCashierInfo(responseData.cashierInfo);
+      }
+      if (responseData.cashierList) {
+        setCashierList(responseData.cashierList);
+      }
     } catch (err: any) {
-      console.error("Gagal memuat riwayat transaksi:", err);
+      console.error("Gagal memuat riwayat transaksi kasir:", err);
       setFetchError(
         err.message || "Gagal terhubung ke server. Silakan coba lagi."
       );
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery]);
+  }, [selectedDate, selectedPaymentMethod, searchQuery, selectedCashierFilter]);
 
   useEffect(() => {
     loadTransactions();
   }, [loadTransactions]);
 
-  // Quick Metrics Computation
-  const totalTransactionsCount = transactions.length;
+  // Persentase Rekonsiliasi Tunai vs Non-Tunai
+  const cashPercentage = useMemo(() => {
+    if (summary.totalRevenue === 0) return 0;
+    return Math.round((summary.cashTotal / summary.totalRevenue) * 100);
+  }, [summary.cashTotal, summary.totalRevenue]);
 
-  const totalRevenue = useMemo(() => {
-    return transactions.reduce((acc, t) => acc + (t.total || 0), 0);
-  }, [transactions]);
-
-  const averageBasketSize = useMemo(() => {
-    if (totalTransactionsCount === 0) return 0;
-    return Math.round(totalRevenue / totalTransactionsCount);
-  }, [totalRevenue, totalTransactionsCount]);
-
-  // Filtered Transactions
-  const filteredTransactions = useMemo(() => {
-    return transactions.filter((t) => {
-      const matchesSearch =
-        !searchQuery.trim() ||
-        t.transactionNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.cashierId.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesMethod =
-        selectedPaymentMethod === "ALL" || t.paymentMethod === selectedPaymentMethod;
-
-      return matchesSearch && matchesMethod;
-    });
-  }, [transactions, searchQuery, selectedPaymentMethod]);
+  const nonCashPercentage = useMemo(() => {
+    if (summary.totalRevenue === 0) return 0;
+    return 100 - cashPercentage;
+  }, [summary.totalRevenue, cashPercentage]);
 
   // Trigger Print Receipt
   const handlePrintReceipt = () => {
     window.print();
   };
+
+  const isAdmin = cashierInfo?.role === "ADMIN";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] p-4 sm:p-6 lg:p-8 font-sans">
@@ -166,46 +198,73 @@ export default function CashierHistoryPage() {
         {/* ========================================================================= */}
         {/* 1. PAGE HEADER                                                            */}
         {/* ========================================================================= */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[11px] uppercase tracking-wider">
-                Kasir POS
+              <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-extrabold text-[11px] uppercase tracking-wider">
+                {isAdmin ? "Admin Overview" : "Kasir POS"}
               </span>
-              <span className="text-xs text-slate-400">• Histori</span>
+              <span className="text-xs text-slate-400">• Histori Sesi Kasir</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
-              Riwayat Transaksi Penjualan
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Daftar seluruh transaksi kasir, detail item belanja, status pembayaran, dan cetak ulang struk thermal.
+
+            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+                {isAdmin ? "Riwayat & Ringkasan Penjualan Kasir" : "Riwayat Transaksi Saya"}
+              </h1>
+              
+              {/* Badge Kasir Aktif */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>
+                  {cashierInfo?.displayName || "Memuat Kasir..."}
+                  {cashierInfo?.email ? ` (${cashierInfo.email})` : ""}
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Daftar transaksi penjualan terisolasi kasir, analisis omset harian, dan cetak ulang struk thermal.
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={loadTransactions}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shrink-0"
-          >
-            <svg
-              className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Date Picker Filter */}
+            <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
+              <span className="text-xs font-bold text-slate-500 pl-2">Tanggal:</span>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"
               />
-            </svg>
-            <span>Refresh Data</span>
-          </button>
+            </div>
+
+            {/* Refresh Button */}
+            <button
+              type="button"
+              onClick={loadTransactions}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shrink-0"
+            >
+              <svg
+                className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 2. QUICK METRICS CARDS                                                    */}
+        {/* 2. PERSONALIZED KPI CARDS                                                 */}
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Card 1: Total Transaksi */}
@@ -215,7 +274,7 @@ export default function CashierHistoryPage() {
                 Total Transaksi
               </span>
               <span className="text-2xl font-black text-slate-900 mt-1 block font-mono">
-                {totalTransactionsCount}{" "}
+                {summary.totalTransactions}{" "}
                 <span className="text-xs font-normal text-slate-400">struk</span>
               </span>
             </div>
@@ -243,7 +302,7 @@ export default function CashierHistoryPage() {
                 Total Omset Penjualan
               </span>
               <span className="text-xl font-black text-slate-900 mt-1 block font-mono">
-                {formatRupiah(totalRevenue)}
+                {formatRupiah(summary.totalRevenue)}
               </span>
             </div>
             <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
@@ -270,7 +329,7 @@ export default function CashierHistoryPage() {
                 Rata-rata / Basket Size
               </span>
               <span className="text-xl font-black text-slate-900 mt-1 block font-mono">
-                {formatRupiah(averageBasketSize)}
+                {formatRupiah(summary.averageBasketSize)}
               </span>
             </div>
             <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
@@ -292,7 +351,62 @@ export default function CashierHistoryPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. TOOLBAR SEARCH & FILTER                                                */}
+        {/* 3. MINI CASH RECONCILIATION BAR (SETORAN KAS AKHIR SHIFT)                 */}
+        {/* ========================================================================= */}
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                  💵 Cash Drawer Reconciliation Bar (Rekonsiliasi Setoran Kas Shift)
+                </span>
+              </div>
+              <p className="text-xs text-slate-500">
+                Pembagian fisik uang tunai dalam laci kas vs penerimaan non-tunai (QRIS/Debit/Transfer).
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4 text-xs font-mono">
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" />
+                <span className="text-slate-600">Fisik Tunai:</span>
+                <span className="font-bold text-slate-900">{formatRupiah(summary.cashTotal)}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-blue-500 inline-block" />
+                <span className="text-slate-600">Digital / Non-Tunai:</span>
+                <span className="font-bold text-slate-900">{formatRupiah(summary.nonCashTotal)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Visual Progress Ratio Bar */}
+          <div className="space-y-1">
+            <div className="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200">
+              <div
+                style={{ width: `${cashPercentage}%` }}
+                className="bg-emerald-500 h-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
+                title={`Tunai: ${cashPercentage}%`}
+              >
+                {cashPercentage > 10 ? `${cashPercentage}%` : ""}
+              </div>
+              <div
+                style={{ width: `${nonCashPercentage}%` }}
+                className="bg-blue-500 h-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
+                title={`Non-Tunai: ${nonCashPercentage}%`}
+              >
+                {nonCashPercentage > 10 ? `${nonCashPercentage}%` : ""}
+              </div>
+            </div>
+            <div className="flex justify-between text-[11px] font-medium text-slate-400">
+              <span>Uang Fisik Laci (Cash): {cashPercentage}%</span>
+              <span>Uang Digital Bank/E-Wallet: {nonCashPercentage}%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 4. TOOLBAR SEARCH & FILTER                                                */}
         {/* ========================================================================= */}
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           {/* Search Input Bar */}
@@ -314,7 +428,7 @@ export default function CashierHistoryPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari berdasarkan Nomor Invoice (TRX-...) atau ID Kasir..."
+              placeholder="Cari Nomor Invoice (TRX-...), Nama Kasir, atau Item Produk..."
               className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none transition-all"
             />
             {searchQuery && (
@@ -328,34 +442,57 @@ export default function CashierHistoryPage() {
             )}
           </div>
 
-          {/* Payment Method Filter Dropdown */}
-          <div className="flex items-center gap-2 min-w-[200px]">
-            <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">
-              Metode:
-            </label>
-            <select
-              value={selectedPaymentMethod}
-              onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
-            >
-              <option value="ALL">Semua Metode</option>
-              <option value="CASH">Tunai (CASH)</option>
-              <option value="QRIS">QRIS</option>
-              <option value="DEBIT">Kartu Debit</option>
-              <option value="CREDIT">Kartu Kredit</option>
-              <option value="TRANSFER">Transfer Bank</option>
-            </select>
+          <div className="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+            {/* Admin Cashier Filter Dropdown (Role ADMIN only) */}
+            {isAdmin && (
+              <div className="flex items-center gap-2 min-w-[180px]">
+                <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">
+                  Kasir:
+                </label>
+                <select
+                  value={selectedCashierFilter}
+                  onChange={(e) => setSelectedCashierFilter(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
+                >
+                  <option value="ALL">Semua Kasir</option>
+                  {cashierList.map((kasir) => (
+                    <option key={kasir.uid} value={kasir.uid}>
+                      {kasir.displayName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Payment Method Filter Dropdown */}
+            <div className="flex items-center gap-2 min-w-[180px]">
+              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">
+                Metode:
+              </label>
+              <select
+                value={selectedPaymentMethod}
+                onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
+              >
+                <option value="ALL">Semua Metode</option>
+                <option value="CASH">Tunai (CASH)</option>
+                <option value="QRIS">QRIS</option>
+                <option value="DEBIT">Kartu Debit</option>
+                <option value="CREDIT">Kartu Kredit</option>
+                <option value="TRANSFER">Transfer Bank</option>
+              </select>
+            </div>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 4. TABEL RIWAYAT TRANSAKSI                                                */}
+        {/* 5. TABEL RIWAYAT TRANSAKSI                                                */}
         {/* ========================================================================= */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center text-slate-500 space-y-3">
               <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-medium">Memuat riwayat transaksi...</p>
+              <p className="text-xs font-medium">Memuat riwayat transaksi kasir...</p>
             </div>
           ) : fetchError ? (
             <div className="p-12 text-center text-red-600 space-y-3">
@@ -368,13 +505,13 @@ export default function CashierHistoryPage() {
                 Coba Lagi
               </button>
             </div>
-          ) : filteredTransactions.length === 0 ? (
+          ) : transactions.length === 0 ? (
             <div className="p-12 text-center text-slate-500 space-y-2">
               <p className="text-sm font-bold text-slate-800">
-                Belum ada data transaksi.
+                Belum ada transaksi pada tanggal {selectedDate}.
               </p>
               <p className="text-xs text-slate-400">
-                Transaksi penjualan yang dilakukan melalui mesin kasir akan tercatat di sini.
+                Transaksi kasir yang diproses pada tanggal ini akan tercatat di sini.
               </p>
             </div>
           ) : (
@@ -392,7 +529,7 @@ export default function CashierHistoryPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 text-xs text-slate-800">
-                  {filteredTransactions.map((trx) => {
+                  {transactions.map((trx) => {
                     const totalQty = trx.items.reduce((sum, i) => sum + i.quantity, 0);
                     const itemNames = trx.items.map((i) => i.productName).join(", ");
 
@@ -414,7 +551,7 @@ export default function CashierHistoryPage() {
                         {/* Kasir */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
                           <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold text-[11px]">
-                            {trx.cashierId || "Kasir Utama"}
+                            {trx.cashierName || trx.cashierId || "Kasir POS"}
                           </span>
                         </td>
 
@@ -492,18 +629,18 @@ export default function CashierHistoryPage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 5. MODAL DETAIL & REPRINT STRUK THERMAL (3 Regi Wrapper: Header, Body, Footer) */}
+      {/* 6. MODAL DETAIL & REPRINT STRUK THERMAL                                   */}
       {/* ========================================================================= */}
       {selectedTransaction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 print-backdrop">
-          {/* Modal Card Wrapper: Max Height 85vh dengan Layout Flex Col */}
+          {/* Modal Card Wrapper */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-[380px] max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 print-modal-card">
             
-            {/* REGION 1: MODAL HEADER (Sticky / Fixed Top - Disembunyikan saat print) */}
+            {/* REGION 1: MODAL HEADER */}
             <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0 no-print">
               <div>
                 <h3 className="text-sm font-extrabold text-slate-900">
-                  Struk Pembayaran
+                  Struk Pembayaran Kasir
                 </h3>
                 <p className="text-[11px] text-slate-500 font-mono">
                   {selectedTransaction.transactionNumber}
@@ -519,9 +656,8 @@ export default function CashierHistoryPage() {
               </button>
             </div>
 
-            {/* REGION 2: MODAL BODY (Scrollable Middle - scroll mandiri jika item panjang) */}
+            {/* REGION 2: MODAL BODY */}
             <div className="flex-1 overflow-y-auto p-4 bg-slate-200/70 flex justify-center print-body-container">
-              {/* Physical Receipt Card dengan id printable-receipt */}
               <div
                 id="printable-receipt"
                 className="bg-white p-4 rounded-md border border-slate-300 shadow-md w-[300px] font-mono text-[11px] text-slate-900 leading-tight my-auto"
@@ -554,7 +690,7 @@ export default function CashierHistoryPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Kasir:</span>
-                    <span>{selectedTransaction.cashierId || "Kasir 1"}</span>
+                    <span>{selectedTransaction.cashierName || selectedTransaction.cashierId || "Kasir POS"}</span>
                   </div>
                 </div>
 
@@ -634,7 +770,7 @@ export default function CashierHistoryPage() {
               </div>
             </div>
 
-            {/* REGION 3: MODAL FOOTER (Sticky / Fixed Bottom - Disembunyikan saat print) */}
+            {/* REGION 3: MODAL FOOTER */}
             <div className="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-2.5 shrink-0 no-print">
               <button
                 type="button"

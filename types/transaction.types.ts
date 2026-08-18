@@ -15,6 +15,7 @@ export interface Transaction {
   id?: string;
   transactionNumber: string;
   cashierId: string;
+  cashierName?: string;
   items: TransactionItem[];
   subtotal: number;
   discount: number;
@@ -33,7 +34,8 @@ export interface CreateTransactionPayload {
   subtotal: number;
   discount: number;
   total: number;
-  cashierId: string;
+  cashierId?: string;
+  cashierName?: string;
 }
 
 export interface TransactionApiResponse<T> {

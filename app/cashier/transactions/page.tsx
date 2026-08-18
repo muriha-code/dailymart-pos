@@ -61,11 +61,45 @@ export default function CashierTransactionsPage() {
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
+  // State Kasir Aktif dari Autentikasi Sesi
+  const [cashierUser, setCashierUser] = useState<{
+    uid: string;
+    displayName: string;
+    role: string;
+    initials: string;
+  } | null>(null);
+
   // State Cart & Filter
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  // Fetch session cashier user info on mount
+  useEffect(() => {
+    async function fetchSessionUser() {
+      try {
+        const res = await fetch("/api/auth/session", { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            const name = json.data.displayName || json.data.email?.split("@")[0] || "Kasir POS";
+            const parts = name.trim().split(/\s+/);
+            const initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : name.substring(0, 2).toUpperCase();
+            setCashierUser({
+              uid: json.data.uid,
+              displayName: name,
+              role: json.data.role || "CASHIER",
+              initials,
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("Gagal memuat sesi kasir aktif:", err);
+      }
+    }
+    fetchSessionUser();
+  }, []);
 
   // State Modal Bayar
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
@@ -326,7 +360,8 @@ export default function CashierTransactionsPage() {
         subtotal: subtotalCart,
         discount: totalDiscountCart,
         total: grandTotal,
-        cashierId: "Ksr-01",
+        cashierId: cashierUser?.uid,
+        cashierName: cashierUser?.displayName,
       };
 
       // 2. Eksekusi request API via transactionService
@@ -486,12 +521,14 @@ export default function CashierTransactionsPage() {
 
           {/* Cashier Info */}
           <div className="hidden sm:flex items-center gap-2 text-xs text-slate-600">
-            <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700">
-              AP
+            <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-[10px]">
+              {cashierUser?.initials || "AP"}
             </div>
             <div>
-              <span className="font-semibold text-slate-900">Ahmad Pratama</span>
-              <span className="text-slate-400 ml-1.5">• Shift Pagi (Ksr-01)</span>
+              <span className="font-semibold text-slate-900">
+                {cashierUser?.displayName || "Ahmad Pratama"}
+              </span>
+              <span className="text-slate-400 ml-1.5">• ({cashierUser?.role || "Ksr-01"})</span>
             </div>
           </div>
         </div>
