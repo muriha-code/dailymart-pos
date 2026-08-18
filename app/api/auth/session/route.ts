@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
           displayName,
           role,
           isActive: userData.isActive ?? true,
+          photoURL: userData.photoURL || null,
         },
       },
       { status: 200 }
@@ -189,6 +190,7 @@ export async function GET(req: NextRequest) {
         displayName: userData.displayName,
         role: userData.role,
         isActive: userData.isActive,
+        photoURL: userData.photoURL || null,
       },
     });
   } catch (error) {

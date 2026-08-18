@@ -6,6 +6,7 @@ export interface AppUser {
   displayName: string;
   role: UserRole;
   isActive: boolean;
+  photoURL?: string;
   createdAt?: string | Date;
 }
 

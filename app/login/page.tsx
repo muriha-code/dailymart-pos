@@ -7,7 +7,7 @@ import { clientAuth } from '@/lib/firebase/client';
 import { UserRole } from '@/types/auth.types';
 
 const ROLE_REDIRECT_MAP: Record<UserRole, string> = {
-  ADMIN: '/admin/products',
+  ADMIN: '/admin/dashboard',
   CASHIER: '/cashier/transactions',
   WAREHOUSE: '/warehouse/stock-in',
 };
