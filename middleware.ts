@@ -3,7 +3,7 @@ import { UserRole } from './types/auth.types';
 
 // Home base default route per user role
 const ROLE_HOME_MAP: Record<UserRole, string> = {
-  ADMIN: '/admin/products',
+  ADMIN: '/admin/dashboard',
   CASHIER: '/cashier/transactions',
   WAREHOUSE: '/warehouse/stock-in',
 };
