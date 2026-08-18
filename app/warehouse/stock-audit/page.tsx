@@ -5,6 +5,7 @@ import { Product } from "@/types/product.types";
 import { StockAuditRecord, AuditReason } from "@/types/stockAudit.types";
 import { productService } from "@/services/product.service";
 import { stockAuditService } from "@/services/stockAudit.service";
+import { getThisWeekDateRange, formatIndonesianDate } from "@/lib/utils/date";
 
 // Helper Format Date Time
 const formatDate = (dateInput: Date | string): string => {
@@ -19,15 +20,6 @@ const formatDate = (dateInput: Date | string): string => {
     hour: "2-digit",
     minute: "2-digit",
   });
-};
-
-// Helper format tanggal YYYY-MM-DD
-const getTodayDateString = (): string => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
 };
 
 const AUDIT_REASONS: AuditReason[] = [
@@ -66,6 +58,46 @@ export default function StockAuditPage() {
 
   // Product pencarian di dalam modal
   const [productSearchModal, setProductSearchModal] = useState<string>("");
+
+  // ==========================================
+  // 1. WEEKLY CYCLE DATE RANGE & AUDIT SET
+  // ==========================================
+  const { startOfWeek, endOfWeek } = useMemo(() => getThisWeekDateRange(), []);
+
+  // Map product IDs / SKUs audited during current week cycle
+  const auditedProductIdsThisWeek = useMemo(() => {
+    const set = new Set<string>();
+    auditLogs.forEach((log) => {
+      const logDate = new Date(log.createdAt);
+      if (logDate >= startOfWeek && logDate <= endOfWeek) {
+        if (log.productId) set.add(log.productId);
+        if (log.sku) set.add(log.sku);
+      }
+    });
+    return set;
+  }, [auditLogs, startOfWeek, endOfWeek]);
+
+  // Total Products Count & Weekly Audit Progress
+  const totalProductsCount = products.length;
+
+  const weeklyAuditedCount = useMemo(() => {
+    return products.filter((p) => {
+      const pId = p.id || p.sku;
+      return (
+        auditedProductIdsThisWeek.has(pId) ||
+        (p.id && auditedProductIdsThisWeek.has(p.id)) ||
+        (p.sku && auditedProductIdsThisWeek.has(p.sku))
+      );
+    }).length;
+  }, [products, auditedProductIdsThisWeek]);
+
+  const weeklyProgressPercentage = useMemo(() => {
+    if (totalProductsCount === 0) return 0;
+    return Math.min(
+      100,
+      Math.round((weeklyAuditedCount / totalProductsCount) * 100)
+    );
+  }, [weeklyAuditedCount, totalProductsCount]);
 
   // Load Products for Selection Dropdown
   const loadProducts = useCallback(async () => {
@@ -112,6 +144,15 @@ export default function StockAuditPage() {
   const selectedProduct = useMemo(() => {
     return products.find((p) => (p.id || p.sku) === selectedProductId) || null;
   }, [products, selectedProductId]);
+
+  const isSelectedProductAuditedThisWeek = useMemo(() => {
+    if (!selectedProduct) return false;
+    const pId = selectedProduct.id || selectedProduct.sku;
+    const matchId = Boolean(selectedProduct.id && auditedProductIdsThisWeek.has(selectedProduct.id));
+    const matchSku = Boolean(selectedProduct.sku && auditedProductIdsThisWeek.has(selectedProduct.sku));
+    const matchPId = Boolean(pId && auditedProductIdsThisWeek.has(pId));
+    return matchId || matchSku || matchPId;
+  }, [selectedProduct, auditedProductIdsThisWeek]);
 
   // Dynamic system stock & physical stock calculation
   const systemStock = selectedProduct ? Number(selectedProduct.stock ?? 0) : 0;
@@ -182,6 +223,11 @@ export default function StockAuditPage() {
     e.preventDefault();
     if (!selectedProduct) {
       setSubmitError("Harap pilih produk yang akan diverifikasi!");
+      return;
+    }
+
+    if (isSelectedProductAuditedThisWeek) {
+      setSubmitError("Produk ini sudah diverifikasi pada minggu berjalan!");
       return;
     }
 
@@ -265,7 +311,63 @@ export default function StockAuditPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 2. KPI METRICS CARDS                                                      */}
+        {/* 2. WEEKLY STOCK AUDIT CYCLE PROGRESS CARD                                 */}
+        {/* ========================================================================= */}
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-base">📅</span>
+                <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">
+                  Siklus Audit Mingguan (Weekly Stock Audit Cycle)
+                </h2>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Target verifikasi fisik seluruh SKU produk toko pada periode minggu berjalan.
+              </p>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 shrink-0">
+              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>
+                {formatIndonesianDate(startOfWeek)} – {formatIndonesianDate(endOfWeek)}
+              </span>
+            </div>
+          </div>
+
+          {/* Progress Bar & Indicators */}
+          <div className="space-y-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs font-semibold gap-2">
+              <div className="flex flex-wrap items-center gap-4 text-slate-600">
+                <span>Total SKU Toko: <strong className="font-mono text-slate-900">{totalProductsCount}</strong> produk</span>
+                <span className="text-slate-300">•</span>
+                <span>Telah Diverifikasi Minggu Ini: <strong className="font-mono text-emerald-700">{weeklyAuditedCount}</strong> produk</span>
+                <span className="text-slate-300">•</span>
+                <span>Sisa Belum Diaudit: <strong className="font-mono text-amber-700">{Math.max(0, totalProductsCount - weeklyAuditedCount)}</strong> produk</span>
+              </div>
+              <div className="text-right">
+                <span className="text-slate-500">Progres Mingguan: </span>
+                <span className="font-mono font-black text-sm text-emerald-600">{weeklyProgressPercentage}%</span>
+              </div>
+            </div>
+
+            {/* Pill Progress Bar */}
+            <div className="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200 p-0.5">
+              <div
+                style={{ width: `${weeklyProgressPercentage}%` }}
+                className="bg-emerald-500 h-full rounded-full transition-all duration-500 flex items-center justify-center text-[9px] font-black text-white"
+                title={`Progres: ${weeklyProgressPercentage}%`}
+              >
+                {weeklyProgressPercentage > 10 ? `${weeklyProgressPercentage}%` : ""}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 3. KPI METRICS CARDS                                                      */}
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Card 1: Total Verifikasi */}
@@ -354,7 +456,7 @@ export default function StockAuditPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. TOOLBAR SEARCH & FILTER                                                */}
+        {/* 4. TOOLBAR SEARCH & FILTER                                                */}
         {/* ========================================================================= */}
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Search Bar */}
@@ -433,7 +535,7 @@ export default function StockAuditPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 4. TABEL RIWAYAT AUDIT STOK                                                */}
+        {/* 5. TABEL RIWAYAT AUDIT STOK                                                */}
         {/* ========================================================================= */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           {isLoadingLogs ? (
@@ -562,7 +664,7 @@ export default function StockAuditPage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 5. FORMULIR INPUT OPNAME (QUICK AUDIT MODAL)                              */}
+      {/* 6. FORMULIR INPUT OPNAME (QUICK AUDIT MODAL)                              */}
       {/* ========================================================================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fade-in">
@@ -625,23 +727,45 @@ export default function StockAuditPage() {
                   className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
                 >
                   <option value="">-- Pilih Produk --</option>
-                  {modalFilteredProducts.map((p) => (
-                    <option key={p.id || p.sku} value={p.id || p.sku}>
-                      {p.name} (SKU: {p.sku} | Stok Sistem: {p.stock} {p.unit})
-                    </option>
-                  ))}
+                  {modalFilteredProducts.map((p) => {
+                    const pId = p.id || p.sku;
+                    const isAudited = Boolean(
+                      auditedProductIdsThisWeek.has(pId) ||
+                      (p.id && auditedProductIdsThisWeek.has(p.id)) ||
+                      (p.sku && auditedProductIdsThisWeek.has(p.sku))
+                    );
+
+                    return (
+                      <option
+                        key={pId}
+                        value={pId}
+                        disabled={isAudited}
+                        className={isAudited ? "text-slate-400 bg-slate-100 font-normal" : "text-slate-900 font-bold"}
+                      >
+                        {p.name} (SKU: {p.sku} | Stok: {p.stock} {p.unit})
+                        {isAudited ? " [✓ Sudah Diaudit Minggu Ini]" : ""}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
-              {/* 2. Kartu Info Produk Terpilih */}
+              {/* 2. Kartu Info Produk Terpilih & Status Audit Minggu Ini */}
               {selectedProduct && (
                 <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-extrabold text-sm text-slate-900">
-                        {selectedProduct.name}
-                      </h4>
-                      <p className="text-xs text-slate-500 font-mono">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-extrabold text-sm text-slate-900">
+                          {selectedProduct.name}
+                        </h4>
+                        {isSelectedProductAuditedThisWeek && (
+                          <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                            ✓ Sudah Diaudit
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 font-mono mt-0.5">
                         SKU: {selectedProduct.sku} • {selectedProduct.categoryName || "Umum"}
                       </p>
                     </div>
@@ -654,6 +778,15 @@ export default function StockAuditPage() {
                       </span>
                     </div>
                   </div>
+
+                  {isSelectedProductAuditedThisWeek && (
+                    <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 font-bold flex items-center gap-2">
+                      <span>⚠️</span>
+                      <span>
+                        Produk ini telah diverifikasi pada siklus minggu berjalan. Pemilihan produk ini dikunci untuk mencegah duplikasi opname.
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -667,7 +800,7 @@ export default function StockAuditPage() {
                   <button
                     type="button"
                     onClick={() => handleAdjustQuantity(-1)}
-                    disabled={!selectedProduct || numericPhysicalStock <= 0}
+                    disabled={!selectedProduct || numericPhysicalStock <= 0 || isSelectedProductAuditedThisWeek}
                     className="w-10 h-10 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-base flex items-center justify-center cursor-pointer disabled:opacity-40"
                   >
                     -
@@ -677,6 +810,7 @@ export default function StockAuditPage() {
                     type="number"
                     min="0"
                     value={physicalStockInput}
+                    disabled={isSelectedProductAuditedThisWeek}
                     onChange={(e) => {
                       const val = e.target.value;
                       setPhysicalStockInput(val);
@@ -692,13 +826,13 @@ export default function StockAuditPage() {
                     }}
                     placeholder="Masukkan jumlah fisik..."
                     required
-                    className="flex-1 px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-base font-black font-mono text-center text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    className="flex-1 px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-base font-black font-mono text-center text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:bg-slate-100 disabled:opacity-60"
                   />
 
                   <button
                     type="button"
                     onClick={() => handleAdjustQuantity(1)}
-                    disabled={!selectedProduct}
+                    disabled={!selectedProduct || isSelectedProductAuditedThisWeek}
                     className="w-10 h-10 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-base flex items-center justify-center cursor-pointer disabled:opacity-40"
                   >
                     +
@@ -741,8 +875,9 @@ export default function StockAuditPage() {
                 </label>
                 <select
                   value={reasonInput}
+                  disabled={isSelectedProductAuditedThisWeek}
                   onChange={(e) => setReasonInput(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:bg-slate-100 disabled:opacity-60"
                 >
                   {AUDIT_REASONS.map((r) => (
                     <option key={r} value={r}>
@@ -760,9 +895,10 @@ export default function StockAuditPage() {
                 <textarea
                   rows={2}
                   value={notesInput}
+                  disabled={isSelectedProductAuditedThisWeek}
                   onChange={(e) => setNotesInput(e.target.value)}
                   placeholder="Keterangan kondisi fisik barang, lokasi rak, dll..."
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 disabled:bg-slate-100 disabled:opacity-60"
                 />
               </div>
 
@@ -779,7 +915,7 @@ export default function StockAuditPage() {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting || !selectedProduct}
+                  disabled={isSubmitting || !selectedProduct || isSelectedProductAuditedThisWeek}
                   className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSubmitting && (
