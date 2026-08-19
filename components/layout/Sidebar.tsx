@@ -189,6 +189,16 @@ export default function Sidebar() {
             </svg>
           ),
         },
+        {
+          title: "Peringatan Stok Minimum",
+          href: "/warehouse/stock-alerts",
+          isQuickAccess: true,
+          icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          ),
+        },
       ],
     },
   ];
@@ -253,6 +263,15 @@ export default function Sidebar() {
           ),
         },
         {
+          title: "Peringatan Stok Minimum",
+          href: "/warehouse/stock-alerts",
+          icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          ),
+        },
+        {
           title: "Kartu Stok & Mutasi",
           href: "/warehouse/inventory",
           icon: (
@@ -270,25 +289,23 @@ export default function Sidebar() {
     userRole === "ADMIN"
       ? adminSections
       : userRole === "WAREHOUSE"
-      ? warehouseSections
-      : cashierSections;
+        ? warehouseSections
+        : cashierSections;
 
   const initials = getInitials(user?.displayName || user?.email);
 
   return (
     <>
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs transition-all duration-300 ease-in-out ${
-          isCollapsed ? "w-20" : "w-64"
-        }`}
+        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs transition-all duration-300 ease-in-out ${isCollapsed ? "w-20" : "w-64"
+          }`}
       >
         {/* ========================================== */}
         {/* TOP BRANDING & LOGO + HAMBURGER TOGGLE */}
         {/* ========================================== */}
         <div>
-          <div className={`p-4 border-b border-slate-100 flex items-center ${
-            isCollapsed ? "justify-center flex-col gap-2" : "justify-between gap-3"
-          }`}>
+          <div className={`p-4 border-b border-slate-100 flex items-center ${isCollapsed ? "justify-center flex-col gap-2" : "justify-between gap-3"
+            }`}>
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
                 D
@@ -345,21 +362,18 @@ export default function Sidebar() {
                         key={item.href + item.title}
                         href={item.href}
                         title={item.title}
-                        className={`flex items-center text-xs transition-all ${
-                          isCollapsed
-                            ? `justify-center py-3 rounded-xl ${
-                                active
-                                  ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500"
-                                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium"
-                              }`
-                            : `gap-3 ${
-                                active
-                                  ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500 pl-3.5 pr-3 py-2.5 rounded-r-xl shadow-2xs"
-                                  : item.isQuickAccess
-                                  ? "text-slate-700 hover:bg-amber-50/50 hover:text-amber-900 font-medium px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50/50"
-                                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium px-4 py-2.5 rounded-xl"
-                              }`
-                        }`}
+                        className={`flex items-center text-xs transition-all ${isCollapsed
+                          ? `justify-center py-3 rounded-xl ${active
+                            ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500"
+                            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium"
+                          }`
+                          : `gap-3 ${active
+                            ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500 pl-3.5 pr-3 py-2.5 rounded-r-xl shadow-2xs"
+                            : item.isQuickAccess
+                              ? "text-slate-700 hover:bg-amber-50/50 hover:text-amber-900 font-medium px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50/50"
+                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium px-4 py-2.5 rounded-xl"
+                          }`
+                          }`}
                       >
                         <span className={`${active ? "text-amber-600" : "text-slate-400"} shrink-0`}>
                           {item.icon}
@@ -377,9 +391,8 @@ export default function Sidebar() {
         {/* ========================================== */}
         {/* FOOTER USER PROFILE & AVATAR */}
         {/* ========================================== */}
-        <div className={`border-t border-slate-100 bg-slate-50/60 shrink-0 ${
-          isCollapsed ? "p-2 space-y-2 text-center" : "p-4 space-y-3"
-        }`}>
+        <div className={`border-t border-slate-100 bg-slate-50/60 shrink-0 ${isCollapsed ? "p-2 space-y-2 text-center" : "p-4 space-y-3"
+          }`}>
           <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
             {/* Avatar Container with Image or Initials Fallback */}
             <div
@@ -409,13 +422,12 @@ export default function Sidebar() {
                 </p>
                 <div className="mt-1">
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
-                      userRole === "ADMIN"
-                        ? "bg-amber-100 text-amber-800 border border-amber-200"
-                        : userRole === "WAREHOUSE"
+                    className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${userRole === "ADMIN"
+                      ? "bg-amber-100 text-amber-800 border border-amber-200"
+                      : userRole === "WAREHOUSE"
                         ? "bg-blue-100 text-blue-800 border border-blue-200"
                         : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                    }`}
+                      }`}
                   >
                     {userRole}
                   </span>
@@ -429,9 +441,8 @@ export default function Sidebar() {
             type="button"
             onClick={() => setIsLogoutModalOpen(true)}
             title={isCollapsed ? "Keluar Sesi (Logout)" : undefined}
-            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold text-xs border border-slate-200 hover:border-red-200 transition-all cursor-pointer group ${
-              isCollapsed ? "p-2.5" : "gap-2 px-3 py-2"
-            }`}
+            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold text-xs border border-slate-200 hover:border-red-200 transition-all cursor-pointer group ${isCollapsed ? "p-2.5" : "gap-2 px-3 py-2"
+              }`}
           >
             <svg
               className="w-4 h-4 text-slate-400 group-hover:text-red-600 transition-colors"
