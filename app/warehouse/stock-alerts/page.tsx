@@ -87,7 +87,7 @@ export default function StockAlertsPage() {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
-              Peringatan Stok Minimum (Stock Alerts)
+              Peringatan Stok Minimum
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
@@ -327,10 +327,10 @@ export default function StockAlertsPage() {
                         <td className="py-3.5 px-4 text-center whitespace-nowrap font-mono">
                           <span
                             className={`font-black text-sm ${isOut
-                                ? "text-red-700"
-                                : isCritical
-                                  ? "text-rose-600"
-                                  : "text-amber-600"
+                              ? "text-red-700"
+                              : isCritical
+                                ? "text-rose-600"
+                                : "text-amber-600"
                               }`}
                           >
                             {item.stock} {item.unit}
