@@ -23,7 +23,7 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area offset by ml-64 (expanded) or ml-20 (collapsed) with smooth transition */}
       <main
-        className={`flex-1 flex flex-col h-screen overflow-y-auto transition-all duration-300 ease-in-out ${
+        className={`flex-1 flex flex-col h-screen overflow-y-auto transition-all duration-300 ease-in-out print:ml-0 print:h-auto print:overflow-visible print:w-full ${
           isCollapsed ? "ml-20" : "ml-64"
         }`}
       >

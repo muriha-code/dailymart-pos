@@ -300,15 +300,7 @@ export default function Sidebar() {
             </svg>
           ),
         },
-        {
-          title: "Kartu Stok & Mutasi",
-          href: "/warehouse/inventory",
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-          ),
-        },
+
         {
           title: "Laporan Inventaris",
           href: "/warehouse/inventory-report",
@@ -335,7 +327,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs transition-all duration-300 ease-in-out ${isCollapsed ? "w-20" : "w-64"
+        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs transition-all duration-300 ease-in-out print:hidden ${isCollapsed ? "w-20" : "w-64"
           }`}
       >
         {/* ========================================== */}
