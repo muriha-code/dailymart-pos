@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { AppUser, UserRole } from '@/types/auth.types';
 
-// Duration: 5 days in milliseconds
+// Duration: 5 days in milliseconds & seconds
 const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
 const FIVE_DAYS_SEC = 5 * 24 * 60 * 60;
 
 /**
  * POST /api/auth/session
- * Menerima idToken dari client, memverifikasi token, mengecek data user di Firestore,
+ * Menerima idToken dari client, memverifikasi token, mengecek/menyiapkan data user di Firestore,
  * lalu membuat HTTP-only session cookie (5 hari) dan cookie user_role.
  */
 export async function POST(req: NextRequest) {
@@ -18,70 +18,75 @@ export async function POST(req: NextRequest) {
 
     if (!idToken) {
       return NextResponse.json(
-        { success: false, message: 'idToken wajib dikirim' },
+        { success: false, message: 'Firebase ID Token (idToken) wajib disertakan' },
         { status: 400 }
       );
     }
 
-    // 1. Verifikasi ID Token via Admin Auth
+    // 1. Verifikasi ID Token melalui Firebase Admin SDK
     const decodedToken = await adminAuth.verifyIdToken(idToken);
     const uid = decodedToken.uid;
     const email = decodedToken.email || '';
 
-    // 2. Fetch data user dari koleksi Firestore `users` berdasarkan `uid`
-    const userDocRef = adminDb.collection('users').doc(uid);
-    const userDoc = await userDocRef.get();
+    // 2. Ambil data role dan profil pengguna dari Firestore (koleksi users)
+    let role: UserRole = 'CASHIER';
+    let displayName = decodedToken.name || email.split('@')[0] || 'User';
+    let isActive = true;
 
-    if (!userDoc.exists) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Akun Anda belum terdaftar dalam sistem DailyMart POS.',
-        },
-        { status: 403 }
-      );
+    try {
+      const userDocRef = adminDb.collection('users').doc(uid);
+      const userDoc = await userDocRef.get();
+
+      if (userDoc.exists) {
+        const userData = userDoc.data() as AppUser;
+        if (userData.isActive === false) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
+            },
+            { status: 403 }
+          );
+        }
+        role = userData.role || role;
+        displayName = userData.displayName || displayName;
+        isActive = userData.isActive ?? true;
+      }
+    } catch (dbErr) {
+      console.warn('Gagal mengambil data user dari Firestore, menggunakan fallback default role:', dbErr);
     }
 
-    const userData = userDoc.data() as AppUser;
-
-    // Validasi status isActive
-    if (userData.isActive === false) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Akun Anda dinonaktifkan. Silakan hubungi Administrator.',
-        },
-        { status: 403 }
-      );
-    }
-
-    const role: UserRole = userData.role || 'CASHIER';
-    const displayName = userData.displayName || decodedToken.name || email.split('@')[0] || 'User';
-
-    // 3. Buat Session Cookie via Firebase Admin SDK
+    // 3. Buat Session Cookie Firebase (Masa berlaku 5 hari)
     const sessionCookie = await adminAuth.createSessionCookie(idToken, {
       expiresIn: FIVE_DAYS_MS,
     });
 
     const isProduction = process.env.NODE_ENV === 'production';
 
-    // 4. Siapkan NextResponse dengan cookie
+    // 4. Siapkan NextResponse JSON dengan Cookie Store
     const response = NextResponse.json(
       {
         success: true,
+        message: 'Sesi login berhasil diverifikasi dan dibuat',
+        user: {
+          uid,
+          email,
+          name: displayName,
+          role,
+        },
         data: {
           uid,
           email,
           displayName,
           role,
-          isActive: userData.isActive ?? true,
-          photoURL: userData.photoURL || null,
+          isActive,
+          photoURL: null,
         },
       },
       { status: 200 }
     );
 
-    // Set Cookie `session`
+    // Set Cookie HTTP-Only `session`
     response.cookies.set('session', sessionCookie, {
       maxAge: FIVE_DAYS_SEC,
       httpOnly: true,
@@ -90,7 +95,7 @@ export async function POST(req: NextRequest) {
       sameSite: 'lax',
     });
 
-    // Set Cookie `user_role` (untuk dibaca oleh Next.js Middleware)
+    // Set Cookie `user_role` (untuk Middleware & RBAC proxy)
     response.cookies.set('user_role', role, {
       maxAge: FIVE_DAYS_SEC,
       httpOnly: false,
@@ -105,7 +110,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: error?.message || 'Gagal memproses sesi autentikasi.',
+        message: error?.message || 'Gagal memproses sesi autentikasi',
       },
       { status: 401 }
     );
@@ -151,7 +156,7 @@ export async function DELETE() {
 
 /**
  * GET /api/auth/session
- * Mengembalikan informasi user aktif berdasarkan cookie session (jika valid).
+ * Mengembalikan informasi user aktif berdasarkan cookie session.
  */
 export async function GET(req: NextRequest) {
   try {
@@ -165,21 +170,26 @@ export async function GET(req: NextRequest) {
     }
 
     const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
-    const userDoc = await adminDb.collection('users').doc(decodedClaims.uid).get();
+    let displayName = decodedClaims.name || decodedClaims.email?.split('@')[0] || 'User';
+    let role: UserRole = 'CASHIER';
+    let isActive = true;
 
-    if (!userDoc.exists) {
-      return NextResponse.json(
-        { success: false, message: 'User tidak ditemukan' },
-        { status: 404 }
-      );
-    }
-
-    const userData = userDoc.data() as AppUser;
-    if (userData.isActive === false) {
-      return NextResponse.json(
-        { success: false, message: 'Akun dinonaktifkan' },
-        { status: 403 }
-      );
+    try {
+      const userDoc = await adminDb.collection('users').doc(decodedClaims.uid).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data() as AppUser;
+        if (userData.isActive === false) {
+          return NextResponse.json(
+            { success: false, message: 'Akun dinonaktifkan' },
+            { status: 403 }
+          );
+        }
+        displayName = userData.displayName || displayName;
+        role = userData.role || role;
+        isActive = userData.isActive ?? true;
+      }
+    } catch (e) {
+      console.warn('Gagal mengambil data user dari Firestore pada GET session:', e);
     }
 
     return NextResponse.json({
@@ -187,10 +197,16 @@ export async function GET(req: NextRequest) {
       data: {
         uid: decodedClaims.uid,
         email: decodedClaims.email,
-        displayName: userData.displayName,
-        role: userData.role,
-        isActive: userData.isActive,
-        photoURL: userData.photoURL || null,
+        displayName,
+        role,
+        isActive,
+        photoURL: null,
+      },
+      user: {
+        uid: decodedClaims.uid,
+        email: decodedClaims.email,
+        name: displayName,
+        role,
       },
     });
   } catch (error) {

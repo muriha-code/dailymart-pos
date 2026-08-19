@@ -496,84 +496,15 @@ export default function CashierTransactionsPage() {
   }, [grandTotal]);
 
   return (
-    <div className="flex-1 h-full w-full min-h-0 overflow-hidden flex flex-col bg-[#F8FAFC] text-[#0F172A] select-none font-sans">
+    <div className="h-screen w-full overflow-hidden p-3 bg-slate-100 text-[#0F172A] select-none font-sans flex flex-col">
       {/* ========================================================================= */}
-      {/* 1. TOP NAVBAR HEADER (Clean Utility Bar)                                   */}
+      {/* MAIN FULL-HEIGHT GRID LAYOUT (Col 8 Catalog | Col 4 Cart)                  */}
       {/* ========================================================================= */}
-      <header className="h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between shrink-0 shadow-xs z-10">
-        {/* Brand & Logo (Deep Red Accent) */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded bg-red-600 flex items-center justify-center text-white font-black text-base tracking-tighter shadow-xs">
-              DM
-            </div>
-            <div>
-              <span className="font-extrabold text-base tracking-tight text-slate-900">
-                DailyMart
-              </span>
-              <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700">
-                POS
-              </span>
-            </div>
-          </div>
-
-          <div className="h-5 w-px bg-slate-200 mx-2 hidden sm:block" />
-
-          {/* Cashier Info */}
-          <div className="hidden sm:flex items-center gap-2 text-xs text-slate-600">
-            <div className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-[10px]">
-              {cashierUser?.initials || "AP"}
-            </div>
-            <div>
-              <span className="font-semibold text-slate-900">
-                {cashierUser?.displayName || "Ahmad Pratama"}
-              </span>
-              <span className="text-slate-400 ml-1.5">• ({cashierUser?.role || "Ksr-01"})</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Status Koneksi & Jam */}
-        <div className="flex items-center gap-4">
-          {/* Online Indicator */}
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Online</span>
-          </div>
-
-          {/* Live Digital Clock */}
-          <div className="font-mono text-xs font-medium text-slate-600 tabular-nums hidden md:block">
-            {currentDateTime || "Memuat jam..."}
-          </div>
-
-          <div className="h-5 w-px bg-slate-200 hidden md:block" />
-
-          {/* Keyboard Shortcut Hints */}
-          <div className="hidden lg:flex items-center gap-2 text-[11px] font-medium text-slate-500">
-            <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 font-mono text-slate-700 font-bold">
-              [F2]
-            </span>
-            <span>Cari</span>
-            <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 font-mono text-slate-700 font-bold ml-1">
-              [F10]
-            </span>
-            <span>Bayar</span>
-            <span className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 font-mono text-slate-700 font-bold ml-1">
-              [ESC]
-            </span>
-            <span>Batal</span>
-          </div>
-        </div>
-      </header>
-
-      {/* ========================================================================= */}
-      {/* MAIN SPLIT-SCREEN LAYOUT (60% Left Catalog | 40% Right Cart)               */}
-      {/* ========================================================================= */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="grid grid-cols-12 gap-3 h-full min-h-0">
         {/* ========================================================================= */}
-        {/* 2. AREA KIRI (60% Desktop) - KATALOG PRODUK                               */}
+        {/* 1. KATALOG PRODUK (col-span-12 lg:col-span-8)                             */}
         {/* ========================================================================= */}
-        <div className="w-full lg:w-[60%] flex flex-col border-r border-slate-200 bg-[#F8FAFC] overflow-hidden">
+        <div className="col-span-12 lg:col-span-8 flex flex-col h-full min-h-0 bg-[#F8FAFC] rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           {/* Top Search & Filter Bar */}
           <div className="p-3 bg-white border-b border-slate-200 space-y-2.5 shrink-0 shadow-xs">
             {/* Search Input Bar */}
@@ -808,9 +739,9 @@ export default function CashierTransactionsPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. AREA KANAN (40% Desktop) - ACTIVE CART / KERANJANG BELANJA             */}
+        {/* 2. KERANJANG BELANJA (col-span-12 lg:col-span-4)                           */}
         {/* ========================================================================= */}
-        <div className="w-full lg:w-[40%] flex flex-col bg-white overflow-hidden">
+        <div className="col-span-12 lg:col-span-4 flex flex-col h-full min-h-0 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           {/* Cart Header */}
           <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70 shrink-0">
             <div className="flex items-center gap-2">

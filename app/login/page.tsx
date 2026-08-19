@@ -44,14 +44,19 @@ export default function LoginPage() {
         body: JSON.stringify({ idToken }),
       });
 
-      const result = await res.json();
+      let result: any = {};
+      try {
+        result = await res.json();
+      } catch (jsonErr) {
+        throw new Error('Gagal membaca respon server sesi. Silakan coba lagi.');
+      }
 
       if (!res.ok || !result.success) {
         throw new Error(result.message || 'Gagal membuat sesi login.');
       }
 
       // 4. Redirect otomatis ke dashboard sesuai role user
-      const userRole: UserRole = result.data.role || 'CASHIER';
+      const userRole: UserRole = result.user?.role || result.data?.role || 'CASHIER';
       const targetPath = ROLE_REDIRECT_MAP[userRole] || '/cashier/transactions';
 
       router.push(targetPath);

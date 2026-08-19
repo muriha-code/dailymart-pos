@@ -8,7 +8,7 @@ import {
 import { inventoryReportService } from "@/services/inventoryReport.service";
 import Pagination from "@/components/common/Pagination";
 
-// Helper Export to CSV
+// Helper Export to CSV (Metode Blob + Directive sep=, untuk Excel)
 const exportToCSV = (data: InventoryReportItem[]) => {
   if (!data || data.length === 0) {
     alert("Tidak ada data untuk diekspor!");
@@ -43,13 +43,21 @@ const exportToCSV = (data: InventoryReportItem[]) => {
     `"${item.unit || "Pcs"}"`,
   ]);
 
-  const csvContent =
-    "data:text/csv;charset=utf-8,\uFEFF" +
-    [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+  // Directif sep=, agar Excel otomatis menggunakan koma sebagai pemisah kolom
+  const csvString = [
+    "sep=,",
+    headers.join(","),
+    ...rows.map((row) => row.join(",")),
+  ].join("\r\n");
 
-  const encodedUri = encodeURI(csvContent);
+  // Tambahkan UTF-8 BOM (\uFEFF) untuk mendukung karakter khusus & Blob URL
+  const blob = new Blob(["\uFEFF" + csvString], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
+  link.setAttribute("href", url);
   link.setAttribute(
     "download",
     `Laporan_Inventaris_DailyMart_${new Date().toISOString().slice(0, 10)}.csv`
@@ -57,6 +65,7 @@ const exportToCSV = (data: InventoryReportItem[]) => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 };
 
 export default function InventoryReportPage() {
