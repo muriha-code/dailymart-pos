@@ -326,13 +326,12 @@ export default function StockAlertsPage() {
                         {/* Stok Fisik vs Min */}
                         <td className="py-3.5 px-4 text-center whitespace-nowrap font-mono">
                           <span
-                            className={`font-black text-sm ${
-                              isOut
+                            className={`font-black text-sm ${isOut
                                 ? "text-red-700"
                                 : isCritical
-                                ? "text-rose-600"
-                                : "text-amber-600"
-                            }`}
+                                  ? "text-rose-600"
+                                  : "text-amber-600"
+                              }`}
                           >
                             {item.stock} {item.unit}
                           </span>
