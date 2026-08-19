@@ -6,6 +6,7 @@ import { StockAuditRecord, AuditReason } from "@/types/stockAudit.types";
 import { productService } from "@/services/product.service";
 import { stockAuditService } from "@/services/stockAudit.service";
 import { getThisWeekDateRange, formatIndonesianDate } from "@/lib/utils/date";
+import Pagination from "@/components/common/Pagination";
 
 // Helper Format Date Time
 const formatDate = (dateInput: Date | string): string => {
@@ -44,6 +45,15 @@ export default function StockAuditPage() {
   // Filter States
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 10;
+
+  // Auto-Reset Halaman ke 1 saat filter pencarian/tanggal berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedDate]);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -181,6 +191,12 @@ export default function StockAuditPage() {
   const totalSurplusItems = useMemo(() => {
     return auditLogs.filter((log) => log.difference > 0).length;
   }, [auditLogs]);
+
+  // Paginated Logs
+  const paginatedLogs = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return auditLogs.slice(start, start + ITEMS_PER_PAGE);
+  }, [auditLogs, currentPage]);
 
   // Open Modal Handler
   const handleOpenModal = (productToAudit?: Product) => {
@@ -578,7 +594,7 @@ export default function StockAuditPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 text-xs text-slate-800">
-                  {auditLogs.map((log) => {
+                  {paginatedLogs.map((log) => {
                     const isMatch = log.difference === 0;
                     const isDeficit = log.difference < 0;
                     const isSurplus = log.difference > 0;
@@ -660,6 +676,13 @@ export default function StockAuditPage() {
               </table>
             </div>
           )}
+
+          <Pagination
+            currentPage={currentPage}
+            totalItems={auditLogs.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
 

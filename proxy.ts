@@ -8,7 +8,7 @@ const ROLE_HOME_MAP: Record<UserRole, string> = {
   WAREHOUSE: '/warehouse/stock-in',
 };
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   const sessionCookie = req.cookies.get('session')?.value;

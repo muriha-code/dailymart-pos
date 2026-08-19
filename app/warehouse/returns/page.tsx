@@ -15,6 +15,7 @@ import {
   SearchableSelect,
   SearchableSelectOption,
 } from "@/components/common/SearchableSelect";
+import Pagination from "@/components/common/Pagination";
 
 // Helper Format Date Time
 const formatDate = (dateInput: Date | string): string => {
@@ -56,6 +57,15 @@ export default function StockReturnsPage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState<string>("ALL");
   const [reasonFilter, setReasonFilter] = useState<string>("ALL");
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 10;
+
+  // Auto-Reset Halaman ke 1 saat filter pencarian/tipe/alasan berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, typeFilter, reasonFilter]);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -176,6 +186,12 @@ export default function StockReturnsPage() {
       .filter((item) => item.type === "DISPOSAL_DAMAGED")
       .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
   }, [returnLogs]);
+
+  // Paginated Logs
+  const paginatedLogs = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return returnLogs.slice(start, start + ITEMS_PER_PAGE);
+  }, [returnLogs, currentPage]);
 
   // Open Modal Handler
   const handleOpenModal = () => {
@@ -480,7 +496,7 @@ export default function StockReturnsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs">
-                  {returnLogs.map((log) => {
+                  {paginatedLogs.map((log) => {
                     const isSupplierReturn = log.type === "RETURN_TO_SUPPLIER";
                     const reasonText = REASON_LABELS[log.reason] || log.reason;
 
@@ -577,6 +593,13 @@ export default function StockReturnsPage() {
               </table>
             </div>
           )}
+
+          <Pagination
+            currentPage={currentPage}
+            totalItems={returnLogs.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
 

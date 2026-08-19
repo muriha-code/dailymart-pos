@@ -9,6 +9,7 @@ import {
   SearchableSelect,
   SearchableSelectOption,
 } from "@/components/common/SearchableSelect";
+import Pagination from "@/components/common/Pagination";
 
 // ==========================================
 // CONSTANTS & HELPERS
@@ -47,6 +48,8 @@ export default function WarehouseStockInPage() {
   const [queueItems, setQueueItems] = useState<
     (StockInItem & { currentStock: number; unit: string })[]
   >([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 10;
 
   // Submission State
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -193,6 +196,20 @@ export default function WarehouseStockInPage() {
     );
   }, [queueItems]);
 
+  // Handle Page bounds
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(queueItems.length / ITEMS_PER_PAGE));
+    if (currentPage > maxPage) {
+      setCurrentPage(maxPage);
+    }
+  }, [queueItems.length, currentPage]);
+
+  // Paginated Queue Items
+  const paginatedQueueItems = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return queueItems.slice(start, start + ITEMS_PER_PAGE);
+  }, [queueItems, currentPage]);
+
   // Submit Stock-In Payload to Service Layer
   const handleSubmitStockIn = async () => {
     if (!supplierId || !supplierId.trim()) {
@@ -239,6 +256,7 @@ export default function WarehouseStockInPage() {
 
       // Reset Form Queue
       setQueueItems([]);
+      setCurrentPage(1);
       setInvoiceNumber("");
       setNotes("");
       loadProducts();
@@ -544,7 +562,10 @@ export default function WarehouseStockInPage() {
                 {queueItems.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => setQueueItems([])}
+                    onClick={() => {
+                      setQueueItems([]);
+                      setCurrentPage(1);
+                    }}
                     className="text-[11px] font-bold text-red-600 hover:text-red-800 cursor-pointer"
                   >
                     Kosongkan Antrean
@@ -575,7 +596,7 @@ export default function WarehouseStockInPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 text-xs text-slate-800">
-                      {queueItems.map((item) => {
+                      {paginatedQueueItems.map((item) => {
                         const subtotal = item.quantity * item.purchasePrice;
 
                         return (
@@ -653,6 +674,13 @@ export default function WarehouseStockInPage() {
                   </table>
                 </div>
               )}
+
+              <Pagination
+                currentPage={currentPage}
+                totalItems={queueItems.length}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={setCurrentPage}
+              />
             </div>
           </div>
         </div>
