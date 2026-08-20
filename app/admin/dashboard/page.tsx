@@ -51,13 +51,7 @@ export default function AdminDashboardPage() {
         {/* ========================================== */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[11px] uppercase tracking-wider">
-                Administrator
-              </span>
-              <span className="text-xs text-slate-400 font-medium">• Ringkasan Analitik</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
               Dashboard Analitik & Penjualan
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">

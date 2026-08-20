@@ -28,9 +28,17 @@ interface MenuItem {
   isQuickAccess?: boolean;
 }
 
+interface AccordionGroup {
+  groupTitle: string;
+  groupKey: "openKasir" | "openGudang";
+  icon: React.ReactNode;
+  items: MenuItem[];
+}
+
 interface MenuSection {
   sectionTitle: string;
-  items: MenuItem[];
+  items?: MenuItem[];
+  accordionGroups?: AccordionGroup[];
 }
 
 export default function Sidebar() {
@@ -42,6 +50,10 @@ export default function Sidebar() {
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
+
+  // Accordion open/close independent states for Akses Operasional (Default: collapsed / false)
+  const [openKasir, setOpenKasir] = useState<boolean>(false);
+  const [openGudang, setOpenGudang] = useState<boolean>(false);
 
   // Fetch session user info on mount
   const fetchUserData = useCallback(async () => {
@@ -103,7 +115,7 @@ export default function Sidebar() {
   // RBAC MENU STRUCTURE DEFINITIONS
   // ==========================================
 
-  // A. ADMIN MENU SECTIONS
+  // A. ADMIN MENU SECTIONS (With Accordion Submenus for Akses Operasional)
   const adminSections: MenuSection[] = [
     {
       sectionTitle: "MANAJEMEN UTAMA",
@@ -162,80 +174,112 @@ export default function Sidebar() {
             </svg>
           ),
         },
+        {
+          title: "Pengaturan Sistem",
+          href: "/admin/settings",
+          icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          ),
+        },
       ],
     },
     {
       sectionTitle: "AKSES OPERASIONAL",
-      items: [
+      accordionGroups: [
         {
-          title: "🛒 Buka Mesin Kasir",
-          href: "/cashier/transactions",
-          isQuickAccess: true,
+          groupTitle: "Operasional Kasir",
+          groupKey: "openKasir",
           icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
             </svg>
           ),
+          items: [
+            {
+              title: "Buka Mesin Kasir",
+              href: "/cashier/transactions",
+              isQuickAccess: true,
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              ),
+            },
+          ],
         },
         {
-          title: "📦 Buka Penerimaan Gudang",
-          href: "/warehouse/stock-in",
-          isQuickAccess: true,
+          groupTitle: "Staff Gudang",
+          groupKey: "openGudang",
           icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           ),
-        },
-        {
-          title: "📋 Verifikasi Stok (Opname)",
-          href: "/warehouse/stock-audit",
-          isQuickAccess: true,
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-          ),
-        },
-        {
-          title: "🔄 Retur & Barang Rusak",
-          href: "/warehouse/returns",
-          isQuickAccess: true,
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          ),
-        },
-        {
-          title: "Peringatan Stok Minimum",
-          href: "/warehouse/stock-alerts",
-          isQuickAccess: true,
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          ),
-        },
-        {
-          title: "Restock Request List",
-          href: "/warehouse/restock-requests",
-          isQuickAccess: true,
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          ),
-        },
-        {
-          title: "Laporan Inventaris",
-          href: "/warehouse/inventory-report",
-          isQuickAccess: true,
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          ),
+          items: [
+            {
+              title: "Penerimaan Gudang (Stock-In)",
+              href: "/warehouse/stock-in",
+              isQuickAccess: true,
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8" />
+                </svg>
+              ),
+            },
+            {
+              title: "Verifikasi Stok (Opname)",
+              href: "/warehouse/stock-audit",
+              isQuickAccess: true,
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              ),
+            },
+            {
+              title: "Retur & Barang Rusak",
+              href: "/warehouse/returns",
+              isQuickAccess: true,
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              ),
+            },
+            {
+              title: "Peringatan Stok Minimum",
+              href: "/warehouse/stock-alerts",
+              isQuickAccess: true,
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              ),
+            },
+            {
+              title: "Restock Request List",
+              href: "/warehouse/restock-requests",
+              isQuickAccess: true,
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              ),
+            },
+            {
+              title: "Laporan Inventaris",
+              href: "/warehouse/inventory-report",
+              isQuickAccess: true,
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              ),
+            },
+          ],
         },
       ],
     },
@@ -318,7 +362,6 @@ export default function Sidebar() {
             </svg>
           ),
         },
-
         {
           title: "Laporan Inventaris",
           href: "/warehouse/inventory-report",
@@ -345,15 +388,19 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs transition-all duration-300 ease-in-out print:hidden ${isCollapsed ? "w-20" : "w-64"
-          }`}
+        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs transition-all duration-300 ease-in-out print:hidden ${
+          isCollapsed ? "w-20" : "w-64"
+        }`}
       >
         {/* ========================================== */}
         {/* TOP BRANDING & LOGO + HAMBURGER TOGGLE */}
         {/* ========================================== */}
         <div>
-          <div className={`p-4 border-b border-slate-100 flex items-center ${isCollapsed ? "justify-center flex-col gap-2" : "justify-between gap-3"
-            }`}>
+          <div
+            className={`p-4 border-b border-slate-100 flex items-center ${
+              isCollapsed ? "justify-center flex-col gap-2" : "justify-between gap-3"
+            }`}
+          >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
                 D
@@ -401,36 +448,158 @@ export default function Sidebar() {
                 ) : (
                   idx > 0 && <div className="h-px bg-slate-100 my-2"></div>
                 )}
-                <div className="space-y-1">
-                  {section.items.map((item) => {
-                    const active = isLinkActive(item.href);
 
-                    return (
-                      <Link
-                        key={item.href + item.title}
-                        href={item.href}
-                        title={item.title}
-                        className={`flex items-center text-xs transition-all ${isCollapsed
-                          ? `justify-center py-3 rounded-xl ${active
-                            ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500"
-                            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium"
-                          }`
-                          : `gap-3 ${active
-                            ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500 pl-3.5 pr-3 py-2.5 rounded-r-xl shadow-2xs"
-                            : item.isQuickAccess
-                              ? "text-slate-700 hover:bg-amber-50/50 hover:text-amber-900 font-medium px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50/50"
-                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium px-4 py-2.5 rounded-xl"
-                          }`
+                {/* Normal Direct Menu Items */}
+                {section.items && (
+                  <div className="space-y-1">
+                    {section.items.map((item) => {
+                      const active = isLinkActive(item.href);
+
+                      return (
+                        <Link
+                          key={item.href + item.title}
+                          href={item.href}
+                          title={item.title}
+                          className={`flex items-center text-xs transition-all ${
+                            isCollapsed
+                              ? `justify-center py-3 rounded-xl ${
+                                  active
+                                    ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500"
+                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium"
+                                }`
+                              : `gap-3 ${
+                                  active
+                                    ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500 pl-3.5 pr-3 py-2.5 rounded-r-xl shadow-2xs"
+                                    : item.isQuickAccess
+                                    ? "text-slate-700 hover:bg-amber-50/50 hover:text-amber-900 font-medium px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50/50"
+                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium px-4 py-2.5 rounded-xl"
+                                }`
                           }`}
-                      >
-                        <span className={`${active ? "text-amber-600" : "text-slate-400"} shrink-0`}>
-                          {item.icon}
-                        </span>
-                        {!isCollapsed && <span className="truncate">{item.title}</span>}
-                      </Link>
-                    );
-                  })}
-                </div>
+                        >
+                          <span className={`${active ? "text-amber-600" : "text-slate-400"} shrink-0`}>
+                            {item.icon}
+                          </span>
+                          {!isCollapsed && <span className="truncate">{item.title}</span>}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Accordion Menu Groups per Role */}
+                {section.accordionGroups && (
+                  <div className="space-y-2">
+                    {section.accordionGroups.map((group) => {
+                      const isOpen = group.groupKey === "openKasir" ? openKasir : openGudang;
+                      const toggleOpen = () => {
+                        if (group.groupKey === "openKasir") setOpenKasir((prev) => !prev);
+                        else setOpenGudang((prev) => !prev);
+                      };
+
+                      const hasActiveChild = group.items.some((it) => isLinkActive(it.href));
+
+                      return (
+                        <div key={group.groupTitle} className="rounded-xl overflow-hidden">
+                          {/* Accordion Header Toggle Button */}
+                          <button
+                            type="button"
+                            onClick={toggleOpen}
+                            title={isCollapsed ? group.groupTitle : undefined}
+                            className={`w-full flex items-center justify-between text-xs font-bold transition-all cursor-pointer ${
+                              isCollapsed
+                                ? `justify-center py-3 rounded-xl ${
+                                    hasActiveChild
+                                      ? "bg-amber-50 text-amber-950 border-l-4 border-amber-500"
+                                      : "text-slate-700 hover:bg-slate-100"
+                                  }`
+                                : `px-3.5 py-2.5 rounded-xl border ${
+                                    hasActiveChild
+                                      ? "bg-amber-50/90 border-amber-200 text-amber-950"
+                                      : "bg-slate-50/70 border-slate-200/80 text-slate-700 hover:bg-slate-100/90"
+                                  }`
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className={hasActiveChild ? "text-amber-600" : "text-slate-500"}>
+                                {group.icon}
+                              </span>
+                              {!isCollapsed && (
+                                <span className="truncate">{group.groupTitle}</span>
+                              )}
+                            </div>
+
+                            {!isCollapsed && (
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-slate-500">
+                                  {group.items.length}
+                                </span>
+                                <svg
+                                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                                    isOpen ? "rotate-180" : ""
+                                  }`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M19 9l-7 7-7-7"
+                                  />
+                                </svg>
+                              </div>
+                            )}
+                          </button>
+
+                          {/* Accordion Submenu Child List */}
+                          {(isOpen || isCollapsed) && (
+                            <div
+                              className={`transition-all ${
+                                !isCollapsed
+                                  ? "pl-2 mt-1.5 border-l-2 border-slate-200 ml-3.5 space-y-1"
+                                  : "mt-1 space-y-1"
+                              }`}
+                            >
+                              {group.items.map((child) => {
+                                const active = isLinkActive(child.href);
+                                return (
+                                  <Link
+                                    key={child.href + child.title}
+                                    href={child.href}
+                                    title={child.title}
+                                    className={`flex items-center text-xs transition-all ${
+                                      isCollapsed
+                                        ? `justify-center py-2.5 rounded-xl ${
+                                            active
+                                              ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500"
+                                              : "text-slate-600 hover:bg-slate-100 font-medium"
+                                          }`
+                                        : `gap-2.5 px-3 py-2.5 rounded-xl ${
+                                            active
+                                              ? "bg-amber-500 text-white font-bold shadow-xs"
+                                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium"
+                                          }`
+                                    }`}
+                                  >
+                                    <span
+                                      className={`${
+                                        active ? "text-white" : "text-slate-400"
+                                      } shrink-0`}
+                                    >
+                                      {child.icon}
+                                    </span>
+                                    {!isCollapsed && <span className="truncate">{child.title}</span>}
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             ))}
           </nav>
@@ -439,8 +608,11 @@ export default function Sidebar() {
         {/* ========================================== */}
         {/* FOOTER USER PROFILE & AVATAR */}
         {/* ========================================== */}
-        <div className={`border-t border-slate-100 bg-slate-50/60 shrink-0 ${isCollapsed ? "p-2 space-y-2 text-center" : "p-4 space-y-3"
-          }`}>
+        <div
+          className={`border-t border-slate-100 bg-slate-50/60 shrink-0 ${
+            isCollapsed ? "p-2 space-y-2 text-center" : "p-4 space-y-3"
+          }`}
+        >
           <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
             {/* Avatar Container with Image or Initials Fallback */}
             <div
@@ -470,12 +642,13 @@ export default function Sidebar() {
                 </p>
                 <div className="mt-1">
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${userRole === "ADMIN"
-                      ? "bg-amber-100 text-amber-800 border border-amber-200"
-                      : userRole === "WAREHOUSE"
+                    className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                      userRole === "ADMIN"
+                        ? "bg-amber-100 text-amber-800 border border-amber-200"
+                        : userRole === "WAREHOUSE"
                         ? "bg-blue-100 text-blue-800 border border-blue-200"
                         : "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                      }`}
+                    }`}
                   >
                     {userRole}
                   </span>
@@ -489,8 +662,9 @@ export default function Sidebar() {
             type="button"
             onClick={() => setIsLogoutModalOpen(true)}
             title={isCollapsed ? "Keluar Sesi (Logout)" : undefined}
-            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold text-xs border border-slate-200 hover:border-red-200 transition-all cursor-pointer group ${isCollapsed ? "p-2.5" : "gap-2 px-3 py-2"
-              }`}
+            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold text-xs border border-slate-200 hover:border-red-200 transition-all cursor-pointer group ${
+              isCollapsed ? "p-2.5" : "gap-2 px-3 py-2"
+            }`}
           >
             <svg
               className="w-4 h-4 text-slate-400 group-hover:text-red-600 transition-colors"
@@ -508,7 +682,6 @@ export default function Sidebar() {
             {!isCollapsed && <span>Keluar Sesi (Logout)</span>}
           </button>
         </div>
-
       </aside>
 
       {/* ========================================== */}
