@@ -254,10 +254,7 @@ export default function UserManagementPage() {
         {/* ========================================================================= */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <div>
-            <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2.5 py-0.5 rounded-md border border-purple-200 uppercase tracking-wider">
-              ADMINISTRATOR • Hak Akses & Akun
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
               Manajemen Pengguna & Hak Akses
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
@@ -274,7 +271,7 @@ export default function UserManagementPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
-              <span>+ Tambah Pengguna Baru</span>
+              <span>Tambah Pengguna Baru</span>
             </button>
 
             <button

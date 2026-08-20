@@ -647,7 +647,7 @@ export default function CashierTransactionsPage() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
                 {products.map((product) => {
                   const isOutOfStock = product.stock <= 0;
                   const minStockLimit = product.minimumStock ?? 5;
@@ -659,64 +659,83 @@ export default function CashierTransactionsPage() {
                     <div
                       key={product.id || product.sku}
                       onClick={() => !isOutOfStock && handleAddToCart(product)}
-                      className={`group relative bg-white rounded-lg border p-3 flex flex-col justify-between transition-all duration-150 text-left ${
+                      className={`group relative bg-white rounded-xl border p-2.5 flex flex-col justify-between transition-all duration-150 text-left ${
                         isOutOfStock
-                          ? "opacity-50 border-red-200 cursor-not-allowed bg-red-50/20"
-                          : "border-slate-200 hover:border-slate-400 hover:shadow-sm cursor-pointer active:scale-[0.98]"
+                          ? "opacity-60 border-red-200 cursor-not-allowed bg-red-50/20"
+                          : "border-slate-200 hover:border-amber-400 hover:shadow-md cursor-pointer active:scale-[0.98]"
                       }`}
                     >
-                      {/* Top Badges */}
-                      <div className="flex items-start justify-between gap-1 mb-1.5">
-                        <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded uppercase tracking-wider font-semibold">
+                      {/* Product Thumbnail Container */}
+                      <div className="h-28 w-full rounded-lg overflow-hidden bg-slate-100 mb-2 relative flex items-center justify-center border border-slate-100 shrink-0">
+                        {product.imageUrl ? (
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-slate-400 p-2 text-center">
+                            <svg className="w-7 h-7 mb-0.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                              {product.name.substring(0, 3)}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Overlaid SKU Badge */}
+                        <span className="absolute top-1.5 left-1.5 text-[9px] font-mono font-bold text-slate-700 bg-white/90 backdrop-blur-xs px-1.5 py-0.5 rounded shadow-xs uppercase">
                           {product.sku}
                         </span>
 
+                        {/* Overlaid Discount Badge */}
                         {hasDiscount && (
-                          <span className="text-[10px] font-bold bg-red-600 text-white px-1.5 py-0.5 rounded shadow-xs">
+                          <span className="absolute top-1.5 right-1.5 text-[9px] font-bold bg-red-600 text-white px-1.5 py-0.5 rounded shadow-xs">
                             -{product.discountPercentage || 10}%
                           </span>
                         )}
                       </div>
 
-                      {/* Product Name */}
+                      {/* Product Name & Category */}
                       <div className="mb-2">
-                        <h3 className="text-xs font-semibold text-slate-900 line-clamp-2 leading-snug group-hover:text-red-600 transition-colors">
+                        <h3 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-amber-600 transition-colors">
                           {product.name}
                         </h3>
-                        <p className="text-[11px] text-slate-600 mt-0.5">
+                        <p className="text-[10px] font-semibold text-slate-500 mt-0.5 truncate">
                           {product.categoryName || product.categoryId}
                         </p>
                       </div>
 
-                      {/* Footer: Price & Stock */}
+                      {/* Footer: Price & Stock Badge */}
                       <div className="pt-2 border-t border-slate-100 flex items-end justify-between gap-1 mt-auto">
                         <div>
                           {hasDiscount && product.originalPrice && (
-                            <span className="block text-[10px] font-mono text-slate-500 line-through">
+                            <span className="block text-[9px] font-mono text-slate-400 line-through">
                               {formatRupiah(product.originalPrice)}
                             </span>
                           )}
-                          <span className="text-xs sm:text-sm font-bold font-mono text-slate-900 tabular-nums">
+                          <span className="text-xs sm:text-sm font-extrabold font-mono text-slate-900 tabular-nums">
                             {formatRupiah(product.sellingPrice)}
                           </span>
                         </div>
 
-                        {/* Stock Status Validation */}
+                        {/* Stock Status Badge */}
                         <div className="text-right">
                           <span
-                            className={`text-[10px] font-medium block ${
+                            className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md inline-block ${
                               isOutOfStock
-                                ? "text-red-600 font-extrabold bg-red-100 px-1 py-0.2 rounded"
+                                ? "text-red-700 bg-red-100"
                                 : isLowStock
-                                ? "text-amber-700 font-bold bg-amber-100 px-1 py-0.2 rounded"
-                                : "text-slate-600"
+                                ? "text-amber-800 bg-amber-100"
+                                : "text-slate-600 bg-slate-100"
                             }`}
                           >
                             {isOutOfStock
                               ? "Habis"
                               : isLowStock
-                              ? `Stok: ${product.stock} (Menipis)`
-                              : `Stok: ${product.stock} ${product.unit}`}
+                              ? `Stok: ${product.stock}`
+                              : `Stok: ${product.stock}`}
                           </span>
                         </div>
                       </div>
