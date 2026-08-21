@@ -28,32 +28,42 @@ export async function POST(req: NextRequest) {
     const uid = decodedToken.uid;
     const email = decodedToken.email || '';
 
-    // 2. Ambil data role dan profil pengguna dari Firestore (koleksi users)
-    let role: UserRole = 'CASHIER';
+    // 2. Ambil data role dan profil pengguna (Fast Path via Custom Claims)
+    let role: UserRole = (decodedToken.role || decodedToken.userRole) as UserRole;
     let displayName = decodedToken.name || email.split('@')[0] || 'User';
     let isActive = true;
 
-    try {
-      const userDocRef = adminDb.collection('users').doc(uid);
-      const userDoc = await userDocRef.get();
+    if (!role) {
+      try {
+        const userDocRef = adminDb.collection('users').doc(uid);
+        const userDoc = await userDocRef.get();
 
-      if (userDoc.exists) {
-        const userData = userDoc.data() as AppUser;
-        if (userData.isActive === false) {
-          return NextResponse.json(
-            {
-              success: false,
-              message: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
-            },
-            { status: 403 }
-          );
+        if (userDoc.exists) {
+          const userData = userDoc.data() as AppUser;
+          if (userData.isActive === false) {
+            return NextResponse.json(
+              {
+                success: false,
+                message: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
+              },
+              { status: 403 }
+            );
+          }
+          role = userData.role || 'CASHIER';
+          displayName = userData.displayName || displayName;
+          isActive = userData.isActive ?? true;
+
+          // Sematkan custom claim secara asinkron
+          adminAuth.setCustomUserClaims(uid, { role, displayName }).catch((cErr) => {
+            console.warn('[Custom Claims Set Warning]:', cErr);
+          });
+        } else {
+          role = 'CASHIER';
         }
-        role = userData.role || role;
-        displayName = userData.displayName || displayName;
-        isActive = userData.isActive ?? true;
+      } catch (dbErr) {
+        console.warn('Gagal mengambil data user dari Firestore, menggunakan fallback default role:', dbErr);
+        role = 'CASHIER';
       }
-    } catch (dbErr) {
-      console.warn('Gagal mengambil data user dari Firestore, menggunakan fallback default role:', dbErr);
     }
 
     // 3. Buat Session Cookie Firebase (Masa berlaku 5 hari)
@@ -62,12 +72,19 @@ export async function POST(req: NextRequest) {
     });
 
     const isProduction = process.env.NODE_ENV === 'production';
+    const ROLE_MAP: Record<UserRole, string> = {
+      ADMIN: '/admin/dashboard',
+      CASHIER: '/cashier/transactions',
+      WAREHOUSE: '/warehouse/stock-in',
+    };
+    const redirectTo = ROLE_MAP[role] || '/cashier/transactions';
 
     // 4. Siapkan NextResponse JSON dengan Cookie Store
     const response = NextResponse.json(
       {
         success: true,
         message: 'Sesi login berhasil diverifikasi dan dibuat',
+        redirectTo,
         user: {
           uid,
           email,

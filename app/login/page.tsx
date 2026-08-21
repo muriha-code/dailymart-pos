@@ -37,12 +37,21 @@ export default function LoginPage() {
       // 2. Dapatkan ID Token
       const idToken = await user.getIdToken();
 
-      // 3. Kirim POST ke API Session Handler
-      const res = await fetch('/api/auth/session', {
+      // 3. Kirim POST ke API Auth Login Handler (Teroptimasi)
+      let res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
       });
+
+      if (!res.ok) {
+        // Fallback ke /api/auth/session jika endpoint login tidak tersedia
+        res = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+        });
+      }
 
       let result: any = {};
       try {
@@ -55,19 +64,21 @@ export default function LoginPage() {
         throw new Error(result.message || 'Gagal membuat sesi login.');
       }
 
-      // 4. Tandai tab aktif untuk Strict Single-Tab Session Guard
-      try {
-        sessionStorage.setItem('pos_tab_active', 'true');
-      } catch (sErr) {
-        console.warn('Gagal menyimpan pos_tab_active ke sessionStorage:', sErr);
-      }
+      // 4. Tandai tab aktif untuk Strict Single-Tab Session Guard secara non-blocking
+      setTimeout(() => {
+        try {
+          sessionStorage.setItem('pos_tab_active', 'true');
+        } catch (sErr) {
+          console.warn('Gagal menyimpan pos_tab_active ke sessionStorage:', sErr);
+        }
+      }, 0);
 
-      // 5. Redirect otomatis ke dashboard sesuai role user
+      // 5. Zero-Waterfall Navigation: Prefetch halaman tujuan secara instan sebelum melakukan replace
       const userRole: UserRole = result.user?.role || result.data?.role || 'CASHIER';
-      const targetPath = ROLE_REDIRECT_MAP[userRole] || '/cashier/transactions';
+      const targetPath = result.redirectTo || ROLE_REDIRECT_MAP[userRole] || '/cashier/transactions';
 
-      router.push(targetPath);
-      router.refresh();
+      router.prefetch(targetPath);
+      router.replace(targetPath);
     } catch (err: any) {
       console.error('[Login Error]:', err);
       let errorMsg = 'Terjadi kesalahan saat masuk. Silakan coba lagi.';
