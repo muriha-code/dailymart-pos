@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Product } from "@/types/product.types";
 import { productService } from "@/services/product.service";
+import Cropper from "react-easy-crop";
+import { getCroppedImg, Area } from "@/lib/cropImage";
 import ConfirmModal from "@/components/admin/ConfirmModal";
 
 // ==========================================
@@ -97,12 +99,67 @@ export default function AdminProductsPage() {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
+  // Image Cropper State
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState<boolean>(false);
+  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState<number>(1);
+  const [rotation, setRotation] = useState<number>(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [isCropping, setIsCropping] = useState<boolean>(false);
+
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setSelectedImageFile(file);
-    setImagePreviewUrl(URL.createObjectURL(file));
     setFormError(null);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageToCrop(reader.result as string);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setRotation(0);
+      setIsCropModalOpen(true);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const handleCropComplete = useCallback(
+    (_croppedArea: Area, croppedAreaPixels: Area) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    []
+  );
+
+  const handleApplyCrop = async () => {
+    if (!imageToCrop || !croppedAreaPixels) return;
+    setIsCropping(true);
+    try {
+      const result = await getCroppedImg(
+        imageToCrop,
+        croppedAreaPixels,
+        rotation,
+        500,
+        500
+      );
+      if (result) {
+        setSelectedImageFile(result.file);
+        setImagePreviewUrl(result.url);
+      }
+      setIsCropModalOpen(false);
+      setImageToCrop(null);
+    } catch (err: any) {
+      console.error("Gagal memotong gambar:", err);
+      alert("Gagal memotong gambar. Silakan coba lagi.");
+    } finally {
+      setIsCropping(false);
+    }
+  };
+
+  const handleCancelCrop = () => {
+    setIsCropModalOpen(false);
+    setImageToCrop(null);
   };
 
   const handleRemoveImage = () => {
@@ -304,8 +361,14 @@ export default function AdminProductsPage() {
       // Jika user memilih file gambar baru, upload ke /api/upload terlebih dahulu
       if (selectedImageFile) {
         setIsUploadingImage(true);
+        const categoryObj = CATEGORIES.find((c) => c.id === formData.categoryId);
+        const categoryVal = categoryObj ? categoryObj.name : formData.categoryId;
+
         const uploadData = new FormData();
         uploadData.append("file", selectedImageFile);
+        uploadData.append("sku", formData.sku.trim());
+        uploadData.append("category", categoryVal);
+
         const res = await fetch("/api/upload", {
           method: "POST",
           body: uploadData,
@@ -1259,6 +1322,112 @@ export default function AdminProductsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 4.5 MODAL IMAGE EDITOR / CROPPER (REACT-EASY-CROP)                       */}
+      {/* ========================================================================= */}
+      {isCropModalOpen && imageToCrop && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/80 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col">
+            {/* Header */}
+            <div className="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-sm font-bold flex items-center gap-2">
+                  <span>✂️ Edit & Potong Foto Produk</span>
+                </h3>
+                <p className="text-[10px] text-slate-300 mt-0.5">
+                  Atur letak, zoom, dan rotasi agar foto pas dalam rasio 1:1 (Persegi POS)
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCancelCrop}
+                className="text-slate-400 hover:text-white text-base font-bold p-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Cropper Canvas Container */}
+            <div className="relative w-full h-72 sm:h-80 bg-slate-950 overflow-hidden">
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                rotation={rotation}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onRotationChange={setRotation}
+                onCropComplete={handleCropComplete}
+              />
+            </div>
+
+            {/* Controls Bar */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 space-y-3 shrink-0">
+              {/* Zoom Control Slider (1x - 3x) & Rotation Button */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+                {/* Zoom Slider */}
+                <div className="flex-1 flex items-center gap-2">
+                  <span className="font-semibold text-slate-600 text-[11px] whitespace-nowrap">
+                    🔍 Zoom: <strong className="font-mono text-slate-900">{zoom.toFixed(1)}x</strong>
+                  </span>
+                  <input
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                  />
+                </div>
+
+                {/* Rotation 90° Button */}
+                <button
+                  type="button"
+                  onClick={() => setRotation((prev) => (prev + 90) % 360)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-[11px] inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-xs"
+                >
+                  <svg className="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Putar 90° ({rotation}°)</span>
+                </button>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={handleCancelCrop}
+                  className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleApplyCrop}
+                  disabled={isCropping}
+                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5"
+                >
+                  {isCropping ? (
+                    <>
+                      <svg className="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      <span>Memproses...</span>
+                    </>
+                  ) : (
+                    <span>✓ Terapkan & Simpan Foto</span>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

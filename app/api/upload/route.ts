@@ -12,10 +12,34 @@ cloudinary.config({
   secure: true,
 });
 
+/**
+ * Helper untuk menentukan sub-folder Cloudinary berdasarkan kategori produk atau folderType
+ */
+function resolveProductFolder(category?: string | null, folderType?: string | null): string {
+  if (folderType === 'store') return 'dailymart-pos/store';
+  if (folderType === 'evidence' || folderType?.startsWith('evidence')) return 'dailymart-pos/evidence';
+  if (folderType && folderType.startsWith('dailymart-pos/')) return folderType;
+
+  const cat = (category || '').toLowerCase().trim();
+
+  if (cat.includes('sembako')) return 'dailymart-pos/products/sembako';
+  if (cat.includes('makanan') || cat.includes('food')) return 'dailymart-pos/products/makanan';
+  if (cat.includes('minuman') || cat.includes('drink')) return 'dailymart-pos/products/minuman';
+  if (cat.includes('perawatan')) return 'dailymart-pos/products/Perawatan Diri';
+  if (cat.includes('snack') || cat.includes('biskuit')) return 'dailymart-pos/products/Snack and Biskuit';
+  if (cat.includes('obat') || cat.includes('p3k')) return 'dailymart-pos/products/Obat and P3K';
+  if (cat.includes('kebersihan')) return 'dailymart-pos/products/Kebersihan';
+
+  return 'dailymart-pos/products';
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
+    const sku = (formData.get('sku') || formData.get('public_id') || '').toString().trim();
+    const category = (formData.get('category') || formData.get('categoryId') || formData.get('categoryName') || '').toString().trim();
+    const folderType = (formData.get('folderType') || formData.get('folder') || '').toString().trim();
 
     if (!file) {
       return NextResponse.json(
@@ -27,13 +51,26 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload stream to Cloudinary
+    // Tentukan folder tujuan Cloudinary
+    const targetFolder = resolveProductFolder(category, folderType);
+
+    const uploadOptions: any = {
+      folder: targetFolder,
+      resource_type: 'image',
+    };
+
+    // Jika SKU disediakan, gunakan sebagai public_id dengan overwrite: true
+    if (sku) {
+      const cleanSku = sku.replace(/[^a-zA-Z0-9_-]/g, '_');
+      uploadOptions.public_id = cleanSku;
+      uploadOptions.overwrite = true;
+      uploadOptions.invalidate = true;
+    }
+
+    // Upload stream ke Cloudinary
     const uploadResult = await new Promise<any>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'dailymart-pos/products',
-          resource_type: 'image',
-        },
+        uploadOptions,
         (error, result) => {
           if (error || !result) {
             return reject(error || new Error('Gagal mengunggah gambar ke Cloudinary'));
@@ -48,11 +85,12 @@ export async function POST(req: NextRequest) {
       success: true,
       imageUrl: uploadResult.secure_url,
       publicId: uploadResult.public_id,
+      folder: targetFolder,
     });
   } catch (error: any) {
     console.error('[API /api/upload POST Error]:', error);
 
-    // Fallback: If Cloudinary fails or credentials missing, generate Data URI fallback
+    // Fallback: Jika Cloudinary gagal/kredensial belum diset, hasilkan Data URI fallback
     try {
       const reqClone = req.clone();
       const formData = await reqClone.formData();
