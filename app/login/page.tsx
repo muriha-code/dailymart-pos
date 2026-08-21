@@ -55,7 +55,14 @@ export default function LoginPage() {
         throw new Error(result.message || 'Gagal membuat sesi login.');
       }
 
-      // 4. Redirect otomatis ke dashboard sesuai role user
+      // 4. Tandai tab aktif untuk Strict Single-Tab Session Guard
+      try {
+        sessionStorage.setItem('pos_tab_active', 'true');
+      } catch (sErr) {
+        console.warn('Gagal menyimpan pos_tab_active ke sessionStorage:', sErr);
+      }
+
+      // 5. Redirect otomatis ke dashboard sesuai role user
       const userRole: UserRole = result.user?.role || result.data?.role || 'CASHIER';
       const targetPath = ROLE_REDIRECT_MAP[userRole] || '/cashier/transactions';
 

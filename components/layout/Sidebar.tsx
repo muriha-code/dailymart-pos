@@ -93,6 +93,12 @@ export default function Sidebar() {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
     try {
+      try {
+        sessionStorage.removeItem("pos_tab_active");
+      } catch (sErr) {
+        console.warn("Gagal menghapus pos_tab_active dari sessionStorage:", sErr);
+      }
+      await fetch("/api/auth/logout", { method: "POST" });
       await fetch("/api/auth/session", { method: "DELETE" });
       await signOut(clientAuth);
       window.location.href = "/login";

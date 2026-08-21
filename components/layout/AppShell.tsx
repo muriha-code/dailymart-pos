@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import { SidebarProvider, useSidebarContext } from "@/context/SidebarContext";
 
+import AuthProvider from "@/components/providers/AuthProvider";
+
 function MainLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { isCollapsed } = useSidebarContext();
@@ -35,8 +37,10 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
-      <MainLayoutContent>{children}</MainLayoutContent>
-    </SidebarProvider>
+    <AuthProvider>
+      <SidebarProvider>
+        <MainLayoutContent>{children}</MainLayoutContent>
+      </SidebarProvider>
+    </AuthProvider>
   );
 }
