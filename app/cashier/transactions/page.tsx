@@ -52,6 +52,121 @@ const formatRupiah = (amount: number): string => {
   return "Rp " + (amount || 0).toLocaleString("id-ID");
 };
 
+// Helper Fallback Icon Kategori Dinamis
+const CategoryIconFallback = ({
+  categoryId,
+  categoryName,
+  productName,
+}: {
+  categoryId?: string;
+  categoryName?: string;
+  productName: string;
+}) => {
+  const cat = (categoryId || categoryName || "").toLowerCase();
+
+  if (cat.includes("makanan") || cat.includes("food")) {
+    return (
+      <div className="flex flex-col items-center justify-center text-amber-600 bg-amber-50/80 w-full h-full p-2 text-center">
+        <svg className="w-8 h-8 mb-1 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 max-w-[90px] truncate">
+          Makanan
+        </span>
+      </div>
+    );
+  }
+
+  if (cat.includes("minuman") || cat.includes("drink")) {
+    return (
+      <div className="flex flex-col items-center justify-center text-blue-600 bg-blue-50/80 w-full h-full p-2 text-center">
+        <svg className="w-8 h-8 mb-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.605 15.13a1 1 0 00-1.183.398l-.42.63A2 2 0 004 17.333V20a1 1 0 001 1h14a1 1 0 001-1v-2.667a2 2 0 00-.572-1.414zM8 9h8m-8-3h8m-8 6h8" />
+        </svg>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 max-w-[90px] truncate">
+          Minuman
+        </span>
+      </div>
+    );
+  }
+
+  if (cat.includes("snack") || cat.includes("biskuit")) {
+    return (
+      <div className="flex flex-col items-center justify-center text-orange-600 bg-orange-50/80 w-full h-full p-2 text-center">
+        <svg className="w-8 h-8 mb-1 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-orange-700 max-w-[90px] truncate">
+          Snack
+        </span>
+      </div>
+    );
+  }
+
+  if (cat.includes("sembako")) {
+    return (
+      <div className="flex flex-col items-center justify-center text-emerald-600 bg-emerald-50/80 w-full h-full p-2 text-center">
+        <svg className="w-8 h-8 mb-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 max-w-[90px] truncate">
+          Sembako
+        </span>
+      </div>
+    );
+  }
+
+  if (cat.includes("perawatan") || cat.includes("care")) {
+    return (
+      <div className="flex flex-col items-center justify-center text-pink-600 bg-pink-50/80 w-full h-full p-2 text-center">
+        <svg className="w-8 h-8 mb-1 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.684a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-pink-700 max-w-[90px] truncate">
+          Perawatan
+        </span>
+      </div>
+    );
+  }
+
+  if (cat.includes("kebersihan") || cat.includes("clean")) {
+    return (
+      <div className="flex flex-col items-center justify-center text-purple-600 bg-purple-50/80 w-full h-full p-2 text-center">
+        <svg className="w-8 h-8 mb-1 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+        </svg>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 max-w-[90px] truncate">
+          Kebersihan
+        </span>
+      </div>
+    );
+  }
+
+  if (cat.includes("obat") || cat.includes("med")) {
+    return (
+      <div className="flex flex-col items-center justify-center text-red-600 bg-red-50/80 w-full h-full p-2 text-center">
+        <svg className="w-8 h-8 mb-1 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-red-700 max-w-[90px] truncate">
+          Obat & P3K
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center text-slate-500 bg-slate-100/90 w-full h-full p-2 text-center">
+      <svg className="w-8 h-8 mb-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 max-w-[90px] truncate">
+        {productName ? productName.substring(0, 3) : "POS"}
+      </span>
+    </div>
+  );
+};
+
 // ==========================================
 // MAIN COMPONENT
 // ==========================================
@@ -60,6 +175,11 @@ export default function CashierTransactionsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+
+  const handleImageError = (productId: string) => {
+    setFailedImages((prev) => ({ ...prev, [productId]: true }));
+  };
 
   // State Kasir Aktif dari Autentikasi Sesi
   const [cashierUser, setCashierUser] = useState<{
@@ -667,21 +787,19 @@ export default function CashierTransactionsPage() {
                     >
                       {/* Product Thumbnail Container */}
                       <div className="h-28 w-full rounded-lg overflow-hidden bg-slate-100 mb-2 relative flex items-center justify-center border border-slate-100 shrink-0">
-                        {product.imageUrl ? (
+                        {product.imageUrl && !failedImages[product.id || product.sku] ? (
                           <img
                             src={product.imageUrl}
                             alt={product.name}
+                            onError={() => handleImageError(product.id || product.sku)}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           />
                         ) : (
-                          <div className="flex flex-col items-center justify-center text-slate-400 p-2 text-center">
-                            <svg className="w-7 h-7 mb-0.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                              {product.name.substring(0, 3)}
-                            </span>
-                          </div>
+                          <CategoryIconFallback
+                            categoryId={product.categoryId}
+                            categoryName={product.categoryName}
+                            productName={product.name}
+                          />
                         )}
 
                         {/* Overlaid SKU Badge */}

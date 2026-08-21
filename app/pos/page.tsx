@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation';
+import CashierTransactionsPage from "../cashier/transactions/page";
 
-export default function PosPageRedirect() {
-  redirect('/cashier/transactions');
-}
+export default CashierTransactionsPage;

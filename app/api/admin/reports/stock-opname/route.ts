@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
       }
 
       // Status Check
-      const diff = audit.difference ?? audit.diff ?? (audit.physicalStock - audit.systemStock) ?? 0;
+      const diff = audit.difference ?? audit.diff ?? (audit.physicalStock - audit.systemStock);
       if (statusFilter === 'MATCHED' && diff !== 0) return false;
       if (statusFilter === 'DEFICIT' && diff >= 0) return false;
       if (statusFilter === 'SURPLUS' && diff <= 0) return false;
@@ -114,7 +114,7 @@ export async function GET(req: NextRequest) {
     const discrepancyMap: Record<string, number> = {};
 
     const auditsList: StockOpnameAuditItem[] = filtered.map((audit, idx) => {
-      const diff = audit.difference ?? audit.diff ?? (audit.physicalStock - audit.systemStock) ?? 0;
+      const diff = audit.difference ?? audit.diff ?? (audit.physicalStock - audit.systemStock);
       const hpp = productPriceMap[audit.productId] || productPriceMap[audit.sku] || 15000;
       const impactValueRp = Math.abs(diff) * hpp;
 
