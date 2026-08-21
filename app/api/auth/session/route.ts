@@ -86,18 +86,16 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-    // Set Cookie HTTP-Only `session`
+    // Set Cookie HTTP-Only `session` (Session-Only: Purged on browser/tab close)
     response.cookies.set('session', sessionCookie, {
-      maxAge: FIVE_DAYS_SEC,
       httpOnly: true,
       secure: isProduction,
       path: '/',
       sameSite: 'lax',
     });
 
-    // Set Cookie `user_role` (untuk Middleware & RBAC proxy)
+    // Set Cookie `user_role` (Session-Only: Purged on browser/tab close)
     response.cookies.set('user_role', role, {
-      maxAge: FIVE_DAYS_SEC,
       httpOnly: false,
       secure: isProduction,
       path: '/',

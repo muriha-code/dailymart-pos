@@ -14,27 +14,27 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
-  // Load initial collapse state from localStorage after hydration
+  // Load initial collapse state from sessionStorage after hydration
   useEffect(() => {
     setIsMounted(true);
     try {
-      const savedState = localStorage.getItem("sidebar_collapsed");
+      const savedState = sessionStorage.getItem("sidebar_collapsed");
       if (savedState !== null) {
         setIsCollapsed(savedState === "true");
       }
     } catch (err) {
-      console.warn("Gagal membaca status sidebar dari localStorage:", err);
+      console.warn("Gagal membaca status sidebar dari sessionStorage:", err);
     }
   }, []);
 
-  // Toggle state and save to localStorage
+  // Toggle state and save to sessionStorage
   const toggleSidebar = () => {
     setIsCollapsed((prev) => {
       const nextState = !prev;
       try {
-        localStorage.setItem("sidebar_collapsed", String(nextState));
+        sessionStorage.setItem("sidebar_collapsed", String(nextState));
       } catch (err) {
-        console.warn("Gagal menyimpan status sidebar ke localStorage:", err);
+        console.warn("Gagal menyimpan status sidebar ke sessionStorage:", err);
       }
       return nextState;
     });

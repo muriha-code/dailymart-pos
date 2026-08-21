@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
-import { getAuth, type Auth } from 'firebase/auth';
+import { getAuth, setPersistence, browserSessionPersistence, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
@@ -26,3 +26,8 @@ function getFirebaseApp(): FirebaseApp {
 
 export const app: FirebaseApp = getFirebaseApp();
 export const clientAuth: Auth = getAuth(app);
+
+// Enforce Session-Only persistence (Clears auth session on tab/browser close)
+setPersistence(clientAuth, browserSessionPersistence).catch((err) => {
+  console.error('Failed to set browserSessionPersistence for Firebase Auth:', err);
+});
