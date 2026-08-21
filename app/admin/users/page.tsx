@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import toast from "react-hot-toast";
 import { AppUser, UserRole } from "@/types/auth.types";
 import {
   userManagementService,
@@ -122,19 +123,19 @@ export default function UserManagementPage() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!addForm.displayName || !addForm.email || !addForm.password || !addForm.role) {
-      alert("Nama, Email, Kata Sandi, dan Role wajib diisi!");
+      toast.error("Nama, Email, Kata Sandi, dan Role wajib diisi!");
       return;
     }
 
     if (addForm.password.length < 6) {
-      alert("Kata sandi minimal 6 karakter!");
+      toast.error("Kata sandi minimal 6 karakter!");
       return;
     }
 
     setIsSubmitting(true);
     try {
       await userManagementService.createUser(addForm);
-      alert("Pengguna baru berhasil dibuat!");
+      toast.success("Pengguna baru berhasil dibuat");
       setIsAddModalOpen(false);
       setAddForm({
         displayName: "",
@@ -145,7 +146,7 @@ export default function UserManagementPage() {
       });
       loadUsers();
     } catch (err: any) {
-      alert(err.message || "Gagal membuat pengguna baru.");
+      toast.error(err.message || "Gagal membuat pengguna baru.");
     } finally {
       setIsSubmitting(false);
     }
@@ -168,19 +169,19 @@ export default function UserManagementPage() {
     e.preventDefault();
     if (!selectedUser) return;
     if (!editForm.displayName) {
-      alert("Nama pengguna wajib diisi!");
+      toast.error("Nama pengguna wajib diisi!");
       return;
     }
 
     setIsSubmitting(true);
     try {
       await userManagementService.updateUser(selectedUser.uid, editForm);
-      alert("Profil pengguna berhasil diperbarui!");
+      toast.success("Profil pengguna berhasil diperbarui");
       setIsEditModalOpen(false);
       setSelectedUser(null);
       loadUsers();
     } catch (err: any) {
-      alert(err.message || "Gagal memperbarui pengguna.");
+      toast.error(err.message || "Gagal memperbarui pengguna.");
     } finally {
       setIsSubmitting(false);
     }
@@ -199,19 +200,19 @@ export default function UserManagementPage() {
     e.preventDefault();
     if (!selectedUser) return;
     if (!newPassword || newPassword.length < 6) {
-      alert("Kata sandi baru minimal 6 karakter!");
+      toast.error("Kata sandi baru minimal 6 karakter!");
       return;
     }
 
     setIsSubmitting(true);
     try {
       await userManagementService.resetPassword(selectedUser.uid, newPassword);
-      alert(`Kata sandi untuk pengguna ${selectedUser.displayName} berhasil diubah!`);
+      toast.success(`Kata sandi untuk pengguna ${selectedUser.displayName} berhasil diubah!`);
       setIsResetModalOpen(false);
       setSelectedUser(null);
       setNewPassword("");
     } catch (err: any) {
-      alert(err.message || "Gagal mereset kata sandi.");
+      toast.error(err.message || "Gagal mereset kata sandi.");
     } finally {
       setIsSubmitting(false);
     }
@@ -229,10 +230,10 @@ export default function UserManagementPage() {
 
     try {
       await userManagementService.deleteUser(user.uid);
-      alert("Pengguna berhasil dihapus.");
+      toast.success("Pengguna berhasil dihapus");
       loadUsers();
     } catch (err: any) {
-      alert(err.message || "Gagal menghapus pengguna.");
+      toast.error(err.message || "Gagal menghapus pengguna.");
     }
   };
 

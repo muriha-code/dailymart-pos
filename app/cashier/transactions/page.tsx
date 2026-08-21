@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import toast from "react-hot-toast";
 import { Product } from "@/types/product.types";
 import { productService } from "@/services/product.service";
 import { transactionService } from "@/services/transaction.service";
@@ -347,7 +348,7 @@ export default function CashierTransactionsPage() {
   // ==========================================
   const handleAddToCart = (product: Product) => {
     if (product.stock <= 0) {
-      alert(`Stok produk "${product.name}" telah habis!`);
+      toast.error(`Stok produk "${product.name}" telah habis!`);
       return;
     }
 
@@ -357,7 +358,7 @@ export default function CashierTransactionsPage() {
         const item = prev[existingIndex];
         const newQty = item.quantity + 1;
         if (newQty > product.stock) {
-          alert(
+          toast.error(
             `Stok tidak mencukupi! Produk "${product.name}" tersisa ${product.stock} ${product.unit}.`
           );
           return prev;
@@ -369,8 +370,10 @@ export default function CashierTransactionsPage() {
           subtotal: item.unitPrice * newQty,
           totalDiscount: (item.product.discountAmount || 0) * newQty,
         };
+        toast.success(`Jumlah "${product.name}" (+1) diperbarui`);
         return updated;
       } else {
+        toast.success(`"${product.name}" ditambahkan ke keranjang`);
         return [
           ...prev,
           {
@@ -395,7 +398,7 @@ export default function CashierTransactionsPage() {
             const nextQty = item.quantity + delta;
             if (nextQty <= 0) return null;
             if (nextQty > item.product.stock) {
-              alert(
+              toast.error(
                 `Batas stok maksimum tercapai (${item.product.stock} ${item.product.unit}).`
               );
               return item;
@@ -415,13 +418,18 @@ export default function CashierTransactionsPage() {
 
   const handleRemoveFromCart = (productId: string | undefined) => {
     if (!productId) return;
+    const itemToRemove = cart.find((item) => item.product.id === productId);
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
+    if (itemToRemove) {
+      toast(`"${itemToRemove.product.name}" dihapus dari keranjang`, { icon: "🗑️" });
+    }
   };
 
   const handleClearCart = () => {
     if (cart.length === 0) return;
     if (confirm("Kosongkan semua item di keranjang belanja?")) {
       setCart([]);
+      toast("Keranjang belanja dibersihkan", { icon: "🧹" });
     }
   };
 
@@ -430,7 +438,7 @@ export default function CashierTransactionsPage() {
   // ==========================================
   const handleOpenPaymentModal = () => {
     if (cart.length === 0) {
-      alert("Keranjang belanja masih kosong! Tambahkan produk terlebih dahulu.");
+      toast.error("Keranjang belanja masih kosong! Tambahkan produk terlebih dahulu.");
       return;
     }
     setPaymentMethod("CASH");
@@ -453,12 +461,12 @@ export default function CashierTransactionsPage() {
 
   const handleProcessCheckout = async () => {
     if (!isCashSufficient) {
-      alert("Nominal pembayaran tunai masih kurang dari total tagihan!");
+      toast.error("Nominal pembayaran tunai masih kurang dari total tagihan!");
       return;
     }
 
     if (paymentMethod === "DEBIT" && !debitRefNumber.trim()) {
-      alert("Harap masukkan nomor referensi/approval kartu debit!");
+      toast.error("Harap masukkan nomor referensi/approval kartu debit!");
       return;
     }
 
@@ -502,6 +510,7 @@ export default function CashierTransactionsPage() {
         bankName: paymentMethod === "DEBIT" ? debitBank : undefined,
       };
 
+      toast.success(`Transaksi ${createdTransaction.transactionNumber} berhasil dibayar`);
       setLastTransaction(summary);
       setIsPaymentModalOpen(false);
       setIsSuccessModalOpen(true);
@@ -509,7 +518,7 @@ export default function CashierTransactionsPage() {
       loadProducts(); // Refresh katalog stok produk terkini
     } catch (err: any) {
       console.error("Gagal memproses transaksi checkout:", err);
-      alert(err.message || "Gagal memproses transaksi. Silakan periksa koneksi atau ketersediaan stok.");
+      toast.error(err.message || "Gagal memproses transaksi. Silakan periksa stok.");
     } finally {
       setIsProcessingCheckout(false);
     }

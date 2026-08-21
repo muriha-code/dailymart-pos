@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import toast from "react-hot-toast";
 import { Product } from "@/types/product.types";
 import { productService } from "@/services/product.service";
 import { restockRequestService } from "@/services/restockRequest.service";
@@ -177,10 +178,12 @@ export default function RestockRequestsPage() {
         reasonNotes: reasonNotesInput,
       });
 
+      toast.success("Pengajuan restok berhasil dibuat");
       setIsModalOpen(false);
       loadRestockRequests();
     } catch (err: any) {
       console.error("Gagal membuat pengajuan restok:", err);
+      toast.error(err.message || "Gagal menyimpan tiket pengajuan restok.");
       setSubmitError(err.message || "Gagal menyimpan tiket pengajuan restok.");
     } finally {
       setIsSubmitting(false);

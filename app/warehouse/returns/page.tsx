@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import toast from "react-hot-toast";
 import { Product } from "@/types/product.types";
 import { Supplier } from "@/types/supplier.types";
 import {
@@ -253,11 +254,13 @@ export default function StockReturnsPage() {
         notes: notesInput,
       });
 
+      toast.success("Laporan retur / pemusnahan barang berhasil dicatat");
       setIsModalOpen(false);
       loadReturnLogs();
       loadProducts();
     } catch (err: any) {
       console.error("Gagal mencatat retur barang:", err);
+      toast.error(err.message || "Gagal memproses pencatatan retur.");
       setSubmitError(err.message || "Gagal memproses pencatatan retur.");
     } finally {
       setIsSubmitting(false);

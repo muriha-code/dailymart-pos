@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import toast from "react-hot-toast";
 import { Product } from "@/types/product.types";
 import { StockInItem } from "@/types/inventory.types";
 import { productService } from "@/services/product.service";
@@ -108,7 +109,7 @@ export default function WarehouseStockInPage() {
   // Add Item to Temporary Queue
   const handleAddItemToQueue = () => {
     if (!selectedProductId) {
-      alert("Pilih produk terlebih dahulu!");
+      toast.error("Pilih produk terlebih dahulu!");
       return;
     }
 
@@ -116,12 +117,12 @@ export default function WarehouseStockInPage() {
     if (!targetProduct) return;
 
     if (inputQuantity <= 0) {
-      alert("Kuantitas barang masuk harus lebih dari 0!");
+      toast.error("Kuantitas barang masuk harus lebih dari 0!");
       return;
     }
 
     if (inputPurchasePrice < 0) {
-      alert("Harga beli tidak boleh negatif!");
+      toast.error("Harga beli tidak boleh negatif!");
       return;
     }
 
@@ -155,6 +156,7 @@ export default function WarehouseStockInPage() {
       ]);
     }
 
+    toast.success(`Item "${targetProduct.name}" ditambahkan ke antrean penerimaan`);
     setStatusMessage(null);
   };
 
@@ -213,17 +215,17 @@ export default function WarehouseStockInPage() {
   // Submit Stock-In Payload to Service Layer
   const handleSubmitStockIn = async () => {
     if (!supplierId || !supplierId.trim()) {
-      alert("Pemasok / Supplier wajib dipilih!");
+      toast.error("Pemasok / Supplier wajib dipilih!");
       return;
     }
 
     if (!receivedBy || !receivedBy.trim()) {
-      alert("Petugas Penerima (Staf Gudang) wajib diisi!");
+      toast.error("Petugas Penerima (Staf Gudang) wajib diisi!");
       return;
     }
 
     if (queueItems.length === 0) {
-      alert("Antrean penerimaan barang masih kosong!");
+      toast.error("Antrean penerimaan barang masih kosong!");
       return;
     }
 
@@ -249,6 +251,7 @@ export default function WarehouseStockInPage() {
         })),
       });
 
+      toast.success("Stok masuk berhasil dicatat");
       setStatusMessage({
         type: "success",
         text: `Penerimaan barang (${result.invoiceNumber}) sebanyak ${result.totalQuantity} unit berhasil dicatat di sistem gudang!`,
@@ -262,6 +265,7 @@ export default function WarehouseStockInPage() {
       loadProducts();
     } catch (err: any) {
       console.error("Gagal submit restock:", err);
+      toast.error(err.message || "Gagal mencatat penerimaan barang.");
       setStatusMessage({
         type: "error",
         text: err.message || "Gagal mencatat penerimaan barang.",

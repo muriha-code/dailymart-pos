@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import toast from "react-hot-toast";
 import { Product } from "@/types/product.types";
 import { productService } from "@/services/product.service";
 import Cropper from "react-easy-crop";
@@ -84,14 +85,6 @@ export default function AdminProductsPage() {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState<boolean>(false);
   const [isDeletingProduct, setIsDeletingProduct] = useState<boolean>(false);
-  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
-
-  const showToast = (type: "success" | "error", message: string) => {
-    setToast({ type, message });
-    setTimeout(() => {
-      setToast(null);
-    }, 4000);
-  };
 
   // Form Field States
   const [formData, setFormData] = useState({
@@ -312,10 +305,7 @@ export default function AdminProductsPage() {
         categoryId: productToDelete.categoryId,
         categoryName: productToDelete.categoryName,
       });
-      showToast(
-        "success",
-        `Produk "${productToDelete.name}" (${productToDelete.sku}) beserta foto di Cloudinary berhasil dihapus permanen!`
-      );
+      toast.success("Produk & foto berhasil dihapus permanen");
       setSelectedProductIds((prev) =>
         prev.filter((id) => id !== productToDelete.id)
       );
@@ -323,7 +313,7 @@ export default function AdminProductsPage() {
       loadProducts();
     } catch (err: any) {
       console.error("Gagal menghapus produk:", err);
-      showToast("error", err.message || "Gagal menghapus produk.");
+      toast.error(err.message || "Gagal menghapus produk");
     } finally {
       setIsDeletingProduct(false);
     }
@@ -345,16 +335,13 @@ export default function AdminProductsPage() {
         };
       });
       await productService.deleteProductsBulk(items);
-      showToast(
-        "success",
-        `${selectedProductIds.length} produk terpilih beserta foto di Cloudinary berhasil dihapus permanen!`
-      );
+      toast.success(`${selectedProductIds.length} produk & foto berhasil dihapus permanen`);
       setIsBulkDeleteModalOpen(false);
       setSelectedProductIds([]);
       loadProducts();
     } catch (err: any) {
       console.error("Gagal menghapus produk terpilih:", err);
-      showToast("error", err.message || "Gagal menghapus produk terpilih.");
+      toast.error(err.message || "Gagal menghapus produk terpilih");
     } finally {
       setIsDeletingProduct(false);
     }
@@ -500,6 +487,7 @@ export default function AdminProductsPage() {
           status: formData.status,
           imageUrl: finalImageUrl.trim() || undefined,
         });
+        toast.success("Data produk berhasil diperbarui");
       } else {
         await productService.createProduct({
           sku: formData.sku.trim(),
@@ -516,6 +504,7 @@ export default function AdminProductsPage() {
           status: formData.status,
           imageUrl: finalImageUrl.trim() || undefined,
         });
+        toast.success("Produk baru berhasil ditambahkan");
       }
 
       setIsModalOpen(false);
@@ -525,6 +514,7 @@ export default function AdminProductsPage() {
     } catch (err: any) {
       console.error("Error submit product form:", err);
       setFormError(err.message || "Terjadi kesalahan saat menyimpan produk.");
+      toast.error(err.message || "Terjadi kesalahan saat menyimpan produk.");
     } finally {
       setIsSubmitting(false);
       setIsUploadingImage(false);
@@ -544,11 +534,16 @@ export default function AdminProductsPage() {
     setIsTogglingStatus(true);
     try {
       await productService.toggleProductStatus(productToToggle.id, newStatus);
+      toast.success(
+        `Status produk "${productToToggle.name}" diubah menjadi ${
+          newStatus === "active" ? "Aktif" : "Nonaktif"
+        }`
+      );
       setProductToToggle(null);
       loadProducts();
     } catch (err: any) {
       console.error("Gagal mengubah status produk:", err);
-      alert(err.message || "Terjadi kesalahan saat mengubah status produk.");
+      toast.error(err.message || "Terjadi kesalahan saat mengubah status produk.");
     } finally {
       setIsTogglingStatus(false);
     }
@@ -869,28 +864,27 @@ export default function AdminProductsPage() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+              <div className="w-full overflow-hidden">
+                <table className="w-full table-fixed text-left border-collapse text-xs">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="py-3.5 px-3 text-center w-10">
+                      <th className="py-2.5 px-1.5 text-center w-[4%]">
                         <input
                           type="checkbox"
                           checked={isAllPaginatedSelected}
                           onChange={handleToggleSelectAll}
-                          className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
+                          className="w-3.5 h-3.5 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
                           title="Pilih Semua di Halaman Ini"
                         />
                       </th>
-                      <th className="py-3.5 px-4">SKU / Barcode</th>
-                      <th className="py-3.5 px-4">Nama Produk</th>
-                      <th className="py-3.5 px-4">Kategori</th>
-                      <th className="py-3.5 px-4 text-right">Modal (Beli)</th>
-                      <th className="py-3.5 px-4 text-right">Harga Jual</th>
-                      <th className="py-3.5 px-4 text-center">Est. Margin</th>
-                      <th className="py-3.5 px-4 text-center">Stok / Min</th>
-                      <th className="py-3.5 px-4 text-center">Status</th>
-                      <th className="py-3.5 px-4 text-center">Aksi</th>
+                      <th className="py-2.5 px-2 w-[14%]">SKU / Barcode</th>
+                      <th className="py-2.5 px-2 w-[24%]">Nama Produk</th>
+                      <th className="py-2.5 px-2 w-[12%] text-center">Kategori</th>
+                      <th className="py-2.5 px-2 text-right w-[10%]">Modal (Beli)</th>
+                      <th className="py-2.5 px-2 text-right w-[10%]">Harga Jual</th>
+                      <th className="py-2.5 px-1.5 text-center w-[8%]">Margin (%)</th>
+                      <th className="py-2.5 px-1.5 text-center w-[8%]">Stok</th>
+                      <th className="py-2.5 px-1.5 text-center w-[10%]">Aksi</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 text-xs text-slate-800">
@@ -914,32 +908,32 @@ export default function AdminProductsPage() {
                               : ""
                           }`}
                         >
-                          {/* Checkbox Batch Selection */}
-                          <td className="py-3.5 px-3 text-center">
+                          {/* Checkbox Batch Selection (4%) */}
+                          <td className="py-2.5 px-1.5 text-center w-[4%]">
                             <input
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => handleToggleSelectProduct(prod.id!)}
-                              className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
+                              className="w-3.5 h-3.5 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
                             />
                           </td>
 
-                          {/* SKU / Barcode */}
-                          <td className="py-3.5 px-4 font-mono">
-                            <div className="font-bold text-slate-900">
+                          {/* SKU / Barcode (14%) */}
+                          <td className="py-2.5 px-2 font-mono w-[14%] truncate">
+                            <div className="font-bold text-slate-900 truncate" title={prod.sku}>
                               {prod.sku}
                             </div>
                             {prod.barcode && (
-                              <div className="text-[10px] text-slate-400">
+                              <div className="text-[10px] text-slate-400 truncate" title={prod.barcode}>
                                 {prod.barcode}
                               </div>
                             )}
                           </td>
 
-                          {/* Nama Produk & Satuan */}
-                          <td className="py-3.5 px-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center shadow-xs">
+                          {/* Nama Produk & Satuan (24%) */}
+                          <td className="py-2.5 px-2 w-[24%]">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center shadow-xs">
                                 {prod.imageUrl ? (
                                   <img
                                     src={prod.imageUrl}
@@ -947,43 +941,49 @@ export default function AdminProductsPage() {
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
-                                  <span className="font-bold text-slate-400 text-xs uppercase">
+                                  <span className="font-bold text-slate-400 text-[10px] uppercase">
                                     {prod.name.substring(0, 2)}
                                   </span>
                                 )}
                               </div>
-                              <div>
-                                <div className="font-bold text-slate-900 max-w-xs truncate">
+                              <div className="min-w-0 flex-1">
+                                <div
+                                  className="font-bold text-slate-900 truncate text-xs"
+                                  title={prod.name}
+                                >
                                   {prod.name}
                                 </div>
-                                <span className="text-[10px] font-semibold text-slate-500 uppercase">
-                                  Satuan: {prod.unit || "Pcs"}
+                                <span className="text-[10px] font-semibold text-slate-500 uppercase block truncate">
+                                  {prod.unit || "Pcs"}
                                 </span>
                               </div>
                             </div>
                           </td>
 
-                          {/* Kategori */}
-                          <td className="py-3.5 px-4">
-                            <span className="px-2 py-1 rounded-md bg-slate-100 text-slate-700 font-semibold text-[11px] whitespace-nowrap">
+                          {/* Kategori (12%) */}
+                          <td className="py-2.5 px-2 text-center w-[12%]">
+                            <span
+                              className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold text-[10px] block truncate"
+                              title={prod.categoryName || prod.categoryId}
+                            >
                               {prod.categoryName || prod.categoryId}
                             </span>
                           </td>
 
-                          {/* Harga Beli */}
-                          <td className="py-3.5 px-4 text-right font-mono font-medium text-slate-600 whitespace-nowrap">
+                          {/* Harga Beli (10%) */}
+                          <td className="py-2.5 px-2 text-right font-mono font-medium text-slate-600 w-[10%] truncate">
                             {formatRupiah(prod.purchasePrice)}
                           </td>
 
-                          {/* Harga Jual */}
-                          <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
+                          {/* Harga Jual (10%) */}
+                          <td className="py-2.5 px-2 text-right font-mono font-bold text-slate-900 w-[10%] truncate">
                             {formatRupiah(prod.sellingPrice)}
                           </td>
 
-                          {/* Estimasi Margin (%) */}
-                          <td className="py-3.5 px-4 text-center font-mono whitespace-nowrap">
+                          {/* Estimasi Margin (%) (8%) */}
+                          <td className="py-2.5 px-1.5 text-center font-mono w-[8%]">
                             <span
-                              className={`px-2 py-0.5 rounded font-bold text-[11px] ${
+                              className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
                                 marginPct >= 15
                                   ? "bg-emerald-50 text-emerald-700"
                                   : marginPct >= 5
@@ -995,69 +995,69 @@ export default function AdminProductsPage() {
                             </span>
                           </td>
 
-                          {/* Stok Aktual vs Min Stock */}
-                          <td className="py-3.5 px-4 text-center font-mono whitespace-nowrap">
-                            <div className="flex items-center justify-center gap-1.5">
-                              <span className="font-bold text-slate-900 text-sm">
-                                {prod.stock}
-                              </span>
-                              <span className="text-slate-400 text-[10px]">
-                                / min {prod.minimumStock}
+                          {/* Stok & Status (8%) */}
+                          <td className="py-2.5 px-1.5 text-center font-mono w-[8%]">
+                            <div className="font-bold text-slate-900 text-xs">
+                              {prod.stock}{" "}
+                              <span className="text-[9px] text-slate-400 font-normal">
+                                /{prod.minimumStock}
                               </span>
                             </div>
-                            {isLowStock && (
-                              <span className="inline-block px-1.5 py-0.2 mt-0.5 rounded bg-red-600 text-white font-sans font-bold text-[9px] uppercase tracking-wider">
-                                ⚠️ Low Stock
-                              </span>
-                            )}
+                            <div className="mt-0.5">
+                              {prod.status === "active" ? (
+                                isLowStock ? (
+                                  <span className="inline-block px-1.5 py-0.2 rounded bg-red-600 text-white font-sans font-bold text-[8px] uppercase">
+                                    ⚠️ Low
+                                  </span>
+                                ) : (
+                                  <span className="inline-block px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-sans font-bold text-[8px] uppercase">
+                                    Aktif
+                                  </span>
+                                )
+                              ) : (
+                                <span className="inline-block px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 border border-slate-300 font-sans font-bold text-[8px] uppercase">
+                                  Off
+                                </span>
+                              )}
+                            </div>
                           </td>
 
-                          {/* Status Badge */}
-                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                            {prod.status === "active" ? (
-                              <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px] uppercase tracking-wider">
-                                Aktif
-                              </span>
-                            ) : (
-                              <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-300 font-bold text-[10px] uppercase tracking-wider">
-                                Nonaktif
-                              </span>
-                            )}
-                          </td>
-
-                          {/* Kolom Aksi (Edit, Toggle Status, Hapus Permanen) */}
-                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                            <div className="flex items-center justify-center gap-1.5">
+                          {/* Kolom Aksi (10%) */}
+                          <td className="py-2.5 px-1.5 text-center w-[10%]">
+                            <div className="flex items-center justify-center gap-1">
                               <button
                                 type="button"
                                 onClick={() => handleOpenEditModal(prod)}
-                                className="px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs transition-colors cursor-pointer"
+                                className="p-1 rounded-md border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors cursor-pointer"
                                 title="Edit Produk"
                               >
-                                Edit
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => handleOpenToggleConfirm(prod)}
-                                className={`px-2.5 py-1.5 rounded-lg border font-semibold text-xs transition-colors cursor-pointer ${
+                                className={`p-1 rounded-md border transition-colors cursor-pointer ${
                                   prod.status === "active"
                                     ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"
                                     : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                 }`}
+                                title={prod.status === "active" ? "Nonaktifkan Produk" : "Aktifkan Produk"}
                               >
-                                {prod.status === "active"
-                                  ? "Nonaktifkan"
-                                  : "Aktifkan"}
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                </svg>
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => setProductToDelete(prod)}
-                                className="p-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-xs transition-colors cursor-pointer"
-                                title="Hapus Produk Permanen (Firestore & Cloudinary)"
+                                className="p-1 rounded-md border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
+                                title="Hapus Produk Permanen"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               </button>
@@ -1643,28 +1643,6 @@ export default function AdminProductsPage() {
           if (!isDeletingProduct) setIsBulkDeleteModalOpen(false);
         }}
       />
-
-      {/* ========================================================================= */}
-      {/* 8. TOAST NOTIFICATION BANNER                                             */}
-      {/* ========================================================================= */}
-      {toast && (
-        <div
-          className={`fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-2xl shadow-2xl border font-bold text-xs flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-200 ${
-            toast.type === "success"
-              ? "bg-slate-900 text-emerald-400 border-emerald-500/30"
-              : "bg-slate-900 text-red-400 border-red-500/30"
-          }`}
-        >
-          <span className="text-base">{toast.type === "success" ? "✅" : "⚠️"}</span>
-          <span>{toast.message}</span>
-          <button
-            onClick={() => setToast(null)}
-            className="ml-2 text-slate-400 hover:text-white font-bold p-1 cursor-pointer"
-          >
-            ✕
-          </button>
-        </div>
-      )}
     </div>
   );
 }

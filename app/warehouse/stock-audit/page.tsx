@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import toast from "react-hot-toast";
 import { Product } from "@/types/product.types";
 import { StockAuditRecord, AuditReason } from "@/types/stockAudit.types";
 import { productService } from "@/services/product.service";
@@ -268,12 +269,14 @@ export default function StockAuditPage() {
         notes: notesInput,
       });
 
+      toast.success("Hasil audit stok berhasil diverifikasi");
       // Refresh data
       setIsModalOpen(false);
       loadAuditHistory();
       loadProducts();
     } catch (err: any) {
       console.error("Gagal menyimpan verifikasi stok:", err);
+      toast.error(err.message || "Gagal memproses verifikasi stok.");
       setSubmitError(err.message || "Gagal memproses verifikasi stok.");
     } finally {
       setIsSubmitting(false);
