@@ -130,4 +130,52 @@ export const productService = {
 
     return result.data;
   },
+
+  /**
+   * Permanently delete a single product (Firestore + Cloudinary)
+   */
+  async deleteProduct(
+    id: string,
+    options?: { sku?: string; imageUrl?: string; categoryId?: string; categoryName?: string }
+  ): Promise<void> {
+    const response = await fetch("/api/admin/products/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId: id,
+        sku: options?.sku,
+        imageUrl: options?.imageUrl,
+        category: options?.categoryName || options?.categoryId,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Gagal menghapus produk permanen.");
+    }
+  },
+
+  /**
+   * Permanently delete multiple products in bulk (Firestore + Cloudinary)
+   */
+  async deleteProductsBulk(
+    items: Array<{ productId: string; sku?: string; imageUrl?: string; categoryId?: string; categoryName?: string }>
+  ): Promise<void> {
+    const response = await fetch("/api/admin/products/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ items }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Gagal menghapus produk terpilih.");
+    }
+  },
 };

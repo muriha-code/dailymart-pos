@@ -79,6 +79,20 @@ export default function AdminProductsPage() {
   const [productToToggle, setProductToToggle] = useState<Product | null>(null);
   const [isTogglingStatus, setIsTogglingStatus] = useState<boolean>(false);
 
+  // Delete State (Single & Bulk Batch Delete)
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState<boolean>(false);
+  const [isDeletingProduct, setIsDeletingProduct] = useState<boolean>(false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  const showToast = (type: "success" | "error", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast(null);
+    }, 4000);
+  };
+
   // Form Field States
   const [formData, setFormData] = useState({
     sku: "",
@@ -258,6 +272,93 @@ export default function AdminProductsPage() {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
+
+  // Batch Selection Helpers (Checkbox)
+  const paginatedProductIds = useMemo(() => {
+    return paginatedProducts.map((p) => p.id!).filter(Boolean);
+  }, [paginatedProducts]);
+
+  const isAllPaginatedSelected = useMemo(() => {
+    if (paginatedProductIds.length === 0) return false;
+    return paginatedProductIds.every((id) => selectedProductIds.includes(id));
+  }, [paginatedProductIds, selectedProductIds]);
+
+  const handleToggleSelectAll = () => {
+    if (isAllPaginatedSelected) {
+      setSelectedProductIds((prev) =>
+        prev.filter((id) => !paginatedProductIds.includes(id))
+      );
+    } else {
+      setSelectedProductIds((prev) =>
+        Array.from(new Set([...prev, ...paginatedProductIds]))
+      );
+    }
+  };
+
+  const handleToggleSelectProduct = (id: string) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  // Single Product Delete Confirmation Handler
+  const handleConfirmSingleDelete = async () => {
+    if (!productToDelete || !productToDelete.id) return;
+    setIsDeletingProduct(true);
+    try {
+      await productService.deleteProduct(productToDelete.id, {
+        sku: productToDelete.sku,
+        imageUrl: productToDelete.imageUrl,
+        categoryId: productToDelete.categoryId,
+        categoryName: productToDelete.categoryName,
+      });
+      showToast(
+        "success",
+        `Produk "${productToDelete.name}" (${productToDelete.sku}) beserta foto di Cloudinary berhasil dihapus permanen!`
+      );
+      setSelectedProductIds((prev) =>
+        prev.filter((id) => id !== productToDelete.id)
+      );
+      setProductToDelete(null);
+      loadProducts();
+    } catch (err: any) {
+      console.error("Gagal menghapus produk:", err);
+      showToast("error", err.message || "Gagal menghapus produk.");
+    } finally {
+      setIsDeletingProduct(false);
+    }
+  };
+
+  // Bulk / Batch Product Delete Confirmation Handler
+  const handleConfirmBulkDelete = async () => {
+    if (selectedProductIds.length === 0) return;
+    setIsDeletingProduct(true);
+    try {
+      const items = selectedProductIds.map((id) => {
+        const p = products.find((prod) => prod.id === id);
+        return {
+          productId: id,
+          sku: p?.sku,
+          imageUrl: p?.imageUrl,
+          categoryId: p?.categoryId,
+          categoryName: p?.categoryName,
+        };
+      });
+      await productService.deleteProductsBulk(items);
+      showToast(
+        "success",
+        `${selectedProductIds.length} produk terpilih beserta foto di Cloudinary berhasil dihapus permanen!`
+      );
+      setIsBulkDeleteModalOpen(false);
+      setSelectedProductIds([]);
+      loadProducts();
+    } catch (err: any) {
+      console.error("Gagal menghapus produk terpilih:", err);
+      showToast("error", err.message || "Gagal menghapus produk terpilih.");
+    } finally {
+      setIsDeletingProduct(false);
+    }
+  };
 
   // ==========================================
   // HANDLERS MODAL FORM
@@ -469,27 +570,42 @@ export default function AdminProductsPage() {
             </p>
           </div>
 
-          {/* Tombol Utama: Tambah Produk Baru (Warm Amber Accent) */}
-          <button
-            type="button"
-            onClick={handleOpenCreateModal}
-            className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer shrink-0"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {/* Header Action Buttons */}
+          <div className="flex items-center gap-3 shrink-0">
+            {selectedProductIds.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsBulkDeleteModalOpen(true)}
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer animate-in fade-in zoom-in-95 duration-150"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>Hapus ({selectedProductIds.length}) Terpilih</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={handleOpenCreateModal}
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.5"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            <span>Tambah Produk Baru</span>
-          </button>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              <span>Tambah Produk Baru</span>
+            </button>
+          </div>
         </div>
 
         {/* Quick Stats Metric Cards (Revisi 1: 4 Metrik Kartu Termasuk Total Nonaktif) */}
@@ -757,6 +873,15 @@ export default function AdminProductsPage() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                      <th className="py-3.5 px-3 text-center w-10">
+                        <input
+                          type="checkbox"
+                          checked={isAllPaginatedSelected}
+                          onChange={handleToggleSelectAll}
+                          className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
+                          title="Pilih Semua di Halaman Ini"
+                        />
+                      </th>
                       <th className="py-3.5 px-4">SKU / Barcode</th>
                       <th className="py-3.5 px-4">Nama Produk</th>
                       <th className="py-3.5 px-4">Kategori</th>
@@ -776,16 +901,29 @@ export default function AdminProductsPage() {
                         prod.purchasePrice,
                         prod.sellingPrice
                       );
+                      const isSelected = selectedProductIds.includes(prod.id!);
 
                       return (
                         <tr
                           key={prod.id || prod.sku}
                           className={`hover:bg-slate-50/80 transition-colors ${
-                            prod.status === "inactive"
+                            isSelected
+                              ? "bg-amber-50/50"
+                              : prod.status === "inactive"
                               ? "bg-slate-50/40 opacity-70"
                               : ""
                           }`}
                         >
+                          {/* Checkbox Batch Selection */}
+                          <td className="py-3.5 px-3 text-center">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => handleToggleSelectProduct(prod.id!)}
+                              className="w-4 h-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
+                            />
+                          </td>
+
                           {/* SKU / Barcode */}
                           <td className="py-3.5 px-4 font-mono">
                             <div className="font-bold text-slate-900">
@@ -887,7 +1025,7 @@ export default function AdminProductsPage() {
                             )}
                           </td>
 
-                          {/* Kolom Aksi (Edit & Toggle Status) */}
+                          {/* Kolom Aksi (Edit, Toggle Status, Hapus Permanen) */}
                           <td className="py-3.5 px-4 text-center whitespace-nowrap">
                             <div className="flex items-center justify-center gap-1.5">
                               <button
@@ -904,13 +1042,24 @@ export default function AdminProductsPage() {
                                 onClick={() => handleOpenToggleConfirm(prod)}
                                 className={`px-2.5 py-1.5 rounded-lg border font-semibold text-xs transition-colors cursor-pointer ${
                                   prod.status === "active"
-                                    ? "border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
+                                    ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"
                                     : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                                 }`}
                               >
                                 {prod.status === "active"
                                   ? "Nonaktifkan"
                                   : "Aktifkan"}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => setProductToDelete(prod)}
+                                className="p-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-xs transition-colors cursor-pointer"
+                                title="Hapus Produk Permanen (Firestore & Cloudinary)"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                               </button>
                             </div>
                           </td>
@@ -1460,6 +1609,62 @@ export default function AdminProductsPage() {
           if (!isTogglingStatus) setProductToToggle(null);
         }}
       />
+
+      {/* ========================================================================= */}
+      {/* 6. MODAL KONFIRMASI DESTRUKTIF: HAPUS PRODUK TUNGGAL                     */}
+      {/* ========================================================================= */}
+      <ConfirmModal
+        isOpen={!!productToDelete}
+        title="Hapus Produk Permanen?"
+        message={`Produk "${productToDelete?.name}" (SKU: ${productToDelete?.sku}) beserta file foto di server Cloudinary akan dihapus selamanya. Tindakan ini tidak dapat dibatalkan.`}
+        confirmLabel="Ya, Hapus Permanen"
+        cancelLabel="Batal"
+        isDestructive={true}
+        isLoading={isDeletingProduct}
+        onConfirm={handleConfirmSingleDelete}
+        onClose={() => {
+          if (!isDeletingProduct) setProductToDelete(null);
+        }}
+      />
+
+      {/* ========================================================================= */}
+      {/* 7. MODAL KONFIRMASI DESTRUKTIF: HAPUS MASAL (BULK BATCH DELETE)           */}
+      {/* ========================================================================= */}
+      <ConfirmModal
+        isOpen={isBulkDeleteModalOpen}
+        title={`Hapus ${selectedProductIds.length} Produk Terpilih?`}
+        message={`Apakah Anda yakin ingin menghapus ${selectedProductIds.length} produk yang tercentang? Seluruh dokumen di Firestore dan aset foto terkait di server Cloudinary akan dihapus permanen.`}
+        confirmLabel="Ya, Hapus Permanen"
+        cancelLabel="Batal"
+        isDestructive={true}
+        isLoading={isDeletingProduct}
+        onConfirm={handleConfirmBulkDelete}
+        onClose={() => {
+          if (!isDeletingProduct) setIsBulkDeleteModalOpen(false);
+        }}
+      />
+
+      {/* ========================================================================= */}
+      {/* 8. TOAST NOTIFICATION BANNER                                             */}
+      {/* ========================================================================= */}
+      {toast && (
+        <div
+          className={`fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-2xl shadow-2xl border font-bold text-xs flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-200 ${
+            toast.type === "success"
+              ? "bg-slate-900 text-emerald-400 border-emerald-500/30"
+              : "bg-slate-900 text-red-400 border-red-500/30"
+          }`}
+        >
+          <span className="text-base">{toast.type === "success" ? "✅" : "⚠️"}</span>
+          <span>{toast.message}</span>
+          <button
+            onClick={() => setToast(null)}
+            className="ml-2 text-slate-400 hover:text-white font-bold p-1 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }
