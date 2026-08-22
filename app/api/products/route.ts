@@ -363,16 +363,25 @@ export async function POST(req: NextRequest) {
     const body: Product = await req.json();
 
     // Validasi basic
-    if (!body.sku || !body.name || body.purchasePrice == null || body.sellingPrice == null) {
+    if (!body.sku || !body.name || (body.purchasePrice == null && body.supplierPrice == null) || body.sellingPrice == null) {
       return NextResponse.json(
-        { success: false, message: 'SKU, Nama, Harga Beli, dan Harga Jual wajib diisi' },
+        { success: false, message: 'SKU, Nama, Harga Beli/Supplier, dan Harga Jual wajib diisi' },
         { status: 400 }
       );
     }
 
-    if (body.purchasePrice < 0 || body.sellingPrice < 0 || (body.stock && body.stock < 0)) {
+    if (
+      (body.purchasePrice != null && body.purchasePrice < 0) ||
+      (body.supplierPrice != null && body.supplierPrice < 0) ||
+      (body.purchaseUnitCost != null && body.purchaseUnitCost < 0) ||
+      body.sellingPrice < 0 ||
+      (body.stock && body.stock < 0) ||
+      (body.purchaseDiscount != null && body.purchaseDiscount < 0) ||
+      (body.additionalCost != null && body.additionalCost < 0) ||
+      (body.conversionQty != null && body.conversionQty <= 0)
+    ) {
       return NextResponse.json(
-        { success: false, message: 'Harga dan stok tidak boleh bernilai negatif' },
+        { success: false, message: 'Harga, diskon, biaya tambahan, dan kuantitas konversi tidak valid (harus non-negatif)' },
         { status: 400 }
       );
     }
@@ -386,8 +395,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Kalkulasi HPP per unit (Retail Cost Breakdown)
+    const conversionQty = body.conversionQty && Number(body.conversionQty) > 0 ? Number(body.conversionQty) : 1;
+    let baseUnitSupplierPrice = Number(body.supplierPrice ?? body.purchasePrice ?? 0);
+
+    // Jika dibeli dalam satuan besar (misal Karton/Dus)
+    if (body.purchaseUnitCost && Number(body.purchaseUnitCost) > 0) {
+      baseUnitSupplierPrice = Math.round(Number(body.purchaseUnitCost) / conversionQty);
+    }
+
+    const discount = Number(body.purchaseDiscount || 0);
+    const additional = Number(body.additionalCost || 0);
+    const calculatedHpp = Math.max(0, baseUnitSupplierPrice - discount + additional);
+
+    const markupPct = Number(body.markupPercentage || 0);
+    const recommendedPrice = Math.round(calculatedHpp * (1 + markupPct / 100));
+
     const newProduct = {
       ...body,
+      supplierPrice: baseUnitSupplierPrice,
+      purchaseDiscount: discount,
+      additionalCost: additional,
+      purchaseUnit: body.purchaseUnit || body.unit || 'Pcs',
+      conversionQty,
+      purchaseUnitCost: body.purchaseUnitCost ? Number(body.purchaseUnitCost) : undefined,
+      costPrice: calculatedHpp,
+      purchasePrice: calculatedHpp, // Synced as standard purchase price for backward-compatibility
+      markupPercentage: markupPct,
+      recommendedPrice,
+      sellingPrice: Number(body.sellingPrice),
       barcode: body.barcode || null,
       stock: body.stock || 0,
       minimumStock: body.minimumStock || 5,

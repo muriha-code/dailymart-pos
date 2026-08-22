@@ -53,117 +53,24 @@ const formatRupiah = (amount: number): string => {
   return "Rp " + (amount || 0).toLocaleString("id-ID");
 };
 
-// Helper Fallback Icon Kategori Dinamis
-const CategoryIconFallback = ({
-  categoryId,
-  categoryName,
-  productName,
-}: {
-  categoryId?: string;
-  categoryName?: string;
-  productName: string;
-}) => {
-  const cat = (categoryId || categoryName || "").toLowerCase();
-
-  if (cat.includes("makanan") || cat.includes("food")) {
-    return (
-      <div className="flex flex-col items-center justify-center text-amber-600 bg-amber-50/80 w-full h-full p-2 text-center">
-        <svg className="w-8 h-8 mb-1 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 max-w-[90px] truncate">
-          Makanan
-        </span>
-      </div>
-    );
-  }
-
-  if (cat.includes("minuman") || cat.includes("drink")) {
-    return (
-      <div className="flex flex-col items-center justify-center text-blue-600 bg-blue-50/80 w-full h-full p-2 text-center">
-        <svg className="w-8 h-8 mb-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.605 15.13a1 1 0 00-1.183.398l-.42.63A2 2 0 004 17.333V20a1 1 0 001 1h14a1 1 0 001-1v-2.667a2 2 0 00-.572-1.414zM8 9h8m-8-3h8m-8 6h8" />
-        </svg>
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 max-w-[90px] truncate">
-          Minuman
-        </span>
-      </div>
-    );
-  }
-
-  if (cat.includes("snack") || cat.includes("biskuit")) {
-    return (
-      <div className="flex flex-col items-center justify-center text-orange-600 bg-orange-50/80 w-full h-full p-2 text-center">
-        <svg className="w-8 h-8 mb-1 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-orange-700 max-w-[90px] truncate">
-          Snack
-        </span>
-      </div>
-    );
-  }
-
-  if (cat.includes("sembako")) {
-    return (
-      <div className="flex flex-col items-center justify-center text-emerald-600 bg-emerald-50/80 w-full h-full p-2 text-center">
-        <svg className="w-8 h-8 mb-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 max-w-[90px] truncate">
-          Sembako
-        </span>
-      </div>
-    );
-  }
-
-  if (cat.includes("perawatan") || cat.includes("care")) {
-    return (
-      <div className="flex flex-col items-center justify-center text-pink-600 bg-pink-50/80 w-full h-full p-2 text-center">
-        <svg className="w-8 h-8 mb-1 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.684a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-pink-700 max-w-[90px] truncate">
-          Perawatan
-        </span>
-      </div>
-    );
-  }
-
-  if (cat.includes("kebersihan") || cat.includes("clean")) {
-    return (
-      <div className="flex flex-col items-center justify-center text-purple-600 bg-purple-50/80 w-full h-full p-2 text-center">
-        <svg className="w-8 h-8 mb-1 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-        </svg>
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 max-w-[90px] truncate">
-          Kebersihan
-        </span>
-      </div>
-    );
-  }
-
-  if (cat.includes("obat") || cat.includes("med")) {
-    return (
-      <div className="flex flex-col items-center justify-center text-red-600 bg-red-50/80 w-full h-full p-2 text-center">
-        <svg className="w-8 h-8 mb-1 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-red-700 max-w-[90px] truncate">
-          Obat & P3K
-        </span>
-      </div>
-    );
-  }
-
+// Helper Fallback Icon Kategori Netral (Minimalist Cube / Box Package)
+const CategoryIconFallback = () => {
   return (
-    <div className="flex flex-col items-center justify-center text-slate-500 bg-slate-100/90 w-full h-full p-2 text-center">
-      <svg className="w-8 h-8 mb-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    <div className="flex items-center justify-center bg-slate-100/70 border border-slate-200/70 rounded-xl w-full h-full p-2 text-center select-none">
+      {/* Box Package 3D Cube Icon */}
+      <svg
+        className="w-8 h-8 text-slate-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        strokeWidth="1.75"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+        />
       </svg>
-      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 max-w-[90px] truncate">
-        {productName ? productName.substring(0, 3) : "POS"}
-      </span>
     </div>
   );
 };
@@ -224,6 +131,7 @@ export default function CashierTransactionsPage() {
 
   // State Modal Bayar
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
+  const [isClearCartModalOpen, setIsClearCartModalOpen] = useState<boolean>(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
   const [amountPaidInput, setAmountPaidInput] = useState<string>("");
   const [debitBank, setDebitBank] = useState<string>("BCA");
@@ -352,17 +260,17 @@ export default function CashierTransactionsPage() {
       return;
     }
 
-    setCart((prev) => {
-      const existingIndex = prev.findIndex((item) => item.product.id === product.id);
-      if (existingIndex > -1) {
-        const item = prev[existingIndex];
-        const newQty = item.quantity + 1;
-        if (newQty > product.stock) {
-          toast.error(
-            `Stok tidak mencukupi! Produk "${product.name}" tersisa ${product.stock} ${product.unit}.`
-          );
-          return prev;
-        }
+    const existingIndex = cart.findIndex((item) => item.product.id === product.id);
+    if (existingIndex > -1) {
+      const item = cart[existingIndex];
+      const newQty = item.quantity + 1;
+      if (newQty > product.stock) {
+        toast.error(
+          `Stok tidak mencukupi! Produk "${product.name}" tersisa ${product.stock} ${product.unit}.`
+        );
+        return;
+      }
+      setCart((prev) => {
         const updated = [...prev];
         updated[existingIndex] = {
           ...item,
@@ -370,39 +278,43 @@ export default function CashierTransactionsPage() {
           subtotal: item.unitPrice * newQty,
           totalDiscount: (item.product.discountAmount || 0) * newQty,
         };
-        toast.success(`Jumlah "${product.name}" (+1) diperbarui`);
         return updated;
-      } else {
-        toast.success(`"${product.name}" ditambahkan ke keranjang`);
-        return [
-          ...prev,
-          {
-            product,
-            quantity: 1,
-            unitPrice: product.sellingPrice,
-            subtotal: product.sellingPrice,
-            totalDiscount: product.discountAmount || 0,
-          },
-        ];
-      }
-    });
+      });
+      toast.success(`Jumlah "${product.name}" (+1) diperbarui`);
+    } else {
+      setCart((prev) => [
+        ...prev,
+        {
+          product,
+          quantity: 1,
+          unitPrice: product.sellingPrice,
+          subtotal: product.sellingPrice,
+          totalDiscount: product.discountAmount || 0,
+        },
+      ]);
+      toast.success(`"${product.name}" ditambahkan ke keranjang`);
+    }
   };
 
   const handleUpdateQuantity = (productId: string | undefined, delta: number) => {
     if (!productId) return;
 
+    const existingItem = cart.find((item) => item.product.id === productId);
+    if (!existingItem) return;
+
+    const nextQty = existingItem.quantity + delta;
+    if (nextQty > existingItem.product.stock) {
+      toast.error(
+        `Batas stok maksimum tercapai (${existingItem.product.stock} ${existingItem.product.unit}).`
+      );
+      return;
+    }
+
     setCart((prev) => {
       return prev
         .map((item) => {
           if (item.product.id === productId) {
-            const nextQty = item.quantity + delta;
             if (nextQty <= 0) return null;
-            if (nextQty > item.product.stock) {
-              toast.error(
-                `Batas stok maksimum tercapai (${item.product.stock} ${item.product.unit}).`
-              );
-              return item;
-            }
             return {
               ...item,
               quantity: nextQty,
@@ -427,10 +339,13 @@ export default function CashierTransactionsPage() {
 
   const handleClearCart = () => {
     if (cart.length === 0) return;
-    if (confirm("Kosongkan semua item di keranjang belanja?")) {
-      setCart([]);
-      toast("Keranjang belanja dibersihkan", { icon: "🧹" });
-    }
+    setIsClearCartModalOpen(true);
+  };
+
+  const confirmClearCart = () => {
+    setCart([]);
+    setIsClearCartModalOpen(false);
+    toast("Keranjang belanja dibersihkan", { icon: "🧹" });
   };
 
   // ==========================================
@@ -658,10 +573,10 @@ export default function CashierTransactionsPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari nama produk / SKU / Barcode (Shortcut: Tekan F2)..."
-                className="w-full pl-10 pr-20 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent font-medium transition-all"
+                placeholder="Cari nama produk / SKU / Barcode..."
+                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent font-medium transition-all"
               />
-              {searchQuery ? (
+              {searchQuery && (
                 <button
                   type="button"
                   onClick={() => {
@@ -672,10 +587,6 @@ export default function CashierTransactionsPage() {
                 >
                   Clear ✕
                 </button>
-              ) : (
-                <span className="absolute right-3 px-1.5 py-0.5 text-[10px] font-mono font-semibold text-slate-400 bg-slate-200 rounded border border-slate-300 pointer-events-none">
-                  F2
-                </span>
               )}
             </div>
 
@@ -795,7 +706,7 @@ export default function CashierTransactionsPage() {
                       }`}
                     >
                       {/* Product Thumbnail Container */}
-                      <div className="h-28 w-full rounded-lg overflow-hidden bg-slate-100 mb-2 relative flex items-center justify-center border border-slate-100 shrink-0">
+                      <div className="h-28 w-full rounded-xl overflow-hidden bg-slate-100/70 mb-2 relative flex items-center justify-center border border-slate-200/70 shrink-0">
                         {product.imageUrl && !failedImages[product.id || product.sku] ? (
                           <img
                             src={product.imageUrl}
@@ -804,15 +715,11 @@ export default function CashierTransactionsPage() {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           />
                         ) : (
-                          <CategoryIconFallback
-                            categoryId={product.categoryId}
-                            categoryName={product.categoryName}
-                            productName={product.name}
-                          />
+                          <CategoryIconFallback />
                         )}
 
                         {/* Overlaid SKU Badge */}
-                        <span className="absolute top-1.5 left-1.5 text-[9px] font-mono font-bold text-slate-700 bg-white/90 backdrop-blur-xs px-1.5 py-0.5 rounded shadow-xs uppercase">
+                        <span className="absolute top-1.5 left-1.5 text-[9px] font-mono font-bold text-slate-600 bg-white/95 border border-slate-200 px-1.5 py-0.5 rounded-md shadow-2xs uppercase z-10">
                           {product.sku}
                         </span>
 
@@ -876,7 +783,7 @@ export default function CashierTransactionsPage() {
           {/* Footer Info Strip */}
           <div className="px-4 py-2 bg-white border-t border-slate-200 text-xs text-slate-500 flex items-center justify-between shrink-0">
             <span>
-              Menampilkan <strong>{products.length}</strong> produk aktif dari Firestore
+              Menampilkan <strong>{products.length}</strong> produk aktif
             </span>
             <span className="text-[11px] text-slate-400">
               Klik card untuk tambah ke keranjang
@@ -946,7 +853,7 @@ export default function CashierTransactionsPage() {
                   Keranjang Kosong
                 </p>
                 <p className="text-xs text-slate-400 mt-1 max-w-[220px]">
-                  Pilih produk dari katalog di sebelah kiri atau cari dengan shortcut [F2].
+                  Pilih produk dari katalog di sebelah kiri untuk memulai transaksi.
                 </p>
               </div>
             ) : (
@@ -1070,9 +977,6 @@ export default function CashierTransactionsPage() {
               }`}
             >
               <span>PROSES BAYAR</span>
-              <span className="px-2 py-0.5 rounded bg-amber-400/80 border border-amber-600/30 text-slate-950 font-mono text-xs font-extrabold">
-                F10
-              </span>
             </button>
           </div>
         </div>
@@ -1555,6 +1459,52 @@ export default function CashierTransactionsPage() {
                 <span className="px-1 py-0.2 rounded bg-slate-700 font-mono text-[10px]">
                   [Enter]
                 </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 6. MODAL KONFIRMASI KOSONGKAN KERANJANG (TANPA BROWSER DIALOG)            */}
+      {/* ========================================================================= */}
+      {isClearCartModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-base font-extrabold text-slate-900 tracking-tight">
+                Kosongkan Keranjang Belanja?
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Seluruh item ({totalItemCount} produk) yang ada di keranjang akan dihapus dari daftar transaksi ini.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsClearCartModalOpen(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition-all cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={confirmClearCart}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+              >
+                Ya, Kosongkan
               </button>
             </div>
           </div>

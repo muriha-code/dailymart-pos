@@ -178,4 +178,22 @@ export const productService = {
       throw new Error(result.message || "Gagal menghapus produk terpilih.");
     }
   },
+
+  /**
+   * Fetch restock / purchase history for a specific product
+   */
+  async getProductPurchases(productId: string): Promise<any[]> {
+    const response = await fetch(`/api/products/${productId}/purchases`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Gagal mengambil riwayat pembelian produk.");
+    }
+
+    return result.data || [];
+  },
 };

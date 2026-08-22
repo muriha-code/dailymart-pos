@@ -83,8 +83,12 @@ export async function GET(req: NextRequest) {
       ...Object.entries(categoryOptionsMap).map(([id, name]) => ({ id, name })),
     ];
 
-    // 2. Fetch Transactions from Firestore
-    const transactionsSnapshot = await adminDb.collection('transactions').get();
+    // 2. Fetch Transactions & Operating Expenses from Firestore
+    const [transactionsSnapshot, expensesSnapshot] = await Promise.all([
+      adminDb.collection('transactions').get(),
+      adminDb.collection('operating_expenses').get().catch(() => ({ docs: [], empty: true })),
+    ]);
+
     let allTransactions: any[] = [];
     transactionsSnapshot.forEach((doc) => {
       const data = doc.data();
@@ -95,6 +99,21 @@ export async function GET(req: NextRequest) {
         parsedCreatedAt: parseFirestoreDate(data.createdAt),
       });
     });
+
+    let allExpenses: any[] = [];
+    if (!expensesSnapshot.empty && Array.isArray((expensesSnapshot as any).docs)) {
+      (expensesSnapshot as any).docs.forEach((doc: any) => {
+        const data = doc.data();
+        const parsedDate = parseFirestoreDate(data.date || data.createdAt);
+        allExpenses.push({
+          id: doc.id,
+          name: data.name,
+          category: data.category,
+          amount: Number(data.amount || 0),
+          parsedDate,
+        });
+      });
+    }
 
     // 3. Date Filtering
     const now = new Date();
@@ -133,9 +152,17 @@ export async function GET(req: NextRequest) {
       return true;
     });
 
+    const filteredExpenses = allExpenses.filter((exp) => {
+      const expDate: Date = exp.parsedDate;
+      if (filterStart && expDate < filterStart) return false;
+      if (filterEnd && expDate > filterEnd) return false;
+      return true;
+    });
+
     // 4. Agregasi data Arus Kas & Pendapatan
     let totalGrossRevenue = 0;
     let totalCogs = 0;
+    let totalOperatingExpenses = 0;
 
     const dailyMap: Record<
       string,
@@ -147,6 +174,8 @@ export async function GET(req: NextRequest) {
         grossRevenue: number;
         totalCogs: number;
         grossProfit: number;
+        operatingExpenses: number;
+        netProfit: number;
         txIds: Set<string>;
       }
     > = {};
@@ -190,16 +219,15 @@ export async function GET(req: NextRequest) {
           return;
         }
 
-        // HPP / COGS calculation
+        // HPP / COGS calculation (Priority: snapshot costPrice -> purchasePrice -> master product purchasePrice -> 72% estimate)
         let unitCostPrice = 0;
-        if (item.costPrice !== undefined) {
+        if (item.costPrice !== undefined && item.costPrice !== null) {
           unitCostPrice = Number(item.costPrice);
-        } else if (item.purchasePrice !== undefined) {
+        } else if (item.purchasePrice !== undefined && item.purchasePrice !== null) {
           unitCostPrice = Number(item.purchasePrice);
         } else if (pInfo && pInfo.purchasePrice > 0) {
           unitCostPrice = pInfo.purchasePrice;
         } else {
-          // Default estimated HPP fallback (72% of selling price)
           unitCostPrice = Math.round(price * 0.72);
         }
 
@@ -219,6 +247,8 @@ export async function GET(req: NextRequest) {
             grossRevenue: 0,
             totalCogs: 0,
             grossProfit: 0,
+            operatingExpenses: 0,
+            netProfit: 0,
             txIds: new Set<string>(),
           };
         }
@@ -232,12 +262,54 @@ export async function GET(req: NextRequest) {
       });
     });
 
-    // Update daily transaction count based on unique transactions in that day
+    // Aggregate Operating Expenses per day
+    filteredExpenses.forEach((exp) => {
+      const expDate: Date = exp.parsedDate;
+      const year = expDate.getFullYear();
+      const month = String(expDate.getMonth() + 1).padStart(2, '0');
+      const day = String(expDate.getDate()).padStart(2, '0');
+      const isoDate = `${year}-${month}-${day}`;
+
+      const expAmount = Number(exp.amount || 0);
+      totalOperatingExpenses += expAmount;
+
+      const chartLabel = expDate.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+      });
+      const formattedDate = expDate.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+
+      if (!dailyMap[isoDate]) {
+        dailyMap[isoDate] = {
+          isoDate,
+          formattedDate,
+          chartLabel,
+          transactionCount: 0,
+          grossRevenue: 0,
+          totalCogs: 0,
+          grossProfit: 0,
+          operatingExpenses: 0,
+          netProfit: 0,
+          txIds: new Set<string>(),
+        };
+      }
+
+      dailyMap[isoDate].operatingExpenses += expAmount;
+    });
+
+    // Update daily transaction count and Net Profit
     Object.keys(dailyMap).forEach((dateKey) => {
-      dailyMap[dateKey].transactionCount = dailyMap[dateKey].txIds.size;
+      const d = dailyMap[dateKey];
+      d.transactionCount = d.txIds.size;
+      d.netProfit = d.grossProfit - d.operatingExpenses;
     });
 
     const totalGrossProfit = totalGrossRevenue - totalCogs;
+    const netProfit = totalGrossProfit - totalOperatingExpenses;
     const marginPercentage =
       totalGrossRevenue > 0
         ? Number(((totalGrossProfit / totalGrossRevenue) * 100).toFixed(2))
@@ -252,6 +324,8 @@ export async function GET(req: NextRequest) {
         revenue: d.grossRevenue,
         cogs: d.totalCogs,
         profit: d.grossProfit,
+        operatingExpenses: d.operatingExpenses,
+        netProfit: d.netProfit,
       };
     });
 
@@ -276,9 +350,9 @@ export async function GET(req: NextRequest) {
         }
 
         let unitCostPrice = 0;
-        if (item.costPrice !== undefined) {
+        if (item.costPrice !== undefined && item.costPrice !== null) {
           unitCostPrice = Number(item.costPrice);
-        } else if (item.purchasePrice !== undefined) {
+        } else if (item.purchasePrice !== undefined && item.purchasePrice !== null) {
           unitCostPrice = Number(item.purchasePrice);
         } else if (pInfo && pInfo.purchasePrice > 0) {
           unitCostPrice = pInfo.purchasePrice;
@@ -310,6 +384,8 @@ export async function GET(req: NextRequest) {
         grossRevenue: d.grossRevenue,
         totalCogs: d.totalCogs,
         grossProfit: d.grossProfit,
+        operatingExpenses: d.operatingExpenses,
+        netProfit: d.netProfit,
         margin,
       };
     });
@@ -318,6 +394,8 @@ export async function GET(req: NextRequest) {
       grossRevenue: totalGrossRevenue,
       totalCogs,
       grossProfit: totalGrossProfit,
+      totalOperatingExpenses,
+      netProfit,
       marginPercentage,
     };
 

@@ -2,6 +2,8 @@ export interface CashFlowSummary {
   grossRevenue: number;
   totalCogs: number;
   grossProfit: number;
+  totalOperatingExpenses?: number;
+  netProfit?: number;
   marginPercentage: number;
 }
 
@@ -10,6 +12,8 @@ export interface CashFlowChartItem {
   revenue: number;
   cogs: number;
   profit: number;
+  operatingExpenses?: number;
+  netProfit?: number;
 }
 
 export interface CategoryProfitItem {
@@ -24,6 +28,8 @@ export interface DailyCashFlowBreakdown {
   grossRevenue: number;
   totalCogs: number;
   grossProfit: number;
+  operatingExpenses?: number;
+  netProfit?: number;
   margin: number;
 }
 

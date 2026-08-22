@@ -37,6 +37,8 @@ const UNITS = [
   "Strip",
 ];
 
+const PURCHASE_UNITS = ["Karton", "Dus"];
+
 const ITEMS_PER_PAGE = 10;
 
 // Helper Format Currency Rupiah
@@ -86,18 +88,31 @@ export default function AdminProductsPage() {
   const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState<boolean>(false);
   const [isDeletingProduct, setIsDeletingProduct] = useState<boolean>(false);
 
-  // Form Field States
+  // Modal Tab State
+  const [modalTab, setModalTab] = useState<"info" | "hpp" | "stock" | "purchases">("info");
+  const [purchaseHistory, setPurchaseHistory] = useState<any[]>([]);
+  const [isLoadingPurchases, setIsLoadingPurchases] = useState<boolean>(false);
+
+  // Form Field States (Including HPP Detail & Unit Conversion)
   const [formData, setFormData] = useState({
     sku: "",
     name: "",
     barcode: "",
     categoryId: "cat_makanan",
     supplierId: "",
-    purchasePrice: 0,
-    sellingPrice: 0,
+    purchaseMode: "retail" as "retail" | "bulk", // 'retail' (satuan jual) | 'bulk' (satuan kemasan besar misal karton/dus)
+    purchaseUnit: "", // Satuan pembelian (Karton, Dus, dll)
+    conversionQty: 1, // Berapa satuan jual dalam 1 satuan pembelian (misal 24 botol / karton)
+    purchaseUnitCost: 0, // Harga beli per satuan besar (misal Rp60.000 / karton)
+    supplierPrice: 0, // Harga beli supplier dasar per unit (misal Rp21.500)
+    purchaseDiscount: 0, // Diskon pembelian dari supplier per unit (misal Rp500)
+    additionalCost: 0, // Biaya tambahan / ongkir per unit (misal Rp0)
+    purchasePrice: 0, // Effective HPP modal per unit
+    markupPercentage: 20, // Markup % (misal 20%)
+    sellingPrice: 0, // Harga jual aktual (misal Rp24.900)
     stock: 0,
     minimumStock: 5,
-    unit: "Pcs",
+    unit: "Pcs", // Satuan jual ritel
     status: "active" as "active" | "inactive",
     imageUrl: "",
   });
@@ -348,19 +363,29 @@ export default function AdminProductsPage() {
   };
 
   // ==========================================
-  // HANDLERS MODAL FORM
+  // HANDLERS MODAL FORM & TABS
   // ==========================================
   const handleOpenCreateModal = () => {
     setEditingProduct(null);
     setSelectedImageFile(null);
     setImagePreviewUrl(null);
+    setModalTab("info");
+    setPurchaseHistory([]);
     setFormData({
       sku: `DM-${Math.floor(100 + Math.random() * 900)}`,
       name: "",
       barcode: "",
       categoryId: "cat_makanan",
       supplierId: "sup_indofood",
+      purchaseMode: "retail",
+      purchaseUnit: "",
+      conversionQty: 1,
+      purchaseUnitCost: 0,
+      supplierPrice: 0,
+      purchaseDiscount: 0,
+      additionalCost: 0,
       purchasePrice: 0,
+      markupPercentage: 20,
       sellingPrice: 0,
       stock: 10,
       minimumStock: 5,
@@ -372,18 +397,68 @@ export default function AdminProductsPage() {
     setIsModalOpen(true);
   };
 
-  const handleOpenEditModal = (product: Product) => {
+  const loadProductPurchases = useCallback(async (productId: string) => {
+    setIsLoadingPurchases(true);
+    try {
+      const data = await productService.getProductPurchases(productId);
+      setPurchaseHistory(data);
+    } catch (err) {
+      console.warn("Gagal memuat riwayat pembelian produk:", err);
+      setPurchaseHistory([]);
+    } finally {
+      setIsLoadingPurchases(false);
+    }
+  }, []);
+
+  const handleOpenEditModal = (product: Product, defaultTab: "info" | "hpp" | "stock" | "purchases" = "info") => {
     setEditingProduct(product);
     setSelectedImageFile(null);
     setImagePreviewUrl(null);
+    setModalTab(defaultTab);
+
+    const hasBulk = Boolean(
+      product.purchaseUnitCost &&
+      product.purchaseUnitCost > 0 &&
+      product.purchaseUnit &&
+      product.purchaseUnit !== product.unit
+    );
+
+    const initialSupplierPrice =
+      product.supplierPrice !== undefined
+        ? product.supplierPrice
+        : product.purchasePrice || 0;
+
+    const initialDiscount = product.purchaseDiscount || 0;
+    const initialAdditional = product.additionalCost || 0;
+    const initialCostPrice = product.costPrice ?? product.purchasePrice ?? 0;
+    const initialSellingPrice = product.sellingPrice || 0;
+    
+    // Hitung estimasi markup jika belum tersimpan
+    let initialMarkup = product.markupPercentage;
+    if (initialMarkup === undefined || initialMarkup === null) {
+      if (initialCostPrice > 0 && initialSellingPrice > initialCostPrice) {
+        initialMarkup = Math.round(((initialSellingPrice - initialCostPrice) / initialCostPrice) * 100);
+      } else {
+        initialMarkup = 20;
+      }
+    }
+
     setFormData({
       sku: product.sku,
       name: product.name,
       barcode: product.barcode || "",
       categoryId: product.categoryId || "cat_makanan",
       supplierId: product.supplierId || "",
-      purchasePrice: product.purchasePrice || 0,
-      sellingPrice: product.sellingPrice || 0,
+      purchaseMode: hasBulk ? "bulk" : "retail",
+      purchaseUnit: product.purchaseUnit || "Karton",
+      conversionQty: product.conversionQty && product.conversionQty > 0 ? product.conversionQty : 24,
+      purchaseUnitCost: product.purchaseUnitCost || 0,
+      supplierPrice: initialSupplierPrice,
+      purchaseDiscount: initialDiscount,
+      additionalCost: initialAdditional,
+      purchasePrice: initialCostPrice,
+      markupPercentage: initialMarkup,
+      sellingPrice: initialSellingPrice,
       stock: product.stock || 0,
       minimumStock: product.minimumStock || 5,
       unit: product.unit || "Pcs",
@@ -392,6 +467,10 @@ export default function AdminProductsPage() {
     });
     setFormError(null);
     setIsModalOpen(true);
+
+    if (product.id) {
+      loadProductPurchases(product.id);
+    }
   };
 
   const handleCloseModal = () => {
@@ -401,19 +480,56 @@ export default function AdminProductsPage() {
     setSelectedImageFile(null);
     setImagePreviewUrl(null);
     setFormError(null);
+    setPurchaseHistory([]);
   };
 
-  // Real-time Margin Calculation
-  const calculatedMargin = useMemo(() => {
-    return calculateMarginPercentage(
-      formData.purchasePrice,
-      formData.sellingPrice
-    );
-  }, [formData.purchasePrice, formData.sellingPrice]);
+  // ==========================================
+  // REAL-TIME HPP, MARKUP & MARGIN FORMULAS
+  // ==========================================
+  // 1. Base unit supplier price (Harga beli sebelum diskon & biaya tambahan)
+  const baseUnitSupplierPrice = useMemo(() => {
+    if (formData.purchaseMode === "bulk" && formData.conversionQty > 0) {
+      return Math.round((Number(formData.purchaseUnitCost) || 0) / Number(formData.conversionQty));
+    }
+    return Number(formData.supplierPrice || 0);
+  }, [formData.purchaseMode, formData.purchaseUnitCost, formData.conversionQty, formData.supplierPrice]);
 
+  // 2. HPP per Unit = Harga Beli Supplier - Diskon Pembelian + Biaya Tambahan
+  const calculatedHpp = useMemo(() => {
+    const discount = Number(formData.purchaseDiscount || 0);
+    const additional = Number(formData.additionalCost || 0);
+    return Math.max(0, baseUnitSupplierPrice - discount + additional);
+  }, [baseUnitSupplierPrice, formData.purchaseDiscount, formData.additionalCost]);
+
+  // 3. Harga Jual Rekomendasi = HPP * (1 + Markup / 100)
+  const calculatedRecommendedPrice = useMemo(() => {
+    const markup = Number(formData.markupPercentage || 0);
+    return Math.round(calculatedHpp * (1 + markup / 100));
+  }, [calculatedHpp, formData.markupPercentage]);
+
+  // 4. Laba per Unit = Harga Jual Aktual - HPP per Unit
   const calculatedProfit = useMemo(() => {
-    return Math.max(0, formData.sellingPrice - formData.purchasePrice);
-  }, [formData.purchasePrice, formData.sellingPrice]);
+    return Math.max(0, (Number(formData.sellingPrice) || 0) - calculatedHpp);
+  }, [formData.sellingPrice, calculatedHpp]);
+
+  // 5. Margin Aktual (%) = (Laba per Unit / Harga Jual Aktual) * 100%
+  const calculatedMargin = useMemo(() => {
+    const sellPrice = Number(formData.sellingPrice) || 0;
+    if (sellPrice <= 0) return 0;
+    const profit = sellPrice - calculatedHpp;
+    return Math.round((profit / sellPrice) * 1000) / 10;
+  }, [formData.sellingPrice, calculatedHpp]);
+
+  // Terapkan harga jual rekomendasi ke harga jual saat ini
+  const handleApplyRecommendedPrice = () => {
+    if (calculatedRecommendedPrice > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        sellingPrice: calculatedRecommendedPrice,
+      }));
+      toast.success(`Harga jual diatur ke rekomendasi: ${formatRupiah(calculatedRecommendedPrice)}`);
+    }
+  };
 
   // Submit Form
   const handleSubmitForm = async (e: React.FormEvent) => {
@@ -422,22 +538,27 @@ export default function AdminProductsPage() {
 
     if (!formData.sku.trim()) {
       setFormError("SKU Produk wajib diisi!");
+      setModalTab("info");
       return;
     }
     if (!formData.name.trim()) {
       setFormError("Nama Produk wajib diisi!");
+      setModalTab("info");
       return;
     }
-    if (formData.purchasePrice <= 0) {
-      setFormError("Harga beli (modal) harus lebih dari Rp 0!");
+    if (calculatedHpp <= 0 && formData.purchaseMode === "retail" && formData.supplierPrice <= 0) {
+      setFormError("Harga beli / modal produk harus lebih dari Rp 0!");
+      setModalTab("hpp");
       return;
     }
     if (formData.sellingPrice <= 0) {
-      setFormError("Harga jual harus lebih dari Rp 0!");
+      setFormError("Harga jual ritel harus lebih dari Rp 0!");
+      setModalTab("hpp");
       return;
     }
-    if (formData.sellingPrice < formData.purchasePrice) {
-      setFormError("Harga jual tidak boleh lebih rendah dari harga beli (modal)!");
+    if (formData.sellingPrice < calculatedHpp) {
+      setFormError("Harga jual tidak boleh lebih rendah dari HPP modal produk!");
+      setModalTab("hpp");
       return;
     }
 
@@ -471,40 +592,37 @@ export default function AdminProductsPage() {
       const categoryObj = CATEGORIES.find((c) => c.id === formData.categoryId);
       const categoryName = categoryObj ? categoryObj.name : "Umum";
 
+      const productPayload = {
+        sku: formData.sku.trim(),
+        name: formData.name.trim(),
+        barcode: formData.barcode.trim() || undefined,
+        categoryId: formData.categoryId,
+        categoryName,
+        supplierId: formData.supplierId.trim() || undefined,
+        supplierPrice: baseUnitSupplierPrice,
+        purchaseDiscount: Number(formData.purchaseDiscount || 0),
+        additionalCost: Number(formData.additionalCost || 0),
+        purchaseUnit: formData.purchaseMode === "bulk" ? formData.purchaseUnit : formData.unit,
+        conversionQty: formData.purchaseMode === "bulk" ? Number(formData.conversionQty) : 1,
+        purchaseUnitCost: formData.purchaseMode === "bulk" ? Number(formData.purchaseUnitCost) : undefined,
+        costPrice: calculatedHpp,
+        purchasePrice: calculatedHpp, // Synced as standard purchase price for backward-compatibility
+        markupPercentage: Number(formData.markupPercentage || 0),
+        recommendedPrice: calculatedRecommendedPrice,
+        sellingPrice: Number(formData.sellingPrice),
+        stock: Number(formData.stock),
+        minimumStock: Number(formData.minimumStock),
+        unit: formData.unit,
+        status: formData.status,
+        imageUrl: finalImageUrl.trim() || undefined,
+      };
+
       if (editingProduct && editingProduct.id) {
-        await productService.updateProduct(editingProduct.id, {
-          sku: formData.sku.trim(),
-          name: formData.name.trim(),
-          barcode: formData.barcode.trim() || undefined,
-          categoryId: formData.categoryId,
-          categoryName,
-          supplierId: formData.supplierId.trim() || undefined,
-          purchasePrice: Number(formData.purchasePrice),
-          sellingPrice: Number(formData.sellingPrice),
-          stock: Number(formData.stock),
-          minimumStock: Number(formData.minimumStock),
-          unit: formData.unit,
-          status: formData.status,
-          imageUrl: finalImageUrl.trim() || undefined,
-        });
-        toast.success("Data produk berhasil diperbarui");
+        await productService.updateProduct(editingProduct.id, productPayload);
+        toast.success("Data produk & HPP berhasil diperbarui");
       } else {
-        await productService.createProduct({
-          sku: formData.sku.trim(),
-          name: formData.name.trim(),
-          barcode: formData.barcode.trim() || undefined,
-          categoryId: formData.categoryId,
-          categoryName,
-          supplierId: formData.supplierId.trim() || undefined,
-          purchasePrice: Number(formData.purchasePrice),
-          sellingPrice: Number(formData.sellingPrice),
-          stock: Number(formData.stock),
-          minimumStock: Number(formData.minimumStock),
-          unit: formData.unit,
-          status: formData.status,
-          imageUrl: finalImageUrl.trim() || undefined,
-        });
-        toast.success("Produk baru berhasil ditambahkan");
+        await productService.createProduct(productPayload);
+        toast.success("Produk baru berhasil ditambahkan ke katalog");
       }
 
       setIsModalOpen(false);
@@ -1136,21 +1254,26 @@ export default function AdminProductsPage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 4. MODAL FORM (TAMBAH / EDIT PRODUK)                                      */}
+      {/* 4. MODAL FORM (TAMBAH / EDIT PRODUK DENGAN DETAIL HPP & RIWAYAT)          */}
       {/* ========================================================================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             {/* Modal Header */}
             <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
               <div>
-                <h3 className="text-base font-bold text-slate-900">
-                  {editingProduct ? "Edit Master Produk" : "Tambah Produk Baru"}
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <span>{editingProduct ? "Edit Master Produk & HPP" : "Tambah Produk Baru"}</span>
+                  {editingProduct && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800">
+                      {editingProduct.sku}
+                    </span>
+                  )}
                 </h3>
                 <p className="text-[11px] text-slate-500">
                   {editingProduct
-                    ? `Perbarui informasi untuk SKU: ${editingProduct.sku}`
-                    : "Isi formulir lengkap untuk menambahkan barang ke katalog."}
+                    ? "Kelola spesifikasi produk, kalkulasi HPP retail, markup harga, stok, dan riwayat pembelian."
+                    : "Lengkapi data spesifikasi produk, perhitungan HPP retail, dan harga jual."}
                 </p>
               </div>
               <button
@@ -1162,313 +1285,748 @@ export default function AdminProductsPage() {
               </button>
             </div>
 
+            {/* Modal Tabs Navigation */}
+            <div className="px-5 bg-white border-b border-slate-200 flex items-center gap-2 overflow-x-auto shrink-0 scrollbar-none">
+              <button
+                type="button"
+                onClick={() => setModalTab("info")}
+                className={`py-2.5 px-3 border-b-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  modalTab === "info"
+                    ? "border-amber-500 text-amber-600"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span>📦</span> Informasi Produk
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setModalTab("hpp")}
+                className={`py-2.5 px-3 border-b-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  modalTab === "hpp"
+                    ? "border-amber-500 text-amber-600"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span>🏷️</span> HPP & Harga
+                {calculatedHpp > 0 && (
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-slate-100 text-[10px] font-mono text-slate-700">
+                    {formatRupiah(calculatedHpp)}
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setModalTab("stock")}
+                className={`py-2.5 px-3 border-b-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  modalTab === "stock"
+                    ? "border-amber-500 text-amber-600"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                <span>📊</span> Stok & Inventaris
+              </button>
+
+              {editingProduct && (
+                <button
+                  type="button"
+                  onClick={() => setModalTab("purchases")}
+                  className={`py-2.5 px-3 border-b-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                    modalTab === "purchases"
+                      ? "border-amber-500 text-amber-600"
+                      : "border-transparent text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <span>📜</span> Riwayat Pembelian
+                  {purchaseHistory.length > 0 && (
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-blue-50 text-[10px] font-mono text-blue-700 font-bold">
+                      {purchaseHistory.length}
+                    </span>
+                  )}
+                </button>
+              )}
+            </div>
+
             {/* Modal Form Body */}
             <form onSubmit={handleSubmitForm} className="flex flex-col flex-1 min-h-0 overflow-hidden">
-              <div className="p-4 sm:p-5 space-y-3 text-xs overflow-y-auto flex-1">
+              <div className="p-4 sm:p-5 text-xs overflow-y-auto flex-1 space-y-4">
                 {formError && (
-                  <div className="p-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl font-medium text-xs">
-                    ⚠️ {formError}
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl font-medium text-xs flex items-center gap-2">
+                    <span>⚠️</span>
+                    <span>{formError}</span>
                   </div>
                 )}
 
-                {/* Row 1: SKU & Barcode */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      SKU Produk <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.sku}
-                      onChange={(e) =>
-                        setFormData({ ...formData, sku: e.target.value })
-                      }
-                      placeholder="Contoh: DM-MKN-001"
-                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Barcode EAN/UPC (Opsional)
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.barcode}
-                      onChange={(e) =>
-                        setFormData({ ...formData, barcode: e.target.value })
-                      }
-                      placeholder="Contoh: 8998866200112"
-                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
-                    />
-                  </div>
-                </div>
-
-                {/* Row 2: Nama Produk */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Nama Produk <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    placeholder="Contoh: Indomie Goreng Spesial 85g"
-                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
-                  />
-                </div>
-
-                {/* Row 2.5: Upload Foto Produk (Cloudinary) */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Foto Produk (Cloudinary Upload)
-                  </label>
-                  <div className="flex items-center gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                    <div className="w-12 h-12 rounded-xl border border-slate-300 bg-white flex items-center justify-center overflow-hidden shrink-0 relative shadow-xs">
-                      {imagePreviewUrl || formData.imageUrl ? (
-                        <img
-                          src={imagePreviewUrl || formData.imageUrl}
-                          alt="Preview Foto"
-                          className="w-full h-full object-cover"
+                {/* ========================================================= */}
+                {/* TAB 1: INFORMASI PRODUK                                   */}
+                {/* ========================================================= */}
+                {modalTab === "info" && (
+                  <div className="space-y-3.5">
+                    {/* Row 1: SKU & Barcode */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          SKU Produk <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.sku}
+                          onChange={(e) =>
+                            setFormData({ ...formData, sku: e.target.value })
+                          }
+                          placeholder="Contoh: DM-MKN-001"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
                         />
-                      ) : (
-                        <svg className="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      )}
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Barcode EAN/UPC (Opsional)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.barcode}
+                          onChange={(e) =>
+                            setFormData({ ...formData, barcode: e.target.value })
+                          }
+                          placeholder="Contoh: 8998866200112"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
+                        />
+                      </div>
                     </div>
 
-                    <div className="flex-1 space-y-0.5">
+                    {/* Row 2: Nama Produk */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Nama Produk <span className="text-red-500">*</span>
+                      </label>
                       <input
-                        type="file"
-                        accept="image/*"
-                        id="product-photo-file-input"
-                        onChange={handleImageFileChange}
-                        className="hidden"
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        placeholder="Contoh: Indomie Goreng Spesial 85g atau Rinso Anti Noda 770g"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
                       />
-                      <div className="flex items-center gap-2">
-                        <label
-                          htmlFor="product-photo-file-input"
-                          className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
-                        >
-                          {isUploadingImage ? (
-                            <>
-                              <svg className="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                              </svg>
-                              <span>Mengunggah...</span>
-                            </>
+                    </div>
+
+                    {/* Row 3: Upload Foto Produk (Cloudinary) */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Foto Produk (Cloudinary Upload)
+                      </label>
+                      <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div className="w-14 h-14 rounded-xl border border-slate-300 bg-white flex items-center justify-center overflow-hidden shrink-0 relative shadow-xs">
+                          {imagePreviewUrl || formData.imageUrl ? (
+                            <img
+                              src={imagePreviewUrl || formData.imageUrl}
+                              alt="Preview Foto"
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
-                            <>
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                              </svg>
-                              <span>{selectedImageFile ? "Ganti File" : "Pilih / Upload Foto"}</span>
-                            </>
+                            <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
                           )}
-                        </label>
-                        {(imagePreviewUrl || formData.imageUrl) && (
-                          <button
-                            type="button"
-                            onClick={handleRemoveImage}
-                            className="px-2 py-1 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 text-[11px] font-bold transition-colors cursor-pointer"
-                          >
-                            Hapus Foto
-                          </button>
-                        )}
+                        </div>
+
+                        <div className="flex-1 space-y-1">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id="product-photo-file-input"
+                            onChange={handleImageFileChange}
+                            className="hidden"
+                          />
+                          <div className="flex items-center gap-2">
+                            <label
+                              htmlFor="product-photo-file-input"
+                              className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-xs"
+                            >
+                              {isUploadingImage ? (
+                                <>
+                                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                  </svg>
+                                  <span>Mengunggah...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                  </svg>
+                                  <span>{selectedImageFile ? "Ganti File" : "Pilih / Upload Foto"}</span>
+                                </>
+                              )}
+                            </label>
+                            {(imagePreviewUrl || formData.imageUrl) && (
+                              <button
+                                type="button"
+                                onClick={handleRemoveImage}
+                                className="px-2.5 py-1.5 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold transition-colors cursor-pointer"
+                              >
+                                Hapus Foto
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-500">
+                            {selectedImageFile
+                              ? `File: ${selectedImageFile.name}`
+                              : "Format JPG/PNG. Foto akan otomatis disimpan ke Cloudinary."}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-[10px] text-slate-500">
-                        {selectedImageFile
-                          ? `File dipilih: ${selectedImageFile.name}`
-                          : "Foto disimpan ke Cloudinary."}
+                    </div>
+
+                    {/* Row 4: Kategori & Satuan Jual */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Kategori Barang <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.categoryId}
+                          onChange={(e) =>
+                            setFormData({ ...formData, categoryId: e.target.value })
+                          }
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
+                        >
+                          {CATEGORIES.filter(
+                            (c) => c.id !== "all" && c.id !== "low_stock"
+                          ).map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Satuan Penjualan Ritel <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.unit}
+                          onChange={(e) =>
+                            setFormData({ ...formData, unit: e.target.value })
+                          }
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
+                        >
+                          {UNITS.map((u) => (
+                            <option key={u} value={u}>
+                              {u}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Quick navigation hint */}
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setModalTab("hpp")}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                      >
+                        Lanjut ke HPP & Harga →
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ========================================================= */}
+                {/* TAB 2: HPP & HARGA                                        */}
+                {/* ========================================================= */}
+                {modalTab === "hpp" && (
+                  <div className="space-y-4">
+                    {/* Mode Satuan Pembelian: Eceran vs Kemasan Grosir/Konversi */}
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                      <label className="block text-xs font-bold text-slate-800">
+                        Skema Pembelian dari Supplier:
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <label
+                          className={`p-2.5 rounded-xl border flex items-center gap-2 cursor-pointer transition-all ${
+                            formData.purchaseMode === "retail"
+                              ? "bg-amber-50/70 border-amber-400 text-amber-900 font-bold"
+                              : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="purchaseMode"
+                            value="retail"
+                            checked={formData.purchaseMode === "retail"}
+                            onChange={() => setFormData({ ...formData, purchaseMode: "retail" })}
+                            className="accent-amber-500 cursor-pointer"
+                          />
+                          <div>
+                            <div className="text-xs">Satuan Eceran</div>
+                            <div className="text-[10px] text-slate-500 font-normal">
+                              Dibeli per {formData.unit || "Pcs"}
+                            </div>
+                          </div>
+                        </label>
+
+                        <label
+                          className={`p-2.5 rounded-xl border flex items-center gap-2 cursor-pointer transition-all ${
+                            formData.purchaseMode === "bulk"
+                              ? "bg-amber-50/70 border-amber-400 text-amber-900 font-bold"
+                              : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="purchaseMode"
+                            value="bulk"
+                            checked={formData.purchaseMode === "bulk"}
+                            onChange={() => setFormData({ ...formData, purchaseMode: "bulk" })}
+                            className="accent-amber-500 cursor-pointer"
+                          />
+                          <div>
+                            <div className="text-xs">Satuan Besar / Karton</div>
+                            <div className="text-[10px] text-slate-500 font-normal">
+                              Konversi Dus / Karton → Unit
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Jika Mode Satuan Besar (Konversi Dus / Karton) */}
+                    {formData.purchaseMode === "bulk" && (
+                      <div className="p-3.5 bg-blue-50/50 rounded-xl border border-blue-200 space-y-3">
+                        <div className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                          <span>📦</span> Konversi Satuan Kemasan Besar (Grosir)
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                              Satuan Pembelian
+                            </label>
+                            <select
+                              value={formData.purchaseUnit}
+                              onChange={(e) => setFormData({ ...formData, purchaseUnit: e.target.value })}
+                              className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                            >
+                              <option value="" disabled>
+                                Pilih Satuan
+                              </option>
+                              {PURCHASE_UNITS.map((pu) => (
+                                <option key={pu} value={pu}>
+                                  {pu}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                              Harga Beli per {formData.purchaseUnit || "Karton"}
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={formData.purchaseUnitCost || ""}
+                              onChange={(e) => setFormData({ ...formData, purchaseUnitCost: Number(e.target.value) })}
+                              placeholder="60000"
+                              className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg font-mono text-xs font-bold text-slate-900"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                              Isi per {formData.purchaseUnit || "Karton"} ({formData.unit})
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={formData.conversionQty || ""}
+                              onChange={(e) => setFormData({ ...formData, conversionQty: Math.max(1, Number(e.target.value)) })}
+                              placeholder="24"
+                              className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg font-mono text-xs font-bold text-slate-900"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="p-2 bg-blue-100/50 rounded-lg text-[11px] text-blue-900 flex items-center justify-between font-mono">
+                          <span>Kalkulasi Harga Beli Dasar per {formData.unit}:</span>
+                          <strong className="text-xs">{formatRupiah(baseUnitSupplierPrice)} / {formData.unit}</strong>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Input Biaya Dasar HPP Retail */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {formData.purchaseMode === "retail" && (
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1">
+                            Harga Beli Supplier <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={formData.supplierPrice || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                supplierPrice: Number(e.target.value),
+                              })
+                            }
+                            placeholder="Contoh: 21500"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                          />
+                        </div>
+                      )}
+
+                      <div className={formData.purchaseMode === "bulk" ? "sm:col-span-1" : ""}>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Diskon Pembelian / Unit
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.purchaseDiscount || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              purchaseDiscount: Number(e.target.value),
+                            })
+                          }
+                          placeholder="0 (Contoh: 500)"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs text-slate-900 focus:bg-white focus:outline-none"
+                        />
+                      </div>
+
+                      <div className={formData.purchaseMode === "bulk" ? "sm:col-span-2" : ""}>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Biaya Tambahan / Unit (Ongkir/Handling)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.additionalCost || ""}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              additionalCost: Number(e.target.value),
+                            })
+                          }
+                          placeholder="0"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs text-slate-900 focus:bg-white focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* ========================================================= */}
+                    {/* BREAKDOWN HPP BOX                                         */}
+                    {/* ========================================================= */}
+                    <div className="bg-slate-900 text-white p-4 rounded-2xl shadow-sm space-y-2.5 font-mono">
+                      <div className="flex items-center justify-between text-xs font-sans text-slate-400 font-bold border-b border-slate-800 pb-2">
+                        <span>BREAKDOWN HPP RETAIL</span>
+                        <span className="text-[10px] text-amber-400 font-normal">Per {formData.unit}</span>
+                      </div>
+
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between text-slate-300">
+                          <span>Harga Beli Supplier {formData.purchaseMode === "bulk" ? `(1/${formData.conversionQty} ${formData.purchaseUnit})` : ""}:</span>
+                          <span>{formatRupiah(baseUnitSupplierPrice)}</span>
+                        </div>
+                        <div className="flex justify-between text-amber-300">
+                          <span>Diskon Pembelian:</span>
+                          <span>-{formatRupiah(formData.purchaseDiscount || 0)}</span>
+                        </div>
+                        <div className="flex justify-between text-slate-300">
+                          <span>Biaya Tambahan:</span>
+                          <span>+{formatRupiah(formData.additionalCost || 0)}</span>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-slate-700 pt-2 flex items-center justify-between">
+                        <span className="text-xs font-bold text-white font-sans uppercase tracking-wider">
+                          TOTAL HPP PER UNIT:
+                        </span>
+                        <span className="text-base font-extrabold text-amber-400">
+                          {formatRupiah(calculatedHpp)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* ========================================================= */}
+                    {/* PENENTUAN HARGA JUAL & REKOMENDASI MARKUP                 */}
+                    {/* ========================================================= */}
+                    <div className="p-4 bg-amber-50/60 rounded-2xl border border-amber-200/80 space-y-3">
+                      <div className="text-xs font-bold text-slate-900 flex items-center justify-between">
+                        <span>PENENTUAN HARGA & MARKUP</span>
+                        <span className="text-[10px] text-slate-500 font-normal">Formula: HPP × (1 + Markup/100)</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-800 mb-1">
+                            Input Target Markup (%)
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.5"
+                              value={formData.markupPercentage || ""}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  markupPercentage: Number(e.target.value),
+                                })
+                              }
+                              placeholder="20"
+                              className="w-full px-3 py-2 pr-8 bg-white border border-amber-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                            />
+                            <span className="absolute right-3 top-2 text-xs font-bold text-slate-400">%</span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-800 mb-1">
+                            Harga Jual Rekomendasi
+                          </label>
+                          <div className="flex items-center gap-1.5">
+                            <div className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl font-mono text-xs font-extrabold text-emerald-700">
+                              {formatRupiah(calculatedRecommendedPrice)}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleApplyRecommendedPrice}
+                              title="Terapkan ke Harga Jual Saat Ini"
+                              className="px-2.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] whitespace-nowrap transition-colors cursor-pointer shadow-xs"
+                            >
+                              Terapkan
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Harga Jual Aktual & Estimasi Margin Aktual */}
+                      <div className="pt-2 border-t border-amber-200/60 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-800 mb-1">
+                            Harga Jual Saat Ini / Aktual (Rp) <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            required
+                            value={formData.sellingPrice || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                sellingPrice: Number(e.target.value),
+                              })
+                            }
+                            placeholder="0 (Contoh: 24900)"
+                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl font-mono text-xs font-extrabold text-slate-900 focus:outline-none focus:border-slate-900"
+                          />
+                        </div>
+
+                        <div className="bg-white p-2.5 rounded-xl border border-slate-200 flex flex-col justify-between font-mono">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[10px]">Laba per Unit:</span>
+                            <strong className="text-emerald-700 font-bold text-xs">{formatRupiah(calculatedProfit)}</strong>
+                          </div>
+                          <div className="flex items-center justify-between text-xs mt-1">
+                            <span className="text-slate-500 text-[10px]">Margin Aktual:</span>
+                            <span
+                              className={`px-1.5 py-0.5 rounded font-black text-[11px] ${
+                                calculatedMargin >= 15
+                                  ? "bg-emerald-50 text-emerald-700"
+                                  : calculatedMargin >= 5
+                                  ? "bg-amber-50 text-amber-700"
+                                  : "bg-red-50 text-red-700"
+                              }`}
+                            >
+                              {calculatedMargin}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ========================================================= */}
+                {/* TAB 3: STOK & INVENTARIS                                  */}
+                {/* ========================================================= */}
+                {modalTab === "stock" && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Stok {editingProduct ? "Saat Ini" : "Awal"}{" "}
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          required
+                          value={formData.stock}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              stock: Number(e.target.value),
+                            })
+                          }
+                          placeholder="0"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">
+                          Dihitung dalam satuan: <strong className="text-slate-700">{formData.unit}</strong>
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Minimum Stok Warning <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          required
+                          value={formData.minimumStock}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              minimumStock: Number(e.target.value),
+                            })
+                          }
+                          placeholder="5"
+                          className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                        />
+                        <p className="text-[10px] text-slate-400 mt-1">
+                          Sistem akan memicu peringatan jika stok ≤ batas ini.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1.5">
+                      <div className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <span>ℹ️</span> Catatan Mutasi Stok:
+                      </div>
+                      <p className="text-[11px] leading-relaxed">
+                        Setiap perubahan kuantitas melalui penerimaan barang (restock) atau transaksi penjualan kasir akan otomatis tercatat pada log mutasi inventaris dan tidak mengubah riwayat transaksi lampau.
                       </p>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Row 3: Kategori & Satuan Unit */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Kategori Barang <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={formData.categoryId}
-                      onChange={(e) =>
-                        setFormData({ ...formData, categoryId: e.target.value })
-                      }
-                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
-                    >
-                      {CATEGORIES.filter(
-                        (c) => c.id !== "all" && c.id !== "low_stock"
-                      ).map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                {/* ========================================================= */}
+                {/* TAB 4: RIWAYAT PEMBELIAN (PURCHASE HISTORY)               */}
+                {/* ========================================================= */}
+                {modalTab === "purchases" && editingProduct && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-bold text-slate-800">
+                        Riwayat Restock & Perubahan Harga Beli Supplier
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => editingProduct.id && loadProductPurchases(editingProduct.id)}
+                        disabled={isLoadingPurchases}
+                        className="text-[11px] font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                      >
+                        {isLoadingPurchases ? "Memuat..." : "Refresh"}
+                      </button>
+                    </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Satuan Unit Kemasan <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={formData.unit}
-                      onChange={(e) =>
-                        setFormData({ ...formData, unit: e.target.value })
-                      }
-                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
-                    >
-                      {UNITS.map((u) => (
-                        <option key={u} value={u}>
-                          {u}
-                        </option>
-                      ))}
-                    </select>
+                    {isLoadingPurchases ? (
+                      <div className="p-8 text-center text-slate-500 text-xs">
+                        <div className="animate-spin w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full mx-auto mb-2" />
+                        Memuat riwayat pembelian...
+                      </div>
+                    ) : purchaseHistory.length === 0 ? (
+                      <div className="p-8 bg-slate-50 rounded-xl border border-slate-200 text-center text-slate-500 space-y-1 text-xs">
+                        <p className="font-bold text-slate-700">Belum ada catatan pembelian masuk.</p>
+                        <p className="text-[10px] text-slate-400">
+                          Riwayat akan otomatis terisi saat staf gudang mencatat penerimaan barang masuk (Restock).
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                        <table className="w-full text-left border-collapse text-xs">
+                          <thead>
+                            <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                              <th className="py-2 px-2.5">Tanggal</th>
+                              <th className="py-2 px-2.5">Supplier / Invoice</th>
+                              <th className="py-2 px-2.5 text-right">Harga Beli</th>
+                              <th className="py-2 px-2.5 text-center">Qty</th>
+                              <th className="py-2 px-2.5 text-right">Subtotal</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-xs text-slate-800">
+                            {purchaseHistory.map((item, idx) => (
+                              <tr key={item.id || idx} className="hover:bg-slate-50">
+                                <td className="py-2 px-2.5 font-mono text-[11px]">
+                                  {new Date(item.date).toLocaleDateString("id-ID", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}
+                                </td>
+                                <td className="py-2 px-2.5">
+                                  <div className="font-bold text-slate-900 truncate max-w-[150px]">
+                                    {item.supplierName}
+                                  </div>
+                                  <div className="text-[10px] font-mono text-slate-400">
+                                    {item.invoiceNumber}
+                                  </div>
+                                </td>
+                                <td className="py-2 px-2.5 text-right font-mono font-semibold text-slate-700">
+                                  {formatRupiah(item.purchasePrice)}
+                                </td>
+                                <td className="py-2 px-2.5 text-center font-mono font-bold">
+                                  +{item.quantity}
+                                </td>
+                                <td className="py-2 px-2.5 text-right font-mono font-bold text-slate-900">
+                                  {formatRupiah(item.subtotal)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
-                </div>
-
-                {/* Row 4: Harga Beli & Harga Jual */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Harga Beli / Modal (Rp) <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      required
-                      value={formData.purchasePrice || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          purchasePrice: Number(e.target.value),
-                        })
-                      }
-                      placeholder="0"
-                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Harga Jual Ritel (Rp) <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      required
-                      value={formData.sellingPrice || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          sellingPrice: Number(e.target.value),
-                        })
-                      }
-                      placeholder="0"
-                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
-                    />
-                  </div>
-                </div>
-
-                {/* Real-time Profit Margin Calculation Display Box */}
-                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs font-mono">
-                  <div>
-                    <span className="text-slate-500 block text-[10px]">
-                      Estimasi Keuntungan Bersih:
-                    </span>
-                    <span className="font-bold text-slate-900 text-xs">
-                      {formatRupiah(calculatedProfit)} / {formData.unit}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-slate-500 block text-[10px]">
-                      Margin Persentase:
-                    </span>
-                    <span
-                      className={`font-black text-xs ${
-                        calculatedMargin >= 15
-                          ? "text-emerald-600"
-                          : calculatedMargin >= 5
-                          ? "text-amber-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {calculatedMargin}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Row 5: Stok Awal & Stok Minimum */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Stok {editingProduct ? "Saat Ini" : "Awal"}{" "}
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      required
-                      value={formData.stock}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          stock: Number(e.target.value),
-                        })
-                      }
-                      placeholder="0"
-                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Minimum Stok Warning <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      required
-                      value={formData.minimumStock}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          minimumStock: Number(e.target.value),
-                        })
-                      }
-                      placeholder="5"
-                      className="w-full px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none focus:border-slate-900"
-                    />
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Modal Actions (Sticky Footer) */}
-              <div className="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  Batal
-                </button>
+              <div className="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+                <div className="text-[11px] text-slate-500 font-mono">
+                  HPP: <strong className="text-slate-900">{formatRupiah(calculatedHpp)}</strong> | Jual: <strong className="text-slate-900">{formatRupiah(formData.sellingPrice || 0)}</strong>
+                </div>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting || isUploadingImage}
-                  className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50"
-                >
-                  {isSubmitting || isUploadingImage
-                    ? "Menyimpan..."
-                    : editingProduct
-                    ? "Simpan Perubahan"
-                    : "+ Tambah Produk"}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
+                    Batal
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || isUploadingImage}
+                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {isSubmitting || isUploadingImage
+                      ? "Menyimpan..."
+                      : editingProduct
+                      ? "Simpan Perubahan"
+                      : "+ Tambah Produk"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

@@ -27,8 +27,59 @@ export async function PUT(
       );
     }
 
+    const existingData = docSnap.data() || {};
+    
+    // Kalkulasi HPP per unit (Retail Cost Breakdown) jika ada perubahan harga/diskon/biaya
+    const conversionQty =
+      body.conversionQty !== undefined
+        ? Number(body.conversionQty)
+        : Number(existingData.conversionQty || 1);
+    
+    let baseUnitSupplierPrice =
+      body.supplierPrice !== undefined
+        ? Number(body.supplierPrice)
+        : body.purchasePrice !== undefined
+        ? Number(body.purchasePrice)
+        : Number(existingData.supplierPrice ?? existingData.purchasePrice ?? 0);
+
+    const purchaseUnitCost =
+      body.purchaseUnitCost !== undefined
+        ? Number(body.purchaseUnitCost)
+        : existingData.purchaseUnitCost;
+
+    if (purchaseUnitCost && Number(purchaseUnitCost) > 0) {
+      baseUnitSupplierPrice = Math.round(Number(purchaseUnitCost) / (conversionQty > 0 ? conversionQty : 1));
+    }
+
+    const discount =
+      body.purchaseDiscount !== undefined
+        ? Number(body.purchaseDiscount)
+        : Number(existingData.purchaseDiscount || 0);
+
+    const additional =
+      body.additionalCost !== undefined
+        ? Number(body.additionalCost)
+        : Number(existingData.additionalCost || 0);
+
+    const calculatedHpp = Math.max(0, baseUnitSupplierPrice - discount + additional);
+
+    const markupPct =
+      body.markupPercentage !== undefined
+        ? Number(body.markupPercentage)
+        : Number(existingData.markupPercentage || 0);
+
+    const recommendedPrice = Math.round(calculatedHpp * (1 + markupPct / 100));
+
     const updateData: Record<string, any> = {
       ...body,
+      supplierPrice: baseUnitSupplierPrice,
+      purchaseDiscount: discount,
+      additionalCost: additional,
+      conversionQty: conversionQty > 0 ? conversionQty : 1,
+      costPrice: calculatedHpp,
+      purchasePrice: calculatedHpp, // Synced as standard purchase price for backward-compatibility
+      markupPercentage: markupPct,
+      recommendedPrice,
       updatedAt: new Date(),
     };
 
@@ -45,7 +96,7 @@ export async function PUT(
       {
         success: true,
         message: 'Produk berhasil diperbarui',
-        data: { id, ...docSnap.data(), ...updateData },
+        data: { id, ...existingData, ...updateData },
       },
       { status: 200 }
     );

@@ -6,6 +6,7 @@ export interface TransactionItem {
   productId: string;
   productName: string;
   price: number;
+  costPrice?: number; // Snapshot of HPP per unit at the moment of sale
   quantity: number;
   discount: number;
   subtotal: number;

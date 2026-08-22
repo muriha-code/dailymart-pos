@@ -205,19 +205,28 @@ export async function POST(req: NextRequest) {
       const changeAmount =
         paymentMethod === "CASH" ? Math.max(0, Number(paidAmount) - Number(total)) : 0;
 
-      // Formatting data transaksi dengan snapshot harga & subtotal
+      // Formatting data transaksi dengan snapshot harga, subtotal, dan costPrice (HPP pada saat transaksi)
       const newTransactionData = {
         transactionNumber,
         cashierId: String(finalCashierId),
         cashierName: String(finalCashierName),
-        items: items.map((item) => ({
-          productId: String(item.productId),
-          productName: String(item.productName ?? ""),
-          price: Number(item.price || 0),
-          quantity: Number(item.quantity || 0),
-          discount: Number(item.discount || 0),
-          subtotal: Number(item.subtotal || 0),
-        })),
+        items: items.map((item) => {
+          const productSnap = productSnapshotsMap.get(item.productId);
+          const productData = productSnap?.data();
+          const snapshotCostPrice = Number(
+            productData?.costPrice ?? productData?.purchasePrice ?? (item.price * 0.72)
+          );
+
+          return {
+            productId: String(item.productId),
+            productName: String(item.productName ?? productData?.name ?? ""),
+            price: Number(item.price || 0),
+            costPrice: snapshotCostPrice,
+            quantity: Number(item.quantity || 0),
+            discount: Number(item.discount || 0),
+            subtotal: Number(item.subtotal || 0),
+          };
+        }),
         subtotal: Number(subtotal || 0),
         discount: Number(discount || 0),
         total: Number(total || 0),
