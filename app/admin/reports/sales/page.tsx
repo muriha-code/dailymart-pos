@@ -235,85 +235,191 @@ export default function AdminSalesReportPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 p-4 lg:p-6 print:p-0 print:bg-white print:m-0 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6 print:max-w-none print:w-full print:m-0 print:space-y-4">
+    <div className="w-full min-h-screen bg-slate-50 p-4 lg:p-6 print:p-0 print:bg-white print:m-0 font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto space-y-6 print:max-w-none print:w-full print:m-0 print:space-y-0">
         {/* ========================================================================= */}
-        {/* 1. KOP SURAT FORMAL & TEKS RINGKASAN (CETAK PDF)                           */}
+        {/* PRINT ONLY: RINGKASAN EKSEKUTIF PERFORMA PENJUALAN RETAIL (1 HALAMAN A4)  */}
         {/* ========================================================================= */}
-        <div className="hidden print:block mb-4 border-b-2 border-slate-900 pb-3">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-xl font-black tracking-wider text-slate-900 uppercase">
-                DAILYMART POS
-              </h1>
-              <p className="text-[11px] text-slate-700 font-medium">
-                Sistem Manajemen Kasir & Logistik Retail
-              </p>
-              <p className="text-[10px] text-slate-500">
-                Jl. Retail Utama No. 88, Jakarta Selatan
-              </p>
+        <div className="hidden print:block w-full max-w-2xl mx-auto text-slate-900 font-sans text-xs space-y-3 print:px-8 print:py-6">
+          {/* Header Kop Dokumen */}
+          <div className="border-t-2 border-b border-slate-900 py-2.5 text-center space-y-0.5">
+            <h1 className="text-base font-black tracking-wider uppercase text-slate-900">
+              DAILYMART POS
+            </h1>
+            <p className="text-xs font-bold text-slate-800">
+              Ringkasan Eksekutif Performa Penjualan Retail
+            </p>
+            <p className="text-[10px] text-slate-600">
+              Jl. Retail Utama No. 88, Jakarta Selatan • Telp: (021) 555-0199
+            </p>
+          </div>
+
+          {/* Baris Informasi Metadata Dokumen */}
+          <div className="border-b-2 border-slate-900 pb-2 flex justify-between items-start text-[11px]">
+            <div className="space-y-0.5">
+              <div className="font-extrabold uppercase tracking-wide text-slate-900">
+                DOKUMEN PENJUALAN RESMI
+              </div>
+              <div className="text-slate-700">
+                <span>Periode Laporan : </span>
+                <span className="font-bold text-slate-900">{periodText}</span>
+              </div>
             </div>
-            <div className="text-right">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                LAPORAN PENJUALAN RETAIL
-              </h2>
-              <p className="text-[10px] text-slate-600 mt-0.5">
-                Tanggal Cetak:{" "}
-                {new Date().toLocaleDateString("id-ID", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}{" "}
-                pukul{" "}
-                {new Date().toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              <p className="text-[10px] text-slate-600">
-                Periode: <strong>{periodText}</strong>
-              </p>
-              <p className="text-[10px] font-semibold text-slate-800 mt-0.5">
-                Dicetak Oleh: <span className="underline">{staffName}</span>
-              </p>
+            <div className="text-right space-y-0.5">
+              <div className="text-slate-700">
+                <span>Dicetak : </span>
+                <span className="font-semibold text-slate-900">
+                  {new Date().toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}, {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </div>
+              <div className="text-slate-700">
+                <span>Oleh : </span>
+                <span className="font-bold text-slate-900">
+                  {staffName}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Ringkasan Teks Laporan Cetak */}
-          {reportData && (
-            <div className="mt-3 py-1.5 px-3 border border-slate-300 rounded bg-slate-50/50 text-[10px] flex items-center justify-between text-slate-700">
-              <span>
-                • Total Omset:{" "}
-                <strong className="text-slate-900">
-                  {formatRupiah(reportData.summary.totalRevenue)}
-                </strong>
-              </span>
-              <span>
-                • Total Transaksi:{" "}
-                <strong className="text-slate-900">
-                  {reportData.summary.totalTransactions} Transaksi
-                </strong>
-              </span>
-              <span>
-                • Total Unit Terjual:{" "}
-                <strong className="text-slate-900">
-                  {reportData.summary.totalItemsSold} Unit
-                </strong>
-              </span>
-              <span>
-                • Rata-rata Transaksi (AOV):{" "}
-                <strong className="text-slate-900">
-                  {formatRupiah(reportData.summary.averageTransactionValue)}
-                </strong>
-              </span>
+          {/* ==================== TABEL 1: METRIK UTAMA PENJUALAN ==================== */}
+          <div className="border border-slate-900 overflow-hidden shadow-none mt-4">
+            <div className="bg-slate-100 border-b border-slate-900 text-center py-1.5 font-bold uppercase tracking-wider text-xs text-slate-900">
+              METRIK UTAMA PENJUALAN
             </div>
-          )}
+            <div className="divide-y divide-slate-300 text-xs">
+              <div className="grid grid-cols-12 px-3.5 py-2">
+                <div className="col-span-6 font-medium text-slate-800">
+                  Total Volume Transaksi
+                </div>
+                <div className="col-span-6 font-bold text-slate-900 border-l border-slate-300 pl-3.5">
+                  {reportData?.summary.totalTransactions || 0} Transaksi
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 px-3.5 py-2">
+                <div className="col-span-6 font-medium text-slate-800">
+                  Total Barang Terjual (Unit)
+                </div>
+                <div className="col-span-6 font-bold text-slate-900 border-l border-slate-300 pl-3.5">
+                  {reportData?.summary.totalItemsSold || 0} Unit Item
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 px-3.5 py-2">
+                <div className="col-span-6 font-medium text-slate-800">
+                  Rata-Rata Nilai Transaksi (AOV)
+                </div>
+                <div className="col-span-6 font-semibold text-slate-700 border-l border-slate-300 pl-3.5 font-mono">
+                  {formatRupiah(reportData?.summary.averageTransactionValue || 0)} / Transaksi
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 px-3.5 py-2.5 bg-slate-100 border-t border-slate-900">
+                <div className="col-span-6 font-extrabold text-slate-900 uppercase">
+                  TOTAL OMZET PENJUALAN (GROSS SALES)
+                </div>
+                <div className="col-span-6 font-extrabold text-slate-900 border-l border-slate-300 pl-3.5 font-mono">
+                  {formatRupiah(reportData?.summary.totalRevenue || 0)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ==================== TABEL 2: RINCIAN PENJUALAN BERDASARKAN METODE BAYAR ==================== */}
+          <div className="border border-slate-900 overflow-hidden shadow-none mt-3.5">
+            <div className="bg-slate-100 border-b border-slate-900 text-center py-1.5 font-bold uppercase tracking-wider text-xs text-slate-900">
+              RINCIAN PENJUALAN BERDASARKAN METODE BAYAR
+            </div>
+            <div className="grid grid-cols-12 px-3.5 py-1.5 bg-slate-50 border-b border-slate-400 text-[11px] font-bold text-slate-800 uppercase">
+              <div className="col-span-6">METODE PEMBAYARAN</div>
+              <div className="col-span-3 border-l border-slate-300 pl-3">JUMLAH TX</div>
+              <div className="col-span-3 border-l border-slate-300 pl-3 text-right">TOTAL PENERIMAAN</div>
+            </div>
+            <div className="divide-y divide-slate-300 text-xs">
+              {reportData?.paymentBreakdown && reportData.paymentBreakdown.length > 0 ? (
+                reportData.paymentBreakdown.map((item) => {
+                  const label =
+                    item.method === "CASH"
+                      ? "Tunai / Cash"
+                      : item.method === "QRIS"
+                      ? "Non-Tunai / QRIS"
+                      : item.method === "DEBIT"
+                      ? "Kartu Debit"
+                      : item.method;
+                  return (
+                    <div key={item.method} className="grid grid-cols-12 px-3.5 py-2">
+                      <div className="col-span-6 font-medium text-slate-800">
+                        {label}
+                      </div>
+                      <div className="col-span-3 font-semibold text-slate-700 border-l border-slate-300 pl-3">
+                        {item.count} Transaksi
+                      </div>
+                      <div className="col-span-3 font-mono font-bold text-slate-900 border-l border-slate-300 pl-3 text-right">
+                        {formatRupiah(item.amount)}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="grid grid-cols-12 px-3.5 py-2">
+                  <div className="col-span-6 font-medium text-slate-800">Tunai / Cash</div>
+                  <div className="col-span-3 font-semibold text-slate-700 border-l border-slate-300 pl-3">0 Transaksi</div>
+                  <div className="col-span-3 font-mono font-bold text-slate-900 border-l border-slate-300 pl-3 text-right">Rp 0</div>
+                </div>
+              )}
+
+              {/* Total Penerimaan Kas Footer */}
+              <div className="grid grid-cols-12 px-3.5 py-2.5 bg-slate-100 border-t border-slate-900 font-extrabold">
+                <div className="col-span-6 text-slate-900 uppercase">
+                  TOTAL PENERIMAAN KAS
+                </div>
+                <div className="col-span-3 text-slate-900 border-l border-slate-300 pl-3">
+                  {reportData?.summary.totalTransactions || 0} Transaksi
+                </div>
+                <div className="col-span-3 text-slate-900 border-l border-slate-300 pl-3 font-mono text-right">
+                  {formatRupiah(reportData?.summary.totalRevenue || 0)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ==================== BLOK TANDA TANGAN ==================== */}
+          <div className="pt-8 pb-3 border-b-2 border-slate-900">
+            <div className="grid grid-cols-2 text-xs">
+              <div className="flex flex-col items-start space-y-1">
+                <p className="font-medium text-slate-700">Dibuat Oleh,</p>
+                <div className="h-16" />
+                <p className="font-bold text-slate-900">
+                  ( {staffName.toUpperCase()} )
+                </p>
+                <p className="text-[10px] text-slate-500">Administrator Retail</p>
+              </div>
+
+              <div className="flex flex-col items-end text-right space-y-1">
+                <p className="text-slate-700">
+                  Jakarta, {new Date().toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+                <p className="font-medium text-slate-700">Disetujui Oleh,</p>
+                <div className="h-16" />
+                <p className="font-bold text-slate-900">
+                  ( .................................................... )
+                </p>
+                <p className="text-[10px] text-slate-500">Store Manager / Owner</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* 2. HEADER INTERAKTIF & TOMBOL AKSI                                         */}
-        {/* ========================================================================= */}
-        <div className="print:hidden">
+        {/* ==================== SCREEN CONTAINER ==================== */}
+        <div className="print:hidden space-y-6">
           <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
@@ -711,7 +817,7 @@ export default function AdminSalesReportPage() {
         {/* ========================================================================= */}
         {/* 5. TABEL DAFTAR TRANSAKSI DETAIL                                          */}
         {/* ========================================================================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden print:border-slate-400 print:rounded-none print:shadow-none">
+        <div className="print:hidden bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center text-slate-500 space-y-3">
               <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
@@ -799,34 +905,6 @@ export default function AdminSalesReportPage() {
                   </tbody>
                 </table>
               </div>
-
-              {/* Print Table (Full Records without Pagination) */}
-              <div className="hidden print:block">
-                <table className="w-full table-fixed text-left border-collapse text-xs print:text-[9.5px]">
-                  <thead>
-                    <tr className="border-b border-slate-200 bg-slate-100 font-bold uppercase text-slate-700">
-                      <th className="w-[5%] px-2 py-2 text-center">No</th>
-                      <th className="w-[22%] px-2.5 py-2">No. Invoice</th>
-                      <th className="w-[22%] px-2 py-2">Waktu</th>
-                      <th className="w-[20%] px-2 py-2">Kasir</th>
-                      <th className="w-[13%] px-2 py-2 text-center">Metode</th>
-                      <th className="w-[18%] px-2.5 py-2 text-right">Grand Total</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-300">
-                    {filteredTransactions.map((tx, idx) => (
-                      <tr key={tx.id}>
-                        <td className="px-2 py-2 text-center text-slate-500">{idx + 1}</td>
-                        <td className="px-2.5 py-2 font-mono font-semibold text-slate-900">{tx.invoiceNumber}</td>
-                        <td className="px-2 py-2 text-slate-600">{tx.date}</td>
-                        <td className="px-2 py-2 font-medium text-slate-800">{tx.cashierName}</td>
-                        <td className="px-2 py-2 text-center font-bold text-slate-700">{tx.paymentMethod}</td>
-                        <td className="px-2.5 py-2 text-right font-mono font-bold text-slate-900">{formatRupiah(tx.grandTotal)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             </div>
           )}
 
@@ -840,35 +918,6 @@ export default function AdminSalesReportPage() {
             />
           </div>
         </div>
-
-        {/* ========================================================================= */}
-        {/* 6. LEMBAR TANDA TANGAN FORMAL (HANYA MUNCUL SAAT CETAK)                   */}
-        {/* ========================================================================= */}
-        <div className="hidden print:grid grid-cols-2 mt-10 pt-2 text-xs text-slate-800">
-          <div className="flex flex-col items-center text-center">
-            <p className="invisible select-none text-[11px] leading-tight">
-              Jakarta, 00 Bulan 0000
-            </p>
-            <p className="font-medium text-slate-700 mt-1 leading-tight">Dibuat Oleh,</p>
-            <div className="h-20 w-full" />
-            <p className="font-bold text-slate-900 underline uppercase tracking-wide leading-none">
-              ( {staffName} )
-            </p>
-            <p className="text-[10px] text-slate-500 mt-1.5 leading-none">Administrator Retail</p>
-          </div>
-
-          <div className="flex flex-col items-center text-center">
-            <p className="text-slate-700 text-[11px] leading-tight">
-              Jakarta, {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-            </p>
-            <p className="font-medium text-slate-700 mt-1 leading-tight">Disetujui Oleh,</p>
-            <div className="h-20 w-full" />
-            <p className="font-bold text-slate-900 underline tracking-wide leading-none">
-              ( .................................................... )
-            </p>
-            <p className="text-[10px] text-slate-500 mt-1.5 leading-none">Store Manager / Owner</p>
-          </div>
-        </div>
       </div>
 
       {/* Global Print Styling */}
@@ -876,18 +925,17 @@ export default function AdminSalesReportPage() {
         @media print {
           @page {
             size: A4 portrait;
-            margin: 12mm 15mm 15mm 15mm;
+            margin: 0 !important;
           }
-          body {
+          html, body {
             background: white !important;
             margin: 0 !important;
             padding: 0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
           aside, nav, header, .sidebar, button, input, select {
             display: none !important;
-          }
-          tr {
-            page-break-inside: avoid;
           }
         }
       `}</style>

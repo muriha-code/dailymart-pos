@@ -221,86 +221,223 @@ export default function AdminStockOpnameReportPage() {
       ? `Kustom (${startDate || "-"} s/d ${endDate || "-"})`
       : "Semua Waktu";
 
+  // Executive Summary Computed Metrics
+  const auditMetrics = useMemo(() => {
+    if (!reportData) {
+      return {
+        totalAudited: 0,
+        accuracyRate: 0,
+        matchedCount: 0,
+        discrepancyCount: 0,
+        deficitCount: 0,
+        surplusCount: 0,
+        totalLossRp: 0,
+        totalSurplusRp: 0,
+        netImpactRp: 0,
+      };
+    }
+
+    const audits = reportData.audits || [];
+    const matchedCount = audits.filter((a) => a.diff === 0).length;
+    const deficitCount = audits.filter((a) => a.diff < 0).length;
+    const surplusCount = audits.filter((a) => a.diff > 0).length;
+    const discrepancyCount = deficitCount + surplusCount;
+    const totalLossRp = reportData.summary.totalLossRp || 0;
+    const totalSurplusRp = reportData.summary.totalSurplusRp || 0;
+    const netImpactRp = totalSurplusRp - totalLossRp;
+
+    return {
+      totalAudited: reportData.summary.totalAudited || audits.length,
+      accuracyRate: reportData.summary.accuracyRate || 0,
+      matchedCount,
+      discrepancyCount,
+      deficitCount,
+      surplusCount,
+      totalLossRp,
+      totalSurplusRp,
+      netImpactRp,
+    };
+  }, [reportData]);
+
   return (
-    <div className="w-full min-h-screen bg-slate-50 p-4 lg:p-6 print:p-0 print:bg-white print:m-0 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6 print:max-w-none print:w-full print:m-0 print:space-y-4">
+    <div className="w-full min-h-screen bg-slate-50 p-4 lg:p-6 print:p-0 print:bg-white print:m-0 font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto space-y-6 print:max-w-none print:w-full print:m-0 print:space-y-0">
         {/* ========================================================================= */}
-        {/* 1. KOP SURAT FORMAL & TEKS RINGKASAN (CETAK PDF)                           */}
+        {/* PRINT ONLY: RINGKASAN EKSEKUTIF AUDIT STOCK OPNAME (1 HALAMAN A4)        */}
         {/* ========================================================================= */}
-        <div className="hidden print:block mb-4 border-b-2 border-slate-900 pb-3">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-xl font-black tracking-wider text-slate-900 uppercase">
-                DAILYMART POS
-              </h1>
-              <p className="text-[11px] text-slate-700 font-medium">
-                Sistem Manajemen Kasir & Logistik Gudang
-              </p>
-              <p className="text-[10px] text-slate-500">
-                Jl. Retail Utama No. 88, Jakarta Selatan
-              </p>
+        <div className="hidden print:block w-full max-w-2xl mx-auto text-slate-900 font-sans text-xs space-y-3 print:px-8 print:py-6">
+          {/* Header Kop Dokumen */}
+          <div className="border-t-2 border-b border-slate-900 py-2.5 text-center space-y-0.5">
+            <h1 className="text-base font-black tracking-wider uppercase text-slate-900">
+              DAILYMART POS
+            </h1>
+            <p className="text-xs font-bold text-slate-800">
+              Ringkasan Eksekutif Hasil Audit Stock Opname
+            </p>
+            <p className="text-[10px] text-slate-600">
+              Jl. Retail Utama No. 88, Jakarta Selatan • Telp: (021) 555-0199
+            </p>
+          </div>
+
+          {/* Baris Informasi Metadata Dokumen */}
+          <div className="border-b-2 border-slate-900 pb-2 flex justify-between items-start text-[11px]">
+            <div className="space-y-0.5">
+              <div className="font-extrabold uppercase tracking-wide text-slate-900">
+                DOKUMEN LOGISTIK RESMI
+              </div>
+              <div className="text-slate-700">
+                <span>Periode Laporan : </span>
+                <span className="font-bold text-slate-900">{periodText}</span>
+              </div>
             </div>
-            <div className="text-right">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                LAPORAN AUDIT STOCK OPNAME
-              </h2>
-              <p className="text-[10px] text-slate-600 mt-0.5">
-                Tanggal Cetak:{" "}
-                {new Date().toLocaleDateString("id-ID", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}{" "}
-                pukul{" "}
-                {new Date().toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              <p className="text-[10px] text-slate-600">
-                Periode: <strong>{periodText}</strong>
-              </p>
-              <p className="text-[10px] font-semibold text-slate-800 mt-0.5">
-                Dicetak Oleh: <span className="underline">{staffName}</span>
-              </p>
+            <div className="text-right space-y-0.5">
+              <div className="text-slate-700">
+                <span>Dicetak : </span>
+                <span className="font-semibold text-slate-900">
+                  {new Date().toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}, {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </div>
+              <div className="text-slate-700">
+                <span>Oleh : </span>
+                <span className="font-bold text-slate-900">
+                  {staffName}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Ringkasan Teks Laporan Cetak */}
-          {reportData && (
-            <div className="mt-3 py-1.5 px-3 border border-slate-300 rounded bg-slate-50/50 text-[10px] flex items-center justify-between text-slate-700">
-              <span>
-                • Total Item Diaudit:{" "}
-                <strong className="text-slate-900">
-                  {reportData.summary.totalAudited} Item
-                </strong>
-              </span>
-              <span>
-                • Akurasi Stok:{" "}
-                <strong className="text-emerald-700">
-                  {reportData.summary.accuracyRate}%
-                </strong>
-              </span>
-              <span>
-                • Total Loss (Kerugian):{" "}
-                <strong className="text-rose-700">
-                  {formatRupiah(reportData.summary.totalLossRp)}
-                </strong>
-              </span>
-              <span>
-                • Total Surplus:{" "}
-                <strong className="text-blue-700">
-                  {formatRupiah(reportData.summary.totalSurplusRp)}
-                </strong>
-              </span>
+          {/* ==================== TABEL 1: METRIK & PERFORMA AKURASI INVENTARIS ==================== */}
+          <div className="border border-slate-900 overflow-hidden shadow-none mt-4">
+            <div className="bg-slate-100 border-b border-slate-900 text-center py-1.5 font-bold uppercase tracking-wider text-xs text-slate-900">
+              METRIK & PERFORMA AKURASI INVENTARIS
             </div>
-          )}
+            <div className="divide-y divide-slate-300 text-xs">
+              <div className="grid grid-cols-12 px-3.5 py-2">
+                <div className="col-span-6 font-medium text-slate-800">
+                  Total Item Diaudit
+                </div>
+                <div className="col-span-6 font-bold text-slate-900 border-l border-slate-300 pl-3.5">
+                  {auditMetrics.totalAudited} SKU Produk
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 px-3.5 py-2">
+                <div className="col-span-6 font-medium text-slate-800">
+                  Tingkat Akurasi Stok (Accuracy Rate)
+                </div>
+                <div className="col-span-6 font-bold text-slate-900 border-l border-slate-300 pl-3.5 font-mono">
+                  {auditMetrics.accuracyRate.toFixed(1)}%
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 px-3.5 py-2">
+                <div className="col-span-6 font-medium text-slate-800">
+                  Jumlah Item Sesuai (Sistem = Fisik)
+                </div>
+                <div className="col-span-6 font-bold text-emerald-800 border-l border-slate-300 pl-3.5">
+                  {auditMetrics.matchedCount} SKU
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 px-3.5 py-2 bg-slate-50 border-t border-slate-900">
+                <div className="col-span-6 font-bold text-slate-900">
+                  Jumlah Item Selisih (Varian)
+                </div>
+                <div className="col-span-6 font-bold text-slate-900 border-l border-slate-300 pl-3.5">
+                  {auditMetrics.discrepancyCount} SKU
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ==================== TABEL 2: REKAPITULASI SELISIH & DAMPAK FINANSIAL ==================== */}
+          <div className="border border-slate-900 overflow-hidden shadow-none mt-3.5">
+            <div className="bg-slate-100 border-b border-slate-900 text-center py-1.5 font-bold uppercase tracking-wider text-xs text-slate-900">
+              REKAPITULASI SELISIH & DAMPAK FINANSIAL
+            </div>
+            <div className="grid grid-cols-12 px-3.5 py-1.5 bg-slate-50 border-b border-slate-400 text-[11px] font-bold text-slate-800 uppercase">
+              <div className="col-span-6">KATEGORI SELISIH (VARIAN)</div>
+              <div className="col-span-3 border-l border-slate-300 pl-3">JUMLAH ITEM</div>
+              <div className="col-span-3 border-l border-slate-300 pl-3 text-right">ESTIMASI NILAI DAMPAK (RP)</div>
+            </div>
+            <div className="divide-y divide-slate-300 text-xs">
+              <div className="grid grid-cols-12 px-3.5 py-2">
+                <div className="col-span-6 font-medium text-slate-800">
+                  Selisih Kurang / Loss (Fisik &lt; Sys)
+                </div>
+                <div className="col-span-3 font-semibold text-slate-700 border-l border-slate-300 pl-3">
+                  {auditMetrics.deficitCount} SKU
+                </div>
+                <div className="col-span-3 font-mono font-bold text-rose-700 border-l border-slate-300 pl-3 text-right">
+                  - {formatRupiah(auditMetrics.totalLossRp)}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 px-3.5 py-2">
+                <div className="col-span-6 font-medium text-slate-800">
+                  Selisih Lebih / Surplus (Fisik &gt; Sys)
+                </div>
+                <div className="col-span-3 font-semibold text-slate-700 border-l border-slate-300 pl-3">
+                  {auditMetrics.surplusCount} SKU
+                </div>
+                <div className="col-span-3 font-mono font-bold text-blue-800 border-l border-slate-300 pl-3 text-right">
+                  + {formatRupiah(auditMetrics.totalSurplusRp)}
+                </div>
+              </div>
+
+              {/* Total Dampak Kerugian Bersih Footer */}
+              <div className="grid grid-cols-12 px-3.5 py-2.5 bg-slate-100 border-t border-slate-900 font-extrabold">
+                <div className="col-span-6 text-slate-900 uppercase">
+                  TOTAL DAMPAK KERUGIAN BERSIH (NET)
+                </div>
+                <div className="col-span-3 text-slate-900 border-l border-slate-300 pl-3">
+                  {auditMetrics.discrepancyCount} SKU
+                </div>
+                <div className="col-span-3 text-slate-900 border-l border-slate-300 pl-3 font-mono text-right">
+                  {auditMetrics.netImpactRp >= 0 ? "+ " : "- "}
+                  {formatRupiah(Math.abs(auditMetrics.netImpactRp))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ==================== BLOK TANDA TANGAN ==================== */}
+          <div className="pt-8 pb-3 border-b-2 border-slate-900">
+            <div className="grid grid-cols-2 text-xs">
+              <div className="flex flex-col items-start space-y-1">
+                <p className="font-medium text-slate-700">Dibuat Oleh,</p>
+                <div className="h-16" />
+                <p className="font-bold text-slate-900">
+                  ( {staffName.toUpperCase()} )
+                </p>
+                <p className="text-[10px] text-slate-500">Auditor Gudang & Logistik</p>
+              </div>
+
+              <div className="flex flex-col items-end text-right space-y-1">
+                <p className="text-slate-700">
+                  Jakarta, {new Date().toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+                <p className="font-medium text-slate-700">Disetujui Oleh,</p>
+                <div className="h-16" />
+                <p className="font-bold text-slate-900">
+                  ( .................................................... )
+                </p>
+                <p className="text-[10px] text-slate-500">Store Manager / Owner</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* 2. HEADER INTERAKTIF & UNIFIED DROPDOWN                                   */}
-        {/* ========================================================================= */}
-        <div className="print:hidden">
+        {/* ==================== SCREEN CONTAINER ==================== */}
+        <div className="print:hidden space-y-6">
           <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
@@ -629,7 +766,7 @@ export default function AdminStockOpnameReportPage() {
         {/* ========================================================================= */}
         {/* 4. TABEL AUDIT FIT-WIDTH (100% FIT NO HORIZONTAL SCROLL)                  */}
         {/* ========================================================================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden print:border-slate-400 print:rounded-none print:shadow-none">
+        <div className="print:hidden bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center text-slate-500 space-y-3">
               <div className="w-8 h-8 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
@@ -769,45 +906,6 @@ export default function AdminStockOpnameReportPage() {
                   </tbody>
                 </table>
               </div>
-
-              {/* Print Table (Full Records without Pagination) */}
-              <div className="hidden print:block">
-                <table className="w-full table-fixed text-left border-collapse text-xs print:text-[9.5px]">
-                  <thead>
-                    <tr className="border-b border-slate-200 bg-slate-100 font-bold uppercase text-slate-700">
-                      <th className="w-[5%] px-2 py-2 text-center">No</th>
-                      <th className="w-[18%] px-2.5 py-2">Kode Audit</th>
-                      <th className="w-[27%] px-2.5 py-2">Produk & SKU</th>
-                      <th className="w-[16%] px-2 py-2">Auditor</th>
-                      <th className="w-[8%] px-2 py-2 text-center">Sistem</th>
-                      <th className="w-[8%] px-2 py-2 text-center">Fisik</th>
-                      <th className="w-[8%] px-2 py-2 text-center">Selisih</th>
-                      <th className="w-[10%] px-2.5 py-2 text-right">Dampak (Rp)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-300">
-                    {reportData.audits.map((item, idx) => (
-                      <tr key={item.id || idx}>
-                        <td className="px-2 py-2 text-center text-slate-500">{idx + 1}</td>
-                        <td className="px-2.5 py-2 font-mono font-bold text-slate-900">{item.auditCode}</td>
-                        <td className="px-2.5 py-2">
-                          <div className="font-semibold text-slate-900 truncate">{item.productName}</div>
-                          <div className="text-[10px] text-slate-500 font-mono">{item.sku}</div>
-                        </td>
-                        <td className="px-2 py-2 text-slate-800 font-medium">{item.auditorName}</td>
-                        <td className="px-2 py-2 text-center font-mono">{item.systemStock}</td>
-                        <td className="px-2 py-2 text-center font-mono font-bold">{item.physicalStock}</td>
-                        <td className="px-2 py-2 text-center font-mono font-bold">
-                          {item.diff > 0 ? `+${item.diff}` : item.diff}
-                        </td>
-                        <td className="px-2.5 py-2 text-right font-mono font-bold text-slate-900">
-                          {formatRupiah(item.impactValueRp)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             </div>
           )}
 
@@ -821,42 +919,13 @@ export default function AdminStockOpnameReportPage() {
             />
           </div>
         </div>
-
-        {/* ========================================================================= */}
-        {/* 5. LEMBAR TANDA TANGAN FORMAL (HANYA MUNCUL SAAT CETAK)                   */}
-        {/* ========================================================================= */}
-        <div className="hidden print:grid grid-cols-2 mt-10 pt-2 text-xs text-slate-800">
-          <div className="flex flex-col items-center text-center">
-            <p className="invisible select-none text-[11px] leading-tight">
-              Jakarta, 00 Bulan 0000
-            </p>
-            <p className="font-medium text-slate-700 mt-1 leading-tight">Dibuat Oleh,</p>
-            <div className="h-20 w-full" />
-            <p className="font-bold text-slate-900 underline uppercase tracking-wide leading-none">
-              ( {staffName} )
-            </p>
-            <p className="text-[10px] text-slate-500 mt-1.5 leading-none">Auditor Gudang & Logistik</p>
-          </div>
-
-          <div className="flex flex-col items-center text-center">
-            <p className="text-slate-700 text-[11px] leading-tight">
-              Jakarta, {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-            </p>
-            <p className="font-medium text-slate-700 mt-1 leading-tight">Disetujui Oleh,</p>
-            <div className="h-20 w-full" />
-            <p className="font-bold text-slate-900 underline tracking-wide leading-none">
-              ( .................................................... )
-            </p>
-            <p className="text-[10px] text-slate-500 mt-1.5 leading-none">Store Manager / Owner</p>
-          </div>
-        </div>
       </div>
 
       {/* ========================================================================= */}
       {/* 6. MODAL QUICK VIEW DETAIL TEMUAN AUDIT                                   */}
       {/* ========================================================================= */}
       {selectedAudit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 print:hidden">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
               <div>
@@ -941,18 +1010,17 @@ export default function AdminStockOpnameReportPage() {
         @media print {
           @page {
             size: A4 portrait;
-            margin: 12mm 15mm 15mm 15mm;
+            margin: 0 !important;
           }
-          body {
+          html, body {
             background: white !important;
             margin: 0 !important;
             padding: 0 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
           aside, nav, header, .sidebar, button, input, select {
             display: none !important;
-          }
-          tr {
-            page-break-inside: avoid;
           }
         }
       `}</style>

@@ -302,7 +302,7 @@ export default function AdminCashFlowReportPage() {
         {/* ========================================================================= */}
         {/* PRINT ONLY: RINGKASAN EKSEKUTIF ARUS KAS & LABA RUGI (1 HALAMAN A4)      */}
         {/* ========================================================================= */}
-        <div className="hidden print:block w-full max-w-2xl mx-auto text-slate-900 font-sans text-xs space-y-3 pt-2">
+        <div className="hidden print:block w-full max-w-2xl mx-auto text-slate-900 font-sans text-xs space-y-3 print:px-8 print:py-6">
           {/* Header Kop Dokumen */}
           <div className="border-t-2 border-b border-slate-900 py-2.5 text-center space-y-0.5">
             <h1 className="text-base font-black tracking-wider uppercase text-slate-900">
@@ -1140,9 +1140,9 @@ export default function AdminCashFlowReportPage() {
         @media print {
           @page {
             size: A4 portrait;
-            margin: 10mm 15mm 10mm 15mm;
+            margin: 0 !important;
           }
-          body {
+          html, body {
             background: white !important;
             margin: 0 !important;
             padding: 0 !important;
