@@ -668,17 +668,17 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] p-4 sm:p-6 lg:p-8 font-sans">
+    <div className="min-h-screen bg-[#F1F5F9] text-[#0F172A] p-4 sm:p-6 lg:p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* ========================================================================= */}
         {/* 1. PAGE HEADER & QUICK METRICS                                            */}
         {/* ========================================================================= */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
               Manajemen Master Produk
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-medium">
               Kelola katalog produk minimarket, penentuan harga modal & jual, stok inventaris, serta margin keuntungan.
             </p>
           </div>
@@ -689,7 +689,7 @@ export default function AdminProductsPage() {
               <button
                 type="button"
                 onClick={() => setIsBulkDeleteModalOpen(true)}
-                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer animate-in fade-in zoom-in-95 duration-150"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#E11D48] hover:bg-[#BE123C] active:bg-[#9F1239] text-white font-black text-xs sm:text-sm border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -701,7 +701,7 @@ export default function AdminProductsPage() {
             <button
               type="button"
               onClick={handleOpenCreateModal}
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white font-black text-xs sm:text-sm border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
             >
               <svg
                 className="w-5 h-5"
@@ -716,149 +716,65 @@ export default function AdminProductsPage() {
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              <span>Tambah Produk Baru</span>
+              <span>+ Tambah Produk Baru</span>
             </button>
           </div>
         </div>
 
-        {/* Quick Stats Metric Cards (Revisi 1: 4 Metrik Kartu Termasuk Total Nonaktif) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Quick Stats Metric Cards (4 Grid Metrics Neo-Brutalist) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {/* Metric 1: Total Produk Aktif */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Total Produk Aktif
-              </span>
-              <span className="text-2xl font-black text-slate-900 mt-1 block font-mono">
-                {totalActiveProducts}{" "}
-                <span className="text-xs font-normal text-slate-400">item</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                />
-              </svg>
-            </div>
+          <div className="bg-white border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+            <span className="text-slate-500 font-black text-[10px] uppercase tracking-wider block">
+              Total Produk Aktif
+            </span>
+            <span className="text-xl font-black font-mono text-slate-900 mt-2 block">
+              {totalActiveProducts}{" "}
+              <span className="text-xs font-bold text-slate-500 font-sans">item</span>
+            </span>
           </div>
 
-          {/* Metric 2: Total Produk Nonaktif (Revisi 1) */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Total Nonaktif
-              </span>
-              <span className="text-2xl font-black text-slate-700 mt-1 block font-mono">
-                {totalInactiveProducts}{" "}
-                <span className="text-xs font-normal text-slate-400">item</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                />
-              </svg>
-            </div>
+          {/* Metric 2: Total Produk Nonaktif */}
+          <div className="bg-[#F1F5F9] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+            <span className="text-slate-500 font-black text-[10px] uppercase tracking-wider block">
+              Total Nonaktif
+            </span>
+            <span className="text-xl font-black font-mono text-slate-700 mt-2 block">
+              {totalInactiveProducts}{" "}
+              <span className="text-xs font-bold text-slate-500 font-sans">item</span>
+            </span>
           </div>
 
-          {/* Metric 3: Stok Menipis (Low Stock Alert - Deep Red Accent) */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Stok Menipis (Low Stock)
-              </span>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={`text-2xl font-black font-mono ${
-                    lowStockCount > 0 ? "text-red-600" : "text-slate-900"
-                  }`}
-                >
-                  {lowStockCount}
-                </span>
-                {lowStockCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-bold text-[10px] animate-pulse">
-                    ⚠️ Perlu Restok
-                  </span>
-                )}
-              </div>
-            </div>
-            <div
-              className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${
-                lowStockCount > 0
-                  ? "bg-red-50 border-red-200 text-red-600"
-                  : "bg-slate-100 border-slate-200 text-slate-700"
-              }`}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-            </div>
+          {/* Metric 3: Stok Menipis */}
+          <div className="bg-[#FFE4E6] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+            <span className="text-slate-600 font-black text-[10px] uppercase tracking-wider block">
+              Stok Menipis
+            </span>
+            <span className="text-xl font-black font-mono text-[#E11D48] mt-2 block">
+              {lowStockCount}{" "}
+              <span className="text-xs font-bold text-rose-800 font-sans">item</span>
+            </span>
           </div>
 
-          {/* Metric 4: Total Nilai Aset Inventaris */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Total Aset Modal
-              </span>
-              <span className="text-lg font-black text-slate-900 mt-1 block font-mono">
-                {formatRupiah(totalInventoryValue)}
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
+          {/* Metric 4: Total Nilai Aset Inventaris (Warm Amber Tint) */}
+          <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+            <span className="text-slate-700 font-black text-[10px] uppercase tracking-wider block">
+              Total Aset Modal
+            </span>
+            <span className="text-xl font-black font-mono text-[#B45309] mt-2 block">
+              {formatRupiah(totalInventoryValue)}
+            </span>
           </div>
         </div>
 
         {/* ========================================================================= */}
         {/* 2. TOOLBAR FILTER & SEARCH                                                */}
         {/* ========================================================================= */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="bg-white border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-6">
           {/* Search Bar Input */}
           <div className="relative flex-1">
             <svg
-              className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -866,7 +782,7 @@ export default function AdminProductsPage() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
@@ -875,13 +791,13 @@ export default function AdminProductsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari berdasarkan SKU, Nama Produk, atau Barcode..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none transition-all"
+              className="w-full pl-10 pr-4 py-1.5 bg-slate-50 border-2 border-slate-900 rounded-lg text-xs font-bold text-slate-900 focus:bg-white focus:outline-none transition-all"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400 hover:text-slate-700 cursor-pointer"
               >
                 ✕
               </button>
@@ -889,18 +805,18 @@ export default function AdminProductsPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {/* Filter Kategori Dropdown (Revisi 3: Termasuk opsi Low Stock) */}
+            {/* Filter Kategori Dropdown */}
             <div className="flex items-center gap-1.5 min-w-[200px]">
-              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">
+              <label className="text-xs font-black text-slate-700 uppercase whitespace-nowrap">
                 Kategori:
               </label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className={`w-full px-3 py-2 border rounded-xl text-xs font-semibold focus:outline-none transition-all ${
+                className={`w-full px-3 py-1.5 border-2 border-slate-900 rounded-lg text-xs font-bold focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] cursor-pointer ${
                   selectedCategory === "low_stock"
-                    ? "bg-red-50 border-red-300 text-red-800 font-bold"
-                    : "bg-slate-50 border-slate-300 text-slate-800 focus:bg-white"
+                    ? "bg-[#FFE4E6] text-[#E11D48]"
+                    : "bg-white text-slate-900"
                 }`}
               >
                 {CATEGORIES.map((cat) => (
@@ -913,13 +829,13 @@ export default function AdminProductsPage() {
 
             {/* Filter Status Dropdown */}
             <div className="flex items-center gap-1.5 min-w-[140px]">
-              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">
+              <label className="text-xs font-black text-slate-700 uppercase whitespace-nowrap">
                 Status:
               </label>
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
+                className="w-full px-3 py-1.5 bg-white border-2 border-slate-900 rounded-lg text-xs font-bold text-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
               >
                 <option value="all">Semua Status</option>
                 <option value="active">Aktif</option>
@@ -931,7 +847,7 @@ export default function AdminProductsPage() {
             <button
               type="button"
               onClick={loadProducts}
-              className="p-2.5 rounded-xl border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer"
+              className="bg-white hover:bg-slate-100 border-2 border-slate-900 p-2 rounded-lg shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] text-slate-900 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
               title="Refresh Data"
             >
               <svg
@@ -943,7 +859,7 @@ export default function AdminProductsPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
@@ -952,31 +868,31 @@ export default function AdminProductsPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. DATA TABLE INVENTARIS PRODUK (Revisi 2: 10 Data per Halaman)            */}
+        {/* 3. DATA TABLE INVENTARIS PRODUK                                           */}
         {/* ========================================================================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center text-slate-500 space-y-3">
-              <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-medium">Memuat master produk...</p>
+              <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-xs font-black uppercase text-slate-700">Memuat master produk...</p>
             </div>
           ) : fetchError ? (
-            <div className="p-12 text-center text-red-600 space-y-3">
+            <div className="p-12 text-center text-rose-600 space-y-3">
               <p className="text-sm font-bold">{fetchError}</p>
               <button
                 type="button"
                 onClick={loadProducts}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold"
+                className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
               >
                 Coba Lagi
               </button>
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="p-12 text-center text-slate-500 space-y-2">
-              <p className="text-sm font-bold text-slate-800">
+              <p className="text-sm font-black text-slate-900">
                 Tidak ada produk yang ditemukan.
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 font-medium">
                 Coba ubah kata kunci pencarian atau filter kategori & status.
               </p>
             </div>
@@ -985,27 +901,27 @@ export default function AdminProductsPage() {
               <div className="w-full overflow-hidden">
                 <table className="w-full table-fixed text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="py-2.5 px-1.5 text-center w-[4%]">
+                    <tr className="bg-slate-100 border-b-2 border-slate-900 text-slate-900 font-black text-[11px] uppercase tracking-wider">
+                      <th className="py-3 px-2 text-center w-[4%]">
                         <input
                           type="checkbox"
                           checked={isAllPaginatedSelected}
                           onChange={handleToggleSelectAll}
-                          className="w-3.5 h-3.5 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
+                          className="w-4 h-4 rounded border-2 border-slate-900 accent-[#6366F1] cursor-pointer"
                           title="Pilih Semua di Halaman Ini"
                         />
                       </th>
-                      <th className="py-2.5 px-2 w-[14%]">SKU / Barcode</th>
-                      <th className="py-2.5 px-2 w-[24%]">Nama Produk</th>
-                      <th className="py-2.5 px-2 w-[12%] text-center">Kategori</th>
-                      <th className="py-2.5 px-2 text-right w-[10%]">Modal (Beli)</th>
-                      <th className="py-2.5 px-2 text-right w-[10%]">Harga Jual</th>
-                      <th className="py-2.5 px-1.5 text-center w-[8%]">Margin (%)</th>
-                      <th className="py-2.5 px-1.5 text-center w-[8%]">Stok</th>
-                      <th className="py-2.5 px-1.5 text-center w-[10%]">Aksi</th>
+                      <th className="py-3 px-2 w-[14%]">SKU / Barcode</th>
+                      <th className="py-3 px-2 w-[24%]">Nama Produk</th>
+                      <th className="py-3 px-2 w-[12%] text-center">Kategori</th>
+                      <th className="py-3 px-2 text-right w-[10%]">Modal (Beli)</th>
+                      <th className="py-3 px-2 text-right w-[10%]">Harga Jual</th>
+                      <th className="py-3 px-1.5 text-center w-[8%]">Margin (%)</th>
+                      <th className="py-3 px-1.5 text-center w-[8%]">Stok</th>
+                      <th className="py-3 px-1.5 text-center w-[10%]">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 text-xs text-slate-800">
+                  <tbody className="divide-y divide-slate-200 text-xs text-slate-900">
                     {paginatedProducts.map((prod) => {
                       const isLowStock =
                         prod.status === "active" && prod.stock <= prod.minimumStock;
@@ -1020,38 +936,38 @@ export default function AdminProductsPage() {
                           key={prod.id || prod.sku}
                           className={`hover:bg-slate-50/80 transition-colors ${
                             isSelected
-                              ? "bg-amber-50/50"
+                              ? "bg-amber-50/70"
                               : prod.status === "inactive"
                               ? "bg-slate-50/40 opacity-70"
                               : ""
                           }`}
                         >
                           {/* Checkbox Batch Selection (4%) */}
-                          <td className="py-2.5 px-1.5 text-center w-[4%]">
+                          <td className="py-2.5 px-2 text-center w-[4%]">
                             <input
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => handleToggleSelectProduct(prod.id!)}
-                              className="w-3.5 h-3.5 rounded border-slate-300 text-amber-500 focus:ring-amber-400 cursor-pointer accent-amber-500"
+                              className="w-4 h-4 rounded border-2 border-slate-900 accent-[#6366F1] cursor-pointer"
                             />
                           </td>
 
                           {/* SKU / Barcode (14%) */}
                           <td className="py-2.5 px-2 font-mono w-[14%] truncate">
-                            <div className="font-bold text-slate-900 truncate" title={prod.sku}>
+                            <span className="font-mono text-[11px] font-bold text-slate-900 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-900 inline-block truncate" title={prod.sku}>
                               {prod.sku}
-                            </div>
+                            </span>
                             {prod.barcode && (
-                              <div className="text-[10px] text-slate-400 truncate" title={prod.barcode}>
-                                {prod.barcode}
+                              <div className="text-[10px] text-slate-500 font-bold truncate mt-0.5" title={prod.barcode}>
+                                ║▌ {prod.barcode}
                               </div>
                             )}
                           </td>
 
                           {/* Nama Produk & Satuan (24%) */}
                           <td className="py-2.5 px-2 w-[24%]">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center shadow-xs">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-9 h-9 rounded-lg border-2 border-slate-900 overflow-hidden bg-white shrink-0 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center">
                                 {prod.imageUrl ? (
                                   <img
                                     src={prod.imageUrl}
@@ -1059,19 +975,19 @@ export default function AdminProductsPage() {
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
-                                  <span className="font-bold text-slate-400 text-[10px] uppercase">
+                                  <span className="font-black text-slate-500 text-[10px] uppercase font-mono">
                                     {prod.name.substring(0, 2)}
                                   </span>
                                 )}
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div
-                                  className="font-bold text-slate-900 truncate text-xs"
+                                  className="font-black text-slate-900 truncate text-xs"
                                   title={prod.name}
                                 >
                                   {prod.name}
                                 </div>
-                                <span className="text-[10px] font-semibold text-slate-500 uppercase block truncate">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase block truncate">
                                   {prod.unit || "Pcs"}
                                 </span>
                               </div>
@@ -1081,7 +997,7 @@ export default function AdminProductsPage() {
                           {/* Kategori (12%) */}
                           <td className="py-2.5 px-2 text-center w-[12%]">
                             <span
-                              className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold text-[10px] block truncate"
+                              className="bg-[#EEF2FF] text-[#4338CA] border-1.5 border-slate-900 font-bold text-[10px] px-2 py-0.5 rounded-md block truncate"
                               title={prod.categoryName || prod.categoryId}
                             >
                               {prod.categoryName || prod.categoryId}
@@ -1089,33 +1005,25 @@ export default function AdminProductsPage() {
                           </td>
 
                           {/* Harga Beli (10%) */}
-                          <td className="py-2.5 px-2 text-right font-mono font-medium text-slate-600 w-[10%] truncate">
+                          <td className="py-2.5 px-2 text-right font-mono font-bold text-slate-600 w-[10%] truncate">
                             {formatRupiah(prod.purchasePrice)}
                           </td>
 
                           {/* Harga Jual (10%) */}
-                          <td className="py-2.5 px-2 text-right font-mono font-bold text-slate-900 w-[10%] truncate">
+                          <td className="py-2.5 px-2 text-right font-mono font-black text-slate-900 w-[10%] truncate">
                             {formatRupiah(prod.sellingPrice)}
                           </td>
 
                           {/* Estimasi Margin (%) (8%) */}
                           <td className="py-2.5 px-1.5 text-center font-mono w-[8%]">
-                            <span
-                              className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
-                                marginPct >= 15
-                                  ? "bg-emerald-50 text-emerald-700"
-                                  : marginPct >= 5
-                                  ? "bg-amber-50 text-amber-700"
-                                  : "bg-red-50 text-red-700"
-                              }`}
-                            >
+                            <span className="bg-[#D1FAE5] text-[#065F46] font-mono font-bold text-[10px] px-1.5 py-0.5 rounded border border-slate-900 inline-block">
                               +{marginPct}%
                             </span>
                           </td>
 
                           {/* Stok & Status (8%) */}
                           <td className="py-2.5 px-1.5 text-center font-mono w-[8%]">
-                            <div className="font-bold text-slate-900 text-xs">
+                            <div className="font-black text-slate-900 text-xs">
                               {prod.stock}{" "}
                               <span className="text-[9px] text-slate-400 font-normal">
                                 /{prod.minimumStock}
@@ -1124,16 +1032,16 @@ export default function AdminProductsPage() {
                             <div className="mt-0.5">
                               {prod.status === "active" ? (
                                 isLowStock ? (
-                                  <span className="inline-block px-1.5 py-0.2 rounded bg-red-600 text-white font-sans font-bold text-[8px] uppercase">
+                                  <span className="inline-block px-1.5 py-0.2 rounded bg-[#E11D48] text-white border border-slate-900 font-mono font-black text-[8px] uppercase shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
                                     ⚠️ Low
                                   </span>
                                 ) : (
-                                  <span className="inline-block px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-sans font-bold text-[8px] uppercase">
+                                  <span className="inline-block px-1.5 py-0.2 rounded bg-[#10B981] text-white border border-slate-900 font-mono font-black text-[8px] uppercase shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
                                     Aktif
                                   </span>
                                 )
                               ) : (
-                                <span className="inline-block px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 border border-slate-300 font-sans font-bold text-[8px] uppercase">
+                                <span className="inline-block px-1.5 py-0.2 rounded bg-slate-200 text-slate-700 border border-slate-900 font-mono font-black text-[8px] uppercase">
                                   Off
                                 </span>
                               )}
@@ -1142,42 +1050,32 @@ export default function AdminProductsPage() {
 
                           {/* Kolom Aksi (10%) */}
                           <td className="py-2.5 px-1.5 text-center w-[10%]">
-                            <div className="flex items-center justify-center gap-1">
+                            <div className="flex items-center justify-center gap-1.5">
                               <button
                                 type="button"
                                 onClick={() => handleOpenEditModal(prod)}
-                                className="p-1 rounded-md border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors cursor-pointer"
+                                className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:bg-slate-100 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-slate-900"
                                 title="Edit Produk"
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
+                                ✏️
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => handleOpenToggleConfirm(prod)}
-                                className={`p-1 rounded-md border transition-colors cursor-pointer ${
-                                  prod.status === "active"
-                                    ? "border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                                    : "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                }`}
+                                className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:bg-slate-100 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-slate-900"
                                 title={prod.status === "active" ? "Nonaktifkan Produk" : "Aktifkan Produk"}
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                                </svg>
+                                🚫
                               </button>
 
                               <button
                                 type="button"
                                 onClick={() => setProductToDelete(prod)}
-                                className="p-1 rounded-md border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 transition-colors cursor-pointer"
+                                className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:bg-rose-50 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-rose-600"
                                 title="Hapus Produk Permanen"
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
+                                🗑️
                               </button>
                             </div>
                           </td>
@@ -1191,19 +1089,19 @@ export default function AdminProductsPage() {
               {/* ========================================================================= */}
               {/* PAGINATION FOOTER (Revisi 2: 10 Data per Halaman)                         */}
               {/* ========================================================================= */}
-              <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="px-5 py-3.5 bg-slate-100 border-t-2 border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                 {/* Information Text */}
-                <div className="text-slate-500 text-center sm:text-left">
+                <div className="text-slate-600 font-bold text-center sm:text-left">
                   Menampilkan{" "}
-                  <span className="font-bold font-mono text-slate-800">
+                  <span className="font-black font-mono text-slate-900">
                     {(currentPage - 1) * ITEMS_PER_PAGE + 1}
                   </span>{" "}
                   -{" "}
-                  <span className="font-bold font-mono text-slate-800">
+                  <span className="font-black font-mono text-slate-900">
                     {Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}
                   </span>{" "}
                   dari{" "}
-                  <span className="font-bold font-mono text-slate-800">
+                  <span className="font-black font-mono text-slate-900">
                     {filteredProducts.length}
                   </span>{" "}
                   total produk
@@ -1215,7 +1113,7 @@ export default function AdminProductsPage() {
                     type="button"
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                    className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg border-2 border-slate-900 bg-white hover:bg-slate-50 text-slate-900 font-black text-xs shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                   >
                     ← Prev
                   </button>
@@ -1226,10 +1124,10 @@ export default function AdminProductsPage() {
                       key={pg}
                       type="button"
                       onClick={() => setCurrentPage(pg)}
-                      className={`w-8 h-8 rounded-lg font-bold font-mono text-xs transition-colors cursor-pointer ${
+                      className={`w-8 h-8 rounded-lg font-black font-mono text-xs border-2 border-slate-900 transition-all cursor-pointer ${
                         currentPage === pg
-                          ? "bg-slate-900 text-white shadow-xs"
-                          : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-100"
+                          ? "bg-[#6366F1] text-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                          : "bg-white text-slate-900 hover:bg-slate-50 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
                       }`}
                     >
                       {pg}
@@ -1242,7 +1140,7 @@ export default function AdminProductsPage() {
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                     }
-                    className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg border-2 border-slate-900 bg-white hover:bg-slate-50 text-slate-900 font-black text-xs shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
                   >
                     Next →
                   </button>
@@ -1258,19 +1156,19 @@ export default function AdminProductsPage() {
       {/* ========================================================================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
+          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto">
             {/* Modal Header */}
-            <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
+            <div className="px-5 py-3.5 bg-slate-100 border-b-2 border-slate-900 flex items-center justify-between shrink-0">
               <div>
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
                   <span>{editingProduct ? "Edit Master Produk & HPP" : "Tambah Produk Baru"}</span>
                   {editingProduct && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#6366F1] text-white border border-slate-900">
                       {editingProduct.sku}
                     </span>
                   )}
                 </h3>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-slate-600 font-medium">
                   {editingProduct
                     ? "Kelola spesifikasi produk, kalkulasi HPP retail, markup harga, stok, dan riwayat pembelian."
                     : "Lengkapi data spesifikasi produk, perhitungan HPP retail, dan harga jual."}
@@ -1279,21 +1177,21 @@ export default function AdminProductsPage() {
               <button
                 type="button"
                 onClick={handleCloseModal}
-                className="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 cursor-pointer"
+                className="text-slate-900 hover:text-rose-600 text-lg font-black p-1 cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {/* Modal Tabs Navigation */}
-            <div className="px-5 bg-white border-b border-slate-200 flex items-center gap-2 overflow-x-auto shrink-0 scrollbar-none">
+            <div className="px-5 bg-white border-b-2 border-slate-900 flex items-center gap-2 overflow-x-auto shrink-0 scrollbar-none">
               <button
                 type="button"
                 onClick={() => setModalTab("info")}
-                className={`py-2.5 px-3 border-b-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`py-2.5 px-3 border-b-2 text-xs font-black transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   modalTab === "info"
-                    ? "border-amber-500 text-amber-600"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-[#6366F1] text-[#6366F1]"
+                    : "border-transparent text-slate-500 hover:text-slate-900"
                 }`}
               >
                 <span>📦</span> Informasi Produk
@@ -1302,15 +1200,15 @@ export default function AdminProductsPage() {
               <button
                 type="button"
                 onClick={() => setModalTab("hpp")}
-                className={`py-2.5 px-3 border-b-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`py-2.5 px-3 border-b-2 text-xs font-black transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   modalTab === "hpp"
-                    ? "border-amber-500 text-amber-600"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-[#6366F1] text-[#6366F1]"
+                    : "border-transparent text-slate-500 hover:text-slate-900"
                 }`}
               >
                 <span>🏷️</span> HPP & Harga
                 {calculatedHpp > 0 && (
-                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-slate-100 text-[10px] font-mono text-slate-700">
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-slate-100 border border-slate-900 text-[10px] font-mono text-slate-900">
                     {formatRupiah(calculatedHpp)}
                   </span>
                 )}
@@ -1319,10 +1217,10 @@ export default function AdminProductsPage() {
               <button
                 type="button"
                 onClick={() => setModalTab("stock")}
-                className={`py-2.5 px-3 border-b-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                className={`py-2.5 px-3 border-b-2 text-xs font-black transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   modalTab === "stock"
-                    ? "border-amber-500 text-amber-600"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
+                    ? "border-[#6366F1] text-[#6366F1]"
+                    : "border-transparent text-slate-500 hover:text-slate-900"
                 }`}
               >
                 <span>📊</span> Stok & Inventaris
@@ -1332,15 +1230,15 @@ export default function AdminProductsPage() {
                 <button
                   type="button"
                   onClick={() => setModalTab("purchases")}
-                  className={`py-2.5 px-3 border-b-2 text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  className={`py-2.5 px-3 border-b-2 text-xs font-black transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                     modalTab === "purchases"
-                      ? "border-amber-500 text-amber-600"
-                      : "border-transparent text-slate-500 hover:text-slate-800"
+                      ? "border-[#6366F1] text-[#6366F1]"
+                      : "border-transparent text-slate-500 hover:text-slate-900"
                   }`}
                 >
                   <span>📜</span> Riwayat Pembelian
                   {purchaseHistory.length > 0 && (
-                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-blue-50 text-[10px] font-mono text-blue-700 font-bold">
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full bg-[#EEF2FF] border border-slate-900 text-[10px] font-mono text-[#4338CA] font-bold">
                       {purchaseHistory.length}
                     </span>
                   )}
@@ -2001,8 +1899,8 @@ export default function AdminProductsPage() {
               </div>
 
               {/* Modal Actions (Sticky Footer) */}
-              <div className="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
-                <div className="text-[11px] text-slate-500 font-mono">
+              <div className="px-5 py-3 bg-slate-100 border-t-2 border-slate-900 flex items-center justify-between shrink-0">
+                <div className="text-[11px] text-slate-600 font-mono font-bold">
                   HPP: <strong className="text-slate-900">{formatRupiah(calculatedHpp)}</strong> | Jual: <strong className="text-slate-900">{formatRupiah(formData.sellingPrice || 0)}</strong>
                 </div>
 
@@ -2010,7 +1908,7 @@ export default function AdminProductsPage() {
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                    className="px-4 py-2 rounded-xl border-2 border-slate-900 text-slate-900 font-bold text-xs hover:bg-slate-200 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
                   >
                     Batal
                   </button>
@@ -2018,7 +1916,7 @@ export default function AdminProductsPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting || isUploadingImage}
-                    className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white font-black text-xs border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer disabled:opacity-50"
                   >
                     {isSubmitting || isUploadingImage
                       ? "Menyimpan..."

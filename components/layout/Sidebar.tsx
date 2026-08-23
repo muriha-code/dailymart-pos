@@ -394,7 +394,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white border-r border-slate-200 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans shadow-xs transition-all duration-300 ease-in-out print:hidden ${
+        className={`fixed left-0 top-0 h-screen bg-white border-r-2 border-slate-900 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans transition-all duration-300 ease-in-out print:hidden ${
           isCollapsed ? "w-20" : "w-64"
         }`}
       >
@@ -403,21 +403,21 @@ export default function Sidebar() {
         {/* ========================================== */}
         <div>
           <div
-            className={`p-4 border-b border-slate-100 flex items-center ${
+            className={`p-4 border-b-2 border-slate-900 flex items-center ${
               isCollapsed ? "justify-center flex-col gap-2" : "justify-between gap-3"
             }`}
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
+              <div className="w-10 h-10 bg-[#FFB800] text-slate-950 font-black text-xl rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center shrink-0">
                 D
               </div>
               {!isCollapsed && (
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
-                    <span className="font-extrabold text-base text-slate-900 tracking-tight">DailyMart</span>
-                    <span className="font-black text-base text-amber-600">POS</span>
+                    <span className="font-black text-base text-slate-900 tracking-tight">DailyMart</span>
+                    <span className="font-black text-base text-[#6366F1]">POS</span>
                   </div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block -mt-0.5">
+                  <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase block -mt-0.5">
                     Smart Retail System
                   </span>
                 </div>
@@ -428,14 +428,14 @@ export default function Sidebar() {
             <button
               type="button"
               onClick={toggleSidebar}
-              className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer shrink-0"
+              className="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-900 border-1.5 border-slate-900 rounded-lg flex items-center justify-center shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer shrink-0"
               title={isCollapsed ? "Buka Sidebar (Expanded)" : "Kecilkan Sidebar (Collapsed)"}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isCollapsed ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
                 )}
               </svg>
             </button>
@@ -444,20 +444,20 @@ export default function Sidebar() {
           {/* ========================================== */}
           {/* DYNAMIC RBAC NAVIGATION MENU */}
           {/* ========================================== */}
-          <nav className="p-3 space-y-5">
+          <nav className="p-3 space-y-4">
             {activeMenuSections.map((section, idx) => (
               <div key={section.sectionTitle} className="space-y-1.5">
                 {!isCollapsed ? (
-                  <h3 className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  <h3 className="text-[10px] font-black tracking-widest text-slate-400 uppercase my-3 px-2">
                     {section.sectionTitle}
                   </h3>
                 ) : (
-                  idx > 0 && <div className="h-px bg-slate-100 my-2"></div>
+                  idx > 0 && <div className="h-0.5 bg-slate-900 my-2"></div>
                 )}
 
                 {/* Normal Direct Menu Items */}
                 {section.items && (
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     {section.items.map((item) => {
                       const active = isLinkActive(item.href);
 
@@ -468,21 +468,19 @@ export default function Sidebar() {
                           title={item.title}
                           className={`flex items-center text-xs transition-all ${
                             isCollapsed
-                              ? `justify-center py-3 rounded-xl ${
+                              ? `justify-center py-2.5 rounded-xl border-2 ${
                                   active
-                                    ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500"
-                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium"
+                                    ? "bg-[#6366F1] text-white font-black border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)]"
+                                    : "bg-white hover:bg-slate-50 text-slate-700 font-bold border-transparent hover:border-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
                                 }`
-                              : `gap-3 ${
+                              : `gap-3 p-2.5 rounded-xl border-2 ${
                                   active
-                                    ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500 pl-3.5 pr-3 py-2.5 rounded-r-xl shadow-2xs"
-                                    : item.isQuickAccess
-                                    ? "text-slate-700 hover:bg-amber-50/50 hover:text-amber-900 font-medium px-4 py-2.5 rounded-xl border border-slate-100 bg-slate-50/50"
-                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium px-4 py-2.5 rounded-xl"
+                                    ? "bg-[#6366F1] text-white font-black border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)]"
+                                    : "bg-white hover:bg-slate-50 text-slate-700 font-bold border-transparent hover:border-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
                                 }`
                           }`}
                         >
-                          <span className={`${active ? "text-amber-600" : "text-slate-400"} shrink-0`}>
+                          <span className={`${active ? "text-white" : "text-slate-500"} shrink-0`}>
                             {item.icon}
                           </span>
                           {!isCollapsed && <span className="truncate">{item.title}</span>}
@@ -505,7 +503,7 @@ export default function Sidebar() {
                       const hasActiveChild = group.items.some((it) => isLinkActive(it.href));
 
                       return (
-                        <div key={group.groupTitle} className="rounded-xl overflow-hidden">
+                        <div key={group.groupTitle} className="space-y-1">
                           {/* Accordion Header Toggle Button */}
                           <button
                             type="button"
@@ -513,20 +511,20 @@ export default function Sidebar() {
                             title={isCollapsed ? group.groupTitle : undefined}
                             className={`w-full flex items-center justify-between text-xs font-bold transition-all cursor-pointer ${
                               isCollapsed
-                                ? `justify-center py-3 rounded-xl ${
+                                ? `justify-center py-2.5 rounded-xl border-2 ${
                                     hasActiveChild
-                                      ? "bg-amber-50 text-amber-950 border-l-4 border-amber-500"
-                                      : "text-slate-700 hover:bg-slate-100"
+                                      ? "bg-[#EEF2FF] border-slate-900 text-[#4338CA] shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                                      : "bg-slate-50 border-slate-900 text-slate-700 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
                                   }`
-                                : `px-3.5 py-2.5 rounded-xl border ${
+                                : `p-2.5 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] ${
                                     hasActiveChild
-                                      ? "bg-amber-50/90 border-amber-200 text-amber-950"
-                                      : "bg-slate-50/70 border-slate-200/80 text-slate-700 hover:bg-slate-100/90"
+                                      ? "bg-[#EEF2FF] text-[#4338CA] font-black"
+                                      : "bg-slate-50 text-slate-800 font-bold hover:bg-slate-100"
                                   }`
                             }`}
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <span className={hasActiveChild ? "text-amber-600" : "text-slate-500"}>
+                              <span className={hasActiveChild ? "text-[#6366F1]" : "text-slate-600"}>
                                 {group.icon}
                               </span>
                               {!isCollapsed && (
@@ -536,11 +534,11 @@ export default function Sidebar() {
 
                             {!isCollapsed && (
                               <div className="flex items-center gap-1.5 shrink-0">
-                                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-white border border-slate-200 text-slate-500">
+                                <span className="bg-[#FFB800] text-slate-950 border-1.5 border-slate-900 text-[10px] font-black px-1.5 py-0.5 rounded-md font-mono shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
                                   {group.items.length}
                                 </span>
                                 <svg
-                                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                                  className={`w-4 h-4 text-slate-700 transition-transform duration-200 ${
                                     isOpen ? "rotate-180" : ""
                                   }`}
                                   fill="none"
@@ -550,7 +548,7 @@ export default function Sidebar() {
                                   <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeWidth="2"
+                                    strokeWidth="2.5"
                                     d="M19 9l-7 7-7-7"
                                   />
                                 </svg>
@@ -563,7 +561,7 @@ export default function Sidebar() {
                             <div
                               className={`transition-all ${
                                 !isCollapsed
-                                  ? "pl-2 mt-1.5 border-l-2 border-slate-200 ml-3.5 space-y-1"
+                                  ? "pl-2 mt-1.5 space-y-1"
                                   : "mt-1 space-y-1"
                               }`}
                             >
@@ -576,15 +574,15 @@ export default function Sidebar() {
                                     title={child.title}
                                     className={`flex items-center text-xs transition-all ${
                                       isCollapsed
-                                        ? `justify-center py-2.5 rounded-xl ${
+                                        ? `justify-center py-2 rounded-lg border-2 ${
                                             active
-                                              ? "bg-amber-50 text-amber-950 font-bold border-l-4 border-amber-500"
-                                              : "text-slate-600 hover:bg-slate-100 font-medium"
+                                              ? "bg-[#6366F1] text-white font-black border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                                              : "bg-white text-slate-600 hover:text-slate-900 border-transparent hover:border-slate-900"
                                           }`
-                                        : `gap-2.5 px-3 py-2.5 rounded-xl ${
+                                        : `${
                                             active
-                                              ? "bg-amber-500 text-white font-bold shadow-xs"
-                                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium"
+                                              ? "bg-[#6366F1] text-white font-black text-xs p-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center gap-2"
+                                              : "pl-6 pr-2 py-1.5 text-[11px] font-bold text-slate-600 hover:text-[#6366F1] flex items-center gap-2 transition-colors"
                                           }`
                                     }`}
                                   >
@@ -615,14 +613,14 @@ export default function Sidebar() {
         {/* FOOTER USER PROFILE & AVATAR */}
         {/* ========================================== */}
         <div
-          className={`border-t border-slate-100 bg-slate-50/60 shrink-0 ${
+          className={`border-t-2 border-slate-900 bg-slate-50 shrink-0 ${
             isCollapsed ? "p-2 space-y-2 text-center" : "p-4 space-y-3"
           }`}
         >
           <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
             {/* Avatar Container with Image or Initials Fallback */}
             <div
-              className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-extrabold text-sm shadow-xs shrink-0 overflow-hidden border border-amber-300"
+              className="w-10 h-10 rounded-xl bg-[#FFB800] text-slate-950 flex items-center justify-center font-black text-sm border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] shrink-0 overflow-hidden"
               title={isCollapsed ? `${user?.displayName || "User"} (${userRole})` : undefined}
             >
               {user?.photoURL && !imageError ? (
@@ -640,20 +638,20 @@ export default function Sidebar() {
             {/* User Name, Email, & Role Badge (Hidden when Collapsed) */}
             {!isCollapsed && (
               <div className="min-w-0 flex-1">
-                <h4 className="text-xs font-bold text-slate-900 truncate">
+                <h4 className="text-xs font-black text-slate-900 truncate">
                   {user?.displayName || "Pengguna POS"}
                 </h4>
-                <p className="text-[10px] text-slate-500 truncate">
+                <p className="text-[10px] font-medium text-slate-500 truncate">
                   {user?.email || "user@dailymart.id"}
                 </p>
                 <div className="mt-1">
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                    className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] ${
                       userRole === "ADMIN"
-                        ? "bg-amber-100 text-amber-800 border border-amber-200"
+                        ? "bg-amber-100 text-amber-900"
                         : userRole === "WAREHOUSE"
-                        ? "bg-blue-100 text-blue-800 border border-blue-200"
-                        : "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                        ? "bg-blue-100 text-blue-900"
+                        : "bg-emerald-100 text-emerald-900"
                     }`}
                   >
                     {userRole}
@@ -668,12 +666,12 @@ export default function Sidebar() {
             type="button"
             onClick={() => setIsLogoutModalOpen(true)}
             title={isCollapsed ? "Keluar Sesi (Logout)" : undefined}
-            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 font-bold text-xs border border-slate-200 hover:border-red-200 transition-all cursor-pointer group ${
+            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-rose-50 text-slate-900 hover:text-rose-700 font-bold text-xs border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer group ${
               isCollapsed ? "p-2.5" : "gap-2 px-3 py-2"
             }`}
           >
             <svg
-              className="w-4 h-4 text-slate-400 group-hover:text-red-600 transition-colors"
+              className="w-4 h-4 text-slate-500 group-hover:text-rose-600 transition-colors"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -694,10 +692,10 @@ export default function Sidebar() {
       {/* LOGOUT CONFIRMATION MODAL */}
       {/* ========================================== */}
       {isLogoutModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-sm w-full p-6 text-center space-y-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] max-w-sm w-full p-6 text-center space-y-4">
             {/* Warning Badge Icon */}
-            <div className="w-12 h-12 mx-auto rounded-2xl bg-red-50 border border-red-100 text-red-600 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-rose-100 border-2 border-slate-900 text-rose-700 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center shrink-0">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -710,10 +708,10 @@ export default function Sidebar() {
 
             {/* Title & Description */}
             <div className="space-y-1">
-              <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">
+              <h3 className="text-lg font-black text-slate-900 tracking-tight">
                 Konfirmasi Keluar
               </h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <p className="text-xs text-slate-600 font-medium leading-relaxed">
                 Sesi Anda akan diakhiri. Pastikan semua transaksi atau data barang telah tersimpan dengan benar sebelum keluar.
               </p>
             </div>
@@ -724,7 +722,7 @@ export default function Sidebar() {
                 type="button"
                 onClick={() => setIsLogoutModalOpen(false)}
                 disabled={isLoggingOut}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition-all cursor-pointer disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-900 text-slate-900 hover:bg-slate-100 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer disabled:opacity-50"
               >
                 Batal
               </button>
@@ -732,7 +730,7 @@ export default function Sidebar() {
                 type="button"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
                 {isLoggingOut && (
                   <svg className="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
