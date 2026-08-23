@@ -796,10 +796,10 @@ export default function CashierTransactionsPage() {
         {/* ========================================================================= */}
         <div className="col-span-12 lg:col-span-4 flex flex-col h-full min-h-0 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           {/* Cart Header */}
-          <div className="h-12 px-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/70 shrink-0">
-            <div className="flex items-center gap-2">
+          <div className="h-12 px-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/70 shrink-0 gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
               <svg
-                className="w-4 h-4 text-slate-700"
+                className="w-4 h-4 text-slate-700 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -811,10 +811,10 @@ export default function CashierTransactionsPage() {
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                 />
               </svg>
-              <h2 className="font-bold text-sm text-slate-900">
+              <h2 className="font-bold text-xs sm:text-sm text-slate-900 truncate whitespace-nowrap">
                 Keranjang Belanja
               </h2>
-              <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-slate-200 text-slate-800">
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs font-mono font-bold bg-slate-200 text-slate-800 whitespace-nowrap shrink-0">
                 {totalItemCount} item
               </span>
             </div>
@@ -823,7 +823,7 @@ export default function CashierTransactionsPage() {
               <button
                 type="button"
                 onClick={handleClearCart}
-                className="text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                className="text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 px-1.5 py-0.5 rounded transition-colors whitespace-nowrap shrink-0"
               >
                 Kosongkan
               </button>
@@ -831,7 +831,7 @@ export default function CashierTransactionsPage() {
           </div>
 
           {/* Cart Item List (Scrollable) */}
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-100 p-2">
+          <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-1.5">
             {cart.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-400">
                 <div className="w-14 h-14 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-300 mb-3">
@@ -858,66 +858,80 @@ export default function CashierTransactionsPage() {
               </div>
             ) : (
               cart.map((item) => {
-                const hasDiscount =
-                  !!item.product.discountAmount && item.product.discountAmount > 0;
+                const productId = item.product.id || item.product.sku;
+                const imageUrl = item.product.imageUrl;
 
                 return (
                   <div
-                    key={item.product.id || item.product.sku}
-                    className="py-2.5 px-2 hover:bg-slate-50/80 rounded-md transition-colors flex items-center justify-between gap-3"
+                    key={productId}
+                    className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-200/70 w-full"
                   >
-                    {/* Item Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-mono font-medium text-slate-600 bg-slate-100 px-1 py-0.2 rounded">
-                          {item.product.sku}
-                        </span>
-                        {hasDiscount && (
-                          <span className="text-[9px] font-bold text-red-600 bg-red-50 border border-red-200 px-1 py-0.2 rounded">
-                            Hemat {formatRupiah(item.totalDiscount)}
-                          </span>
-                        )}
-                      </div>
+                    {/* Thumbnail Mini */}
+                    <div className="w-9 h-9 rounded-md bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                      {imageUrl && !failedImages[productId] ? (
+                        <img
+                          src={imageUrl}
+                          alt={item.product.name}
+                          onError={() => handleImageError(productId)}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <svg
+                          className="w-4 h-4 text-slate-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.75"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                          />
+                        </svg>
+                      )}
+                    </div>
 
-                      <h4 className="text-xs font-semibold text-slate-900 truncate mt-0.5">
+                    {/* Area Informasi Nama */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-[11px] font-bold text-slate-900 truncate leading-tight">
                         {item.product.name}
                       </h4>
-
-                      <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+                      <div className="text-[10px] text-slate-400 font-mono leading-none mt-0.5">
                         {formatRupiah(item.unitPrice)} / {item.product.unit}
                       </div>
                     </div>
 
-                    {/* Quantity Stepper */}
-                    <div className="flex items-center gap-1 shrink-0 bg-slate-100 p-0.5 rounded-md border border-slate-200">
+                    {/* Kontrol Qty */}
+                    <div className="flex items-center gap-0.5 bg-white border border-slate-200 rounded-md p-0.5 shrink-0">
                       <button
                         type="button"
                         onClick={() => handleUpdateQuantity(item.product.id, -1)}
-                        className="w-6 h-6 rounded bg-white hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold flex items-center justify-center text-xs shadow-2xs transition-colors"
+                        className="w-5 h-5 rounded bg-white hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold flex items-center justify-center text-[10px] shadow-2xs transition-colors"
                       >
                         -
                       </button>
-                      <span className="w-7 text-center font-mono font-bold text-xs text-slate-900">
+                      <span className="w-5 text-center text-[11px] font-bold font-mono text-slate-900">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleUpdateQuantity(item.product.id, 1)}
-                        className="w-6 h-6 rounded bg-white hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold flex items-center justify-center text-xs shadow-2xs transition-colors"
+                        className="w-5 h-5 rounded bg-white hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold flex items-center justify-center text-[10px] shadow-2xs transition-colors"
                       >
                         +
                       </button>
                     </div>
 
-                    {/* Subtotal & Delete */}
-                    <div className="text-right min-w-[76px] shrink-0">
-                      <div className="font-mono font-bold text-xs text-slate-900 tabular-nums">
+                    {/* Total & Action */}
+                    <div className="text-right shrink-0">
+                      <div className="text-[11px] font-black font-mono text-slate-900 leading-tight">
                         {formatRupiah(item.subtotal)}
                       </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveFromCart(item.product.id)}
-                        className="text-[10px] text-red-600 hover:text-red-800 hover:underline mt-0.5 font-medium"
+                        className="text-[9px] font-semibold text-rose-500 block ml-auto mt-0.5 hover:underline"
                       >
                         Hapus
                       </button>
