@@ -248,17 +248,17 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 p-4 lg:p-6 font-sans">
+    <div className="w-full min-h-screen bg-[#F1F5F9] p-4 lg:p-6 font-sans text-[#0F172A]">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* ========================================================================= */}
         {/* 1. HEADER SECTION                                                         */}
         {/* ========================================================================= */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Manajemen Pengguna & Hak Akses
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
               Kelola akun pengguna, peranan hak akses (RBAC), reset kata sandi, dan status aktif staf.
             </p>
           </div>
@@ -267,19 +267,19 @@ export default function UserManagementPage() {
             <button
               type="button"
               onClick={handleOpenAddModal}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+              className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-4 py-2.5 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer inline-flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
-              <span>Tambah Pengguna Baru</span>
+              <span>+ Tambah Pengguna Baru</span>
             </button>
 
             <button
               type="button"
               onClick={loadUsers}
               title="Refresh Data"
-              className="p-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer"
+              className="bg-white hover:bg-slate-100 border-2 border-slate-900 p-2.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900 transition-all cursor-pointer"
             >
               <svg
                 className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
@@ -301,83 +301,55 @@ export default function UserManagementPage() {
         {/* ========================================================================= */}
         {/* 2. 4 CARD KPI RINGKASAN                                                   */}
         {/* ========================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Total Pengguna
-              </span>
-              <span className="text-2xl font-black text-slate-900 mt-1 block font-mono">
-                {kpiData.total}{" "}
-                <span className="text-xs font-normal text-slate-400">akun</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+            <span className="text-slate-500 font-black text-[10px] uppercase tracking-wider block">
+              Total Pengguna
+            </span>
+            <span className="text-xl font-black font-mono text-slate-900 mt-2 block">
+              {kpiData.total}{" "}
+              <span className="text-xs font-bold text-slate-500 font-sans">akun</span>
+            </span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Administrator
-              </span>
-              <span className="text-2xl font-black text-purple-600 mt-1 block font-mono">
-                {kpiData.admin}{" "}
-                <span className="text-xs font-normal text-slate-400">orang</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
+          <div className="bg-[#EEF2FF] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+            <span className="text-[#4338CA] font-black text-[10px] uppercase tracking-wider block">
+              Administrator
+            </span>
+            <span className="text-xl font-black font-mono text-[#4338CA] mt-2 block">
+              {kpiData.admin}{" "}
+              <span className="text-xs font-bold text-[#4338CA]/70 font-sans">orang</span>
+            </span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Kasir (Cashier)
-              </span>
-              <span className="text-2xl font-black text-blue-600 mt-1 block font-mono">
-                {kpiData.cashier}{" "}
-                <span className="text-xs font-normal text-slate-400">orang</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-              </svg>
-            </div>
+          <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+            <span className="text-[#B45309] font-black text-[10px] uppercase tracking-wider block">
+              Kasir (Cashier)
+            </span>
+            <span className="text-xl font-black font-mono text-[#B45309] mt-2 block">
+              {kpiData.cashier}{" "}
+              <span className="text-xs font-bold text-[#B45309]/70 font-sans">orang</span>
+            </span>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Staf Gudang
-              </span>
-              <span className="text-2xl font-black text-amber-600 mt-1 block font-mono">
-                {kpiData.warehouse}{" "}
-                <span className="text-xs font-normal text-slate-400">orang</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
+          <div className="bg-[#E0F2FE] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+            <span className="text-[#0369A1] font-black text-[10px] uppercase tracking-wider block">
+              Staf Gudang
+            </span>
+            <span className="text-xl font-black font-mono text-[#0369A1] mt-2 block">
+              {kpiData.warehouse}{" "}
+              <span className="text-xs font-bold text-[#0369A1]/70 font-sans">orang</span>
+            </span>
           </div>
         </div>
 
         {/* ========================================================================= */}
         {/* 3. TOOLBAR SEARCH & FILTERS                                               */}
         {/* ========================================================================= */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          <div className="relative flex-1">
+        <div className="bg-white border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-wrap items-center gap-3 mb-6">
+          <div className="relative flex-1 min-w-[240px]">
             <svg
-              className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -394,7 +366,7 @@ export default function UserManagementPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari Nama Pengguna, Email, atau No. Telepon..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none transition-all"
+              className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border-2 border-slate-900 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:bg-white transition-all"
             />
             {searchQuery && (
               <button
@@ -407,13 +379,13 @@ export default function UserManagementPage() {
             )}
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
-            <div className="flex items-center gap-1.5 min-w-[140px]">
-              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Role:</label>
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-1.5">
+              <label className="text-xs font-bold text-slate-700 whitespace-nowrap">Role:</label>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none"
+                className="bg-white border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
               >
                 <option value="ALL">Semua Role</option>
                 <option value="ADMIN">ADMIN</option>
@@ -422,12 +394,12 @@ export default function UserManagementPage() {
               </select>
             </div>
 
-            <div className="flex items-center gap-1.5 min-w-[130px]">
-              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Status:</label>
+            <div className="flex items-center gap-1.5">
+              <label className="text-xs font-bold text-slate-700 whitespace-nowrap">Status:</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none"
+                className="bg-white border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
               >
                 <option value="ALL">Semua Status</option>
                 <option value="ACTIVE">Aktif</option>
@@ -440,29 +412,29 @@ export default function UserManagementPage() {
         {/* ========================================================================= */}
         {/* 4. TABEL PENGGUNA FIT-WIDTH 100%                                          */}
         {/* ========================================================================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center text-slate-500 space-y-3">
-              <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-medium">Memuat data pengguna...</p>
+              <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-xs font-bold text-slate-700">Memuat data pengguna...</p>
             </div>
           ) : error ? (
             <div className="p-12 text-center text-red-600 space-y-3">
-              <p className="text-sm font-bold">{error}</p>
+              <p className="text-sm font-black">{error}</p>
               <button
                 type="button"
                 onClick={loadUsers}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
+                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
               >
                 Coba Lagi
               </button>
             </div>
           ) : filteredUsers.length === 0 ? (
             <div className="p-12 text-center text-slate-500 space-y-2">
-              <p className="text-sm font-bold text-slate-800">
+              <p className="text-sm font-black text-slate-800">
                 Tidak ada pengguna yang sesuai dengan kriteria filter.
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs font-medium text-slate-500">
                 Coba ubah kata kunci pencarian atau filter status/role.
               </p>
             </div>
@@ -470,7 +442,7 @@ export default function UserManagementPage() {
             <div className="w-full overflow-x-auto">
               <table className="w-full table-fixed text-left border-collapse text-xs text-slate-600">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <tr className="bg-slate-100 border-b-2 border-slate-900 text-slate-900 font-black text-[11px] uppercase tracking-wider">
                     <th className="w-[32%] px-4 py-3.5">Pengguna & Email</th>
                     <th className="w-[18%] px-3 py-3.5 text-center">Role / Hak Akses</th>
                     <th className="w-[15%] px-3 py-3.5 text-center">Status</th>
@@ -478,19 +450,19 @@ export default function UserManagementPage() {
                     <th className="w-[17%] px-4 py-3.5 text-center">Aksi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody className="divide-y divide-slate-200 text-xs">
                   {filteredUsers.map((user) => {
                     const initials = getInitials(user.displayName);
 
                     return (
                       <tr
                         key={user.uid}
-                        className="hover:bg-slate-50/75 transition-colors"
+                        className="hover:bg-slate-50/80 transition-colors"
                       >
                         {/* Pengguna & Email */}
                         <td className="px-4 py-3.5 align-middle">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#FFB800] text-slate-950 font-black text-xs border-1.5 border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center shrink-0">
                               {initials}
                             </div>
                             <div className="min-w-0 flex-1">
@@ -501,7 +473,7 @@ export default function UserManagementPage() {
                                 {user.displayName}
                               </div>
                               <div
-                                className="text-[11px] text-slate-500 font-mono truncate"
+                                className="text-[10px] text-slate-500 font-mono truncate"
                                 title={user.email}
                               >
                                 {user.email}
@@ -512,34 +484,36 @@ export default function UserManagementPage() {
 
                         {/* Role / Hak Akses */}
                         <td className="px-3 py-3.5 align-middle text-center">
-                          <span
-                            className={`inline-block px-2.5 py-0.5 rounded-full font-bold text-[11px] border uppercase ${
-                              user.role === "ADMIN"
-                                ? "bg-purple-50 text-purple-700 border-purple-200"
-                                : user.role === "CASHIER"
-                                ? "bg-blue-50 text-blue-700 border-blue-200"
-                                : "bg-amber-50 text-amber-700 border-amber-200"
-                            }`}
-                          >
-                            {user.role}
-                          </span>
+                          {user.role === "ADMIN" ? (
+                            <span className="bg-[#EEF2FF] text-[#4338CA] border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                              ADMIN
+                            </span>
+                          ) : user.role === "CASHIER" ? (
+                            <span className="bg-[#FEF3C7] text-[#B45309] border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                              CASHIER
+                            </span>
+                          ) : (
+                            <span className="bg-[#E0F2FE] text-[#0369A1] border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                              WAREHOUSE
+                            </span>
+                          )}
                         </td>
 
                         {/* Status */}
                         <td className="px-3 py-3.5 align-middle text-center">
-                          <span
-                            className={`inline-block px-2.5 py-0.5 rounded-full font-bold text-[11px] border ${
-                              user.isActive
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : "bg-slate-100 text-slate-600 border-slate-200"
-                            }`}
-                          >
-                            {user.isActive ? "Aktif" : "Nonaktif"}
-                          </span>
+                          {user.isActive ? (
+                            <span className="bg-[#D1FAE5] text-[#065F46] border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
+                              Aktif
+                            </span>
+                          ) : (
+                            <span className="bg-slate-100 text-slate-600 border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
+                              Nonaktif
+                            </span>
+                          )}
                         </td>
 
                         {/* No. Telepon */}
-                        <td className="px-3 py-3.5 align-middle font-mono text-slate-700">
+                        <td className="px-3 py-3.5 align-middle font-mono font-bold text-slate-800">
                           {user.phone || "-"}
                         </td>
 
@@ -551,7 +525,7 @@ export default function UserManagementPage() {
                               type="button"
                               onClick={() => handleOpenEdit(user)}
                               title="Edit Pengguna"
-                              className="p-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 transition-colors cursor-pointer"
+                              className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-slate-900"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -563,7 +537,7 @@ export default function UserManagementPage() {
                               type="button"
                               onClick={() => handleOpenResetPassword(user)}
                               title="Reset Password"
-                              className="p-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 transition-colors cursor-pointer"
+                              className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-amber-700"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -575,7 +549,7 @@ export default function UserManagementPage() {
                               type="button"
                               onClick={() => handleDeleteUser(user)}
                               title="Hapus Pengguna"
-                              className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors cursor-pointer"
+                              className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-rose-600"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -598,15 +572,15 @@ export default function UserManagementPage() {
       {/* ========================================================================= */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <h3 className="font-extrabold text-base text-slate-900">
+          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-6 py-4 border-b-2 border-slate-900 flex items-center justify-between bg-slate-100">
+              <h3 className="font-black text-base text-slate-900">
                 Tambah Pengguna Baru
               </h3>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold text-sm transition-colors"
+                className="text-slate-900 hover:text-rose-600 text-lg font-black p-1 cursor-pointer"
               >
                 ✕
               </button>
@@ -614,7 +588,7 @@ export default function UserManagementPage() {
 
             <form onSubmit={handleCreateUser} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                   Nama Lengkap <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -625,12 +599,12 @@ export default function UserManagementPage() {
                     setAddForm({ ...addForm, displayName: e.target.value })
                   }
                   placeholder="Contoh: Budi Santoso"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                   Alamat Email <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -641,12 +615,12 @@ export default function UserManagementPage() {
                     setAddForm({ ...addForm, email: e.target.value })
                   }
                   placeholder="Contoh: nama@dailymart.com"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                   Kata Sandi Awal <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -659,12 +633,12 @@ export default function UserManagementPage() {
                       setAddForm({ ...addForm, password: e.target.value })
                     }
                     placeholder="Minimal 6 karakter"
-                    className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowAddPassword(!showAddPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900 transition-colors p-1 cursor-pointer"
                     title={showAddPassword ? "Sembunyikan password" : "Tampilkan password"}
                   >
                     {showAddPassword ? (
@@ -683,7 +657,7 @@ export default function UserManagementPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                  <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                     Role / Akses <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -692,21 +666,19 @@ export default function UserManagementPage() {
                     onChange={(e) =>
                       setAddForm({ ...addForm, role: e.target.value as UserRole })
                     }
-                    className={`w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold focus:bg-white focus:outline-none ${
-                      !addForm.role ? "text-slate-400 font-normal" : "text-slate-900"
-                    }`}
+                    className="w-full px-3.5 py-2.5 bg-white border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:outline-none"
                   >
                     <option value="" disabled>
-                      -- Pilih Role Akses --
+                      -- Pilih Role --
                     </option>
-                    <option value="CASHIER" className="text-slate-900 font-medium">CASHIER (Kasir)</option>
-                    <option value="WAREHOUSE" className="text-slate-900 font-medium">WAREHOUSE (Gudang)</option>
-                    <option value="ADMIN" className="text-slate-900 font-medium">ADMIN</option>
+                    <option value="CASHIER">CASHIER (Kasir)</option>
+                    <option value="WAREHOUSE">WAREHOUSE (Gudang)</option>
+                    <option value="ADMIN">ADMIN</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                  <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                     No. Telepon / HP
                   </label>
                   <input
@@ -716,23 +688,23 @@ export default function UserManagementPage() {
                       setAddForm({ ...addForm, phone: e.target.value })
                     }
                     placeholder="Contoh: 081234567890"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t-2 border-slate-900 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 text-xs font-bold text-slate-900 hover:bg-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
                 >
                   {isSubmitting && (
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -750,20 +722,20 @@ export default function UserManagementPage() {
       {/* ========================================================================= */}
       {isEditModalOpen && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-6 py-4 border-b-2 border-slate-900 flex items-center justify-between bg-slate-100">
               <div>
-                <h3 className="font-extrabold text-base text-slate-900">
+                <h3 className="font-black text-base text-slate-900">
                   Edit Pengguna
                 </h3>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">
+                <p className="text-xs text-slate-600 font-mono font-bold mt-0.5">
                   {selectedUser.email}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold text-sm transition-colors"
+                className="text-slate-900 hover:text-rose-600 text-lg font-black p-1 cursor-pointer"
               >
                 ✕
               </button>
@@ -771,7 +743,7 @@ export default function UserManagementPage() {
 
             <form onSubmit={handleEditUser} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                   Nama Lengkap <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -781,13 +753,13 @@ export default function UserManagementPage() {
                   onChange={(e) =>
                     setEditForm({ ...editForm, displayName: e.target.value })
                   }
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                  <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                     Role / Akses <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -795,7 +767,7 @@ export default function UserManagementPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, role: e.target.value as UserRole })
                     }
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold focus:bg-white focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:outline-none"
                   >
                     <option value="CASHIER">CASHIER (Kasir)</option>
                     <option value="WAREHOUSE">WAREHOUSE (Gudang)</option>
@@ -804,7 +776,7 @@ export default function UserManagementPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                  <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                     Status Akun <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -815,7 +787,7 @@ export default function UserManagementPage() {
                         isActive: e.target.value === "ACTIVE",
                       })
                     }
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold focus:bg-white focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:outline-none"
                   >
                     <option value="ACTIVE">Aktif (Bisa Login)</option>
                     <option value="INACTIVE">Nonaktif (Blokir)</option>
@@ -824,7 +796,7 @@ export default function UserManagementPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                   No. Telepon / HP
                 </label>
                 <input
@@ -833,22 +805,22 @@ export default function UserManagementPage() {
                   onChange={(e) =>
                     setEditForm({ ...editForm, phone: e.target.value })
                   }
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t-2 border-slate-900 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 text-xs font-bold text-slate-900 hover:bg-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
                 >
                   {isSubmitting && (
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -866,20 +838,20 @@ export default function UserManagementPage() {
       {/* ========================================================================= */}
       {isResetModalOpen && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-amber-50">
+          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-6 py-4 border-b-2 border-slate-900 flex items-center justify-between bg-[#FEF3C7]">
               <div>
-                <h3 className="font-extrabold text-base text-amber-900">
+                <h3 className="font-black text-base text-[#B45309]">
                   Reset Kata Sandi
                 </h3>
-                <p className="text-xs text-amber-800 font-medium mt-0.5">
+                <p className="text-xs text-[#B45309] font-mono font-bold mt-0.5">
                   {selectedUser.displayName} ({selectedUser.email})
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsResetModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-amber-200 hover:bg-amber-300 text-amber-900 flex items-center justify-center font-bold text-sm transition-colors"
+                className="text-slate-900 hover:text-rose-600 text-lg font-black p-1 cursor-pointer"
               >
                 ✕
               </button>
@@ -887,7 +859,7 @@ export default function UserManagementPage() {
 
             <form onSubmit={handleResetPassword} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase text-slate-700 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
                   Kata Sandi Baru <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -898,12 +870,12 @@ export default function UserManagementPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Masukkan kata sandi baru (min 6 karakter)"
-                    className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowResetPassword(!showResetPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900 transition-colors p-1 cursor-pointer"
                     title={showResetPassword ? "Sembunyikan password" : "Tampilkan password"}
                   >
                     {showResetPassword ? (
@@ -920,22 +892,22 @@ export default function UserManagementPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl text-[11px] text-amber-900">
+              <div className="p-3 bg-[#FEF3C7] border-1.5 border-slate-900 rounded-xl text-[11px] text-[#B45309] font-bold shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
                 ⚠️ Kata sandi pengguna akan langsung diperbarui di Firebase Auth. Pastikan Anda menyampaikan kata sandi baru kepada pengguna yang bersangkutan.
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t-2 border-slate-900 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsResetModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 text-xs font-bold text-slate-900 hover:bg-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
                 >
                   {isSubmitting && (
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
