@@ -70,29 +70,29 @@ export default function AdminSettingsPage() {
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* ==================== HEADER & TOP ACTION BAR ==================== */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <span className="p-2.5 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
+            <div className="p-2.5 rounded-xl bg-[#FFB800] border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-            </span>
+            </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+              <h1 className="text-xl font-black text-slate-900 tracking-tight">
                 Pengaturan Sistem & Toko
               </h1>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs font-bold text-slate-500">
                 Kelola profil toko, skema pajak PPN, struk printer thermal, dan parameter stok
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end md:self-auto">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setFormData(DEFAULT_FORM)}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors border border-slate-200 cursor-pointer"
+              className="bg-white hover:bg-slate-100 border-2 border-slate-900 px-3.5 py-2.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900 font-bold text-xs transition-all cursor-pointer"
             >
               Reset Default
             </button>
@@ -100,36 +100,36 @@ export default function AdminSettingsPage() {
               type="button"
               onClick={() => handleSave()}
               disabled={isSaving || isLoading}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-4 py-2.5 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {isSaving ? (
                 <>
                   <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                   <span>Menyimpan...</span>
                 </>
               ) : (
                 <>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>Simpan Perubahan</span>
+                  <span>✓ Simpan Perubahan</span>
                 </>
               )}
             </button>
           </div>
         </div>
 
-        {/* ==================== TAB NAVIGATION ==================== */}
-        <div className="flex items-center gap-1 border-b border-slate-200 bg-white p-1.5 rounded-2xl shadow-xs overflow-x-auto">
+        {/* ==================== TAB NAVIGATION BAR ==================== */}
+        <div className="bg-white border-2 border-slate-900 rounded-xl p-1.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-wrap items-center gap-2 mb-6">
           <button
             onClick={() => setActiveTab("profile")}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={
               activeTab === "profile"
-                ? "bg-slate-900 text-white shadow-xs"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+                ? "bg-[#6366F1] text-white font-black text-xs px-3.5 py-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center gap-2 transition-all cursor-pointer"
+                : "bg-transparent hover:bg-slate-100 text-slate-700 font-bold text-xs px-3.5 py-2 rounded-lg border-2 border-transparent hover:border-slate-900 flex items-center gap-2 transition-all cursor-pointer"
+            }
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -139,11 +139,11 @@ export default function AdminSettingsPage() {
 
           <button
             onClick={() => setActiveTab("tax")}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={
               activeTab === "tax"
-                ? "bg-slate-900 text-white shadow-xs"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+                ? "bg-[#6366F1] text-white font-black text-xs px-3.5 py-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center gap-2 transition-all cursor-pointer"
+                : "bg-transparent hover:bg-slate-100 text-slate-700 font-bold text-xs px-3.5 py-2 rounded-lg border-2 border-transparent hover:border-slate-900 flex items-center gap-2 transition-all cursor-pointer"
+            }
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -153,11 +153,11 @@ export default function AdminSettingsPage() {
 
           <button
             onClick={() => setActiveTab("receipt")}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={
               activeTab === "receipt"
-                ? "bg-slate-900 text-white shadow-xs"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+                ? "bg-[#6366F1] text-white font-black text-xs px-3.5 py-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center gap-2 transition-all cursor-pointer"
+                : "bg-transparent hover:bg-slate-100 text-slate-700 font-bold text-xs px-3.5 py-2 rounded-lg border-2 border-transparent hover:border-slate-900 flex items-center gap-2 transition-all cursor-pointer"
+            }
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -167,11 +167,11 @@ export default function AdminSettingsPage() {
 
           <button
             onClick={() => setActiveTab("inventory")}
-            className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
+            className={
               activeTab === "inventory"
-                ? "bg-slate-900 text-white shadow-xs"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+                ? "bg-[#6366F1] text-white font-black text-xs px-3.5 py-2 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center gap-2 transition-all cursor-pointer"
+                : "bg-transparent hover:bg-slate-100 text-slate-700 font-bold text-xs px-3.5 py-2 rounded-lg border-2 border-transparent hover:border-slate-900 flex items-center gap-2 transition-all cursor-pointer"
+            }
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -182,78 +182,78 @@ export default function AdminSettingsPage() {
 
         {/* ==================== TAB CONTENT AREA ==================== */}
         {isLoading ? (
-          <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center text-xs text-slate-400">
+          <div className="bg-white border-2 border-slate-900 rounded-xl p-12 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-center text-xs font-black text-slate-600 mb-6">
             Memuat konfigurasi toko...
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* MAIN FORM PANEL */}
-            <div className={`${activeTab === "receipt" ? "lg:col-span-7" : "lg:col-span-12"} bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6`}>
+            <div className={`${activeTab === "receipt" ? "lg:col-span-7" : "lg:col-span-12"} bg-white border-2 border-slate-900 rounded-xl p-6 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] mb-6`}>
               
               {/* TAB 1: PROFIL & INFORMASI TOKO */}
               {activeTab === "profile" && (
-                <div className="space-y-4">
-                  <div className="border-b border-slate-100 pb-3">
-                    <h3 className="text-sm font-bold text-slate-900">Grup 1: Profil & Informasi Toko</h3>
-                    <p className="text-xs text-slate-500">Informasi resmi identitas toko yang akan tampil pada laporan dan struk</p>
+                <div>
+                  <div className="mb-6 pb-3 border-b-2 border-slate-900/10">
+                    <h3 className="text-sm font-black text-slate-900 mb-1">Grup 1: Profil & Informasi Toko</h3>
+                    <p className="text-xs text-slate-500 font-medium">Informasi resmi identitas toko yang akan tampil pada laporan dan struk</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Nama Toko / Brand</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Nama Toko / Brand</label>
                       <input
                         type="text"
                         value={formData.storeName}
                         onChange={(e) => handleChange("storeName", e.target.value)}
                         placeholder="Contoh: DailyMart Retail"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Nama Cabang</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Nama Cabang</label>
                       <input
                         type="text"
                         value={formData.storeBranch}
                         onChange={(e) => handleChange("storeBranch", e.target.value)}
                         placeholder="Contoh: Cabang Utama"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Alamat Lengkap Toko</label>
+                  <div className="mb-5">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Alamat Lengkap Toko</label>
                     <textarea
                       rows={3}
                       value={formData.storeAddress}
                       onChange={(e) => handleChange("storeAddress", e.target.value)}
                       placeholder="Alamat fisik toko..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Nomor Telepon / WhatsApp</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Nomor Telepon / WhatsApp</label>
                       <input
                         type="text"
                         value={formData.storePhone}
                         onChange={(e) => handleChange("storePhone", e.target.value)}
                         placeholder="Contoh: 0271-712345"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Email Resmi Toko</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Email Resmi Toko</label>
                       <input
                         type="email"
                         value={formData.storeEmail}
                         onChange={(e) => handleChange("storeEmail", e.target.value)}
                         placeholder="admin@dailymart.com"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all"
                       />
                     </div>
                   </div>
@@ -262,17 +262,17 @@ export default function AdminSettingsPage() {
 
               {/* TAB 2: PAJAK & TRANSAKSI */}
               {activeTab === "tax" && (
-                <div className="space-y-5">
-                  <div className="border-b border-slate-100 pb-3">
-                    <h3 className="text-sm font-bold text-slate-900">Grup 2: Pengaturan Transaksi, Pajak & Mata Uang</h3>
-                    <p className="text-xs text-slate-500">Konfigurasi PPN penjualan, persen tarif, dan format mata uang</p>
+                <div>
+                  <div className="mb-6 pb-3 border-b-2 border-slate-900/10">
+                    <h3 className="text-sm font-black text-slate-900 mb-1">Grup 2: Pengaturan Transaksi, Pajak & Mata Uang</h3>
+                    <p className="text-xs text-slate-500 font-medium">Konfigurasi PPN penjualan, persen tarif, dan format mata uang</p>
                   </div>
 
                   {/* Toggle Aktifkan Pajak */}
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] mb-5">
                     <div>
-                      <p className="text-xs font-bold text-slate-900">Aktifkan Pajak Pertambahan Nilai (PPN)</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Otomatis menghitung PPN pada setiap transaksi transaksi di kasir</p>
+                      <p className="text-xs font-black text-slate-900">Aktifkan Pajak Pertambahan Nilai (PPN)</p>
+                      <p className="text-[11px] font-medium text-slate-500 mt-1">Otomatis menghitung PPN pada setiap transaksi di kasir</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -281,13 +281,13 @@ export default function AdminSettingsPage() {
                         onChange={(e) => handleChange("enableTax", e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                      <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-lg border-2 border-slate-900 peer peer-checked:bg-[#6366F1] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-2 after:border-slate-900 after:rounded-md after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-6"></div>
                     </label>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Tarif Pajak PPN (%)</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Tarif Pajak PPN (%)</label>
                       <div className="relative">
                         <input
                           type="number"
@@ -295,20 +295,20 @@ export default function AdminSettingsPage() {
                           disabled={!formData.enableTax}
                           value={formData.taxRate}
                           onChange={(e) => handleChange("taxRate", Number(e.target.value))}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400"
+                          className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all disabled:bg-slate-200 disabled:text-slate-400"
                         />
-                        <span className="absolute right-3.5 top-2.5 text-xs text-slate-400">%</span>
+                        <span className="absolute right-3.5 top-2.5 text-xs font-black text-slate-500">%</span>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Simbol Mata Uang</label>
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Simbol Mata Uang</label>
                       <input
                         type="text"
                         value={formData.currencySymbol}
                         onChange={(e) => handleChange("currencySymbol", e.target.value)}
                         placeholder="Rp"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all"
                       />
                     </div>
                   </div>
@@ -317,27 +317,27 @@ export default function AdminSettingsPage() {
 
               {/* TAB 3: STRUK KASIR THERMAL */}
               {activeTab === "receipt" && (
-                <div className="space-y-4">
-                  <div className="border-b border-slate-100 pb-3">
-                    <h3 className="text-sm font-bold text-slate-900">Grup 3: Pengaturan Struk Kasir Thermal</h3>
-                    <p className="text-xs text-slate-500">Format cetak cetakan printer thermal 58mm / 80mm dan pesan struk</p>
+                <div>
+                  <div className="mb-6 pb-3 border-b-2 border-slate-900/10">
+                    <h3 className="text-sm font-black text-slate-900 mb-1">Grup 3: Pengaturan Struk Kasir Thermal</h3>
+                    <p className="text-xs text-slate-500 font-medium">Format cetak cetakan printer thermal 58mm / 80mm dan pesan struk</p>
                   </div>
 
                   {/* Radio Paper Width */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-2">Ukuran Kertas Thermal Printer</label>
-                    <div className="grid grid-cols-2 gap-3">
+                  <div className="mb-5">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-2 block">Ukuran Kertas Thermal Printer</label>
+                    <div className="grid grid-cols-2 gap-4">
                       <button
                         type="button"
                         onClick={() => handleChange("receiptPaperWidth", "58mm")}
-                        className={`p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                        className={`p-3.5 rounded-xl border-2 border-slate-900 text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
                           formData.receiptPaperWidth === "58mm"
-                            ? "bg-amber-50 border-amber-500 text-amber-950 shadow-xs"
-                            : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                            ? "bg-[#6366F1] text-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                            : "bg-white text-slate-700 hover:bg-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
                         }`}
                       >
-                        <span className="w-3 h-3 rounded-full border-2 border-amber-500 flex items-center justify-center">
-                          {formData.receiptPaperWidth === "58mm" && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
+                        <span className={`w-3.5 h-3.5 rounded-full border-2 border-slate-900 flex items-center justify-center ${formData.receiptPaperWidth === "58mm" ? "bg-white" : "bg-transparent"}`}>
+                          {formData.receiptPaperWidth === "58mm" && <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1]" />}
                         </span>
                         Standard Thermal 58mm
                       </button>
@@ -345,14 +345,14 @@ export default function AdminSettingsPage() {
                       <button
                         type="button"
                         onClick={() => handleChange("receiptPaperWidth", "80mm")}
-                        className={`p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                        className={`p-3.5 rounded-xl border-2 border-slate-900 text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${
                           formData.receiptPaperWidth === "80mm"
-                            ? "bg-amber-50 border-amber-500 text-amber-950 shadow-xs"
-                            : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                            ? "bg-[#6366F1] text-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                            : "bg-white text-slate-700 hover:bg-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
                         }`}
                       >
-                        <span className="w-3 h-3 rounded-full border-2 border-amber-500 flex items-center justify-center">
-                          {formData.receiptPaperWidth === "80mm" && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
+                        <span className={`w-3.5 h-3.5 rounded-full border-2 border-slate-900 flex items-center justify-center ${formData.receiptPaperWidth === "80mm" ? "bg-white" : "bg-transparent"}`}>
+                          {formData.receiptPaperWidth === "80mm" && <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1]" />}
                         </span>
                         Wide Thermal 80mm
                       </button>
@@ -360,48 +360,54 @@ export default function AdminSettingsPage() {
                   </div>
 
                   {/* Header & Footer Note */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Catatan Header Struk</label>
+                  <div className="mb-5">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Catatan Header Struk</label>
                     <input
                       type="text"
                       value={formData.receiptHeaderNote}
                       onChange={(e) => handleChange("receiptHeaderNote", e.target.value)}
                       placeholder="Selamat Datang di DailyMart"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Catatan Footer Struk</label>
+                  <div className="mb-5">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">Catatan Footer Struk</label>
                     <textarea
                       rows={2}
                       value={formData.receiptFooterNote}
                       onChange={(e) => handleChange("receiptFooterNote", e.target.value)}
                       placeholder="Pesan ucapan terima kasih di bagian bawah..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full transition-all"
                     />
                   </div>
 
                   {/* Toggles */}
                   <div className="space-y-3 pt-2">
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-xs font-semibold text-slate-800">Tampilkan Nama Kasir di Struk</span>
-                      <input
-                        type="checkbox"
-                        checked={formData.showCashierName}
-                        onChange={(e) => handleChange("showCashierName", e.target.checked)}
-                        className="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-500"
-                      />
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
+                      <span className="text-xs font-black text-slate-900">Tampilkan Nama Kasir di Struk</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.showCashierName}
+                          onChange={(e) => handleChange("showCashierName", e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-lg border-2 border-slate-900 peer peer-checked:bg-[#6366F1] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-2 after:border-slate-900 after:rounded-md after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-6"></div>
+                      </label>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-xs font-semibold text-slate-800">Tampilkan Rincian Pajak (PPN) di Struk</span>
-                      <input
-                        type="checkbox"
-                        checked={formData.showTaxDetails}
-                        onChange={(e) => handleChange("showTaxDetails", e.target.checked)}
-                        className="w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-500"
-                      />
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
+                      <span className="text-xs font-black text-slate-900">Tampilkan Rincian Pajak (PPN) di Struk</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.showTaxDetails}
+                          onChange={(e) => handleChange("showTaxDetails", e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-lg border-2 border-slate-900 peer peer-checked:bg-[#6366F1] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-2 after:border-slate-900 after:rounded-md after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-6"></div>
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -409,14 +415,14 @@ export default function AdminSettingsPage() {
 
               {/* TAB 4: INVENTARIS & STOK */}
               {activeTab === "inventory" && (
-                <div className="space-y-5">
-                  <div className="border-b border-slate-100 pb-3">
-                    <h3 className="text-sm font-bold text-slate-900">Grup 4: Parameter Inventaris & Stok</h3>
-                    <p className="text-xs text-slate-500">Pengaturan ambang batas stok minimum dan visibilitas di kasir POS</p>
+                <div>
+                  <div className="mb-6 pb-3 border-b-2 border-slate-900/10">
+                    <h3 className="text-sm font-black text-slate-900 mb-1">Grup 4: Parameter Inventaris & Stok</h3>
+                    <p className="text-xs text-slate-500 font-medium">Pengaturan ambang batas stok minimum dan visibilitas di kasir POS</p>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <div className="mb-5">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 block">
                       Batas Peringatan Stok Kritis Default (Min Stock Alert)
                     </label>
                     <input
@@ -424,17 +430,17 @@ export default function AdminSettingsPage() {
                       min={1}
                       value={formData.defaultMinStockAlert}
                       onChange={(e) => handleChange("defaultMinStockAlert", Number(e.target.value))}
-                      className="w-full md:w-1/2 px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full md:w-1/2 transition-all"
                     />
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-[11px] font-medium text-slate-500 mt-1">
                       Produk dengan jumlah stok di bawah batas ini akan otomatis memicu peringatan stok di gudang.
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
                     <div>
-                      <p className="text-xs font-bold text-slate-900">Sembunyikan Produk Habis dari Mesin Kasir (POS)</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Produk dengan stok 0 tidak akan ditampilkan pada katalog kasir</p>
+                      <p className="text-xs font-black text-slate-900">Sembunyikan Produk Habis dari Mesin Kasir (POS)</p>
+                      <p className="text-[11px] font-medium text-slate-500 mt-1">Produk dengan stok 0 tidak akan ditampilkan pada katalog kasir</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -443,7 +449,7 @@ export default function AdminSettingsPage() {
                         onChange={(e) => handleChange("autoHideOutOfStock", e.target.checked)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                      <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-lg border-2 border-slate-900 peer peer-checked:bg-[#6366F1] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-2 after:border-slate-900 after:rounded-md after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-6"></div>
                     </label>
                   </div>
                 </div>
@@ -451,23 +457,23 @@ export default function AdminSettingsPage() {
 
             </div>
 
-            {/* LIVE RECEIPT PREVIEW PANEL (Visible when activeTab is 'receipt' or always on desktop) */}
+            {/* LIVE RECEIPT PREVIEW PANEL */}
             {activeTab === "receipt" && (
-              <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="lg:col-span-5 bg-white border-2 border-slate-900 rounded-xl p-6 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] mb-6 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b-2 border-slate-900/10">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Live Preview Struk Thermal</h3>
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#FFB800] border border-slate-900 animate-pulse" />
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">Live Preview Struk Thermal</h3>
                   </div>
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                  <span className="px-2.5 py-1 text-[10px] font-black rounded-lg bg-[#FFB800] text-slate-900 border-2 border-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]">
                     {formData.receiptPaperWidth}
                   </span>
                 </div>
 
                 {/* Simulated Thermal Receipt Container */}
-                <div className="bg-slate-100 p-4 rounded-xl flex justify-center">
+                <div className="bg-slate-100 p-4 rounded-xl border-2 border-slate-900 flex justify-center">
                   <div
-                    className={`bg-white p-4 shadow-md font-mono text-[11px] leading-tight text-slate-900 border border-slate-200 transition-all ${
+                    className={`bg-white p-4 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] font-mono text-[11px] leading-tight text-slate-900 border-2 border-slate-900 transition-all ${
                       formData.receiptPaperWidth === "80mm" ? "w-72" : "w-56"
                     }`}
                   >
