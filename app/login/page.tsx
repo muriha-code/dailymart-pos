@@ -38,7 +38,7 @@ export default function LoginPage() {
       // 2. Dapatkan ID Token
       const idToken = await user.getIdToken();
 
-      // 3. Kirim POST ke API Auth Login Handler (Teroptimasi)
+      // 3. Kirim POST ke API Auth Login Handler
       let res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,15 +54,19 @@ export default function LoginPage() {
         });
       }
 
+      // Ambil teks mentah terlebih dahulu untuk menghindari crash parsing JSON
+      const rawText = await res.text();
       let result: any = {};
+
       try {
-        result = await res.json();
+        result = rawText ? JSON.parse(rawText) : {};
       } catch (jsonErr) {
-        throw new Error('Gagal membaca respon server sesi. Silakan coba lagi.');
+        console.error('[Server Non-JSON Response]:', rawText);
+        throw new Error(`Server mengembalikan respon tidak valid (${res.status}). Silakan periksa koneksi atau backend.`);
       }
 
       if (!res.ok || !result.success) {
-        throw new Error(result.message || 'Gagal membuat sesi login.');
+        throw new Error(result.message || result.error || 'Gagal membuat sesi login.');
       }
 
       // 4. Tandai tab aktif untuk Strict Single-Tab Session Guard secara non-blocking
@@ -101,22 +105,15 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row bg-white overflow-hidden selection:bg-slate-900 selection:text-white font-sans">
       
-      {/* ======================================================== */}
-      {/* LEFT PANEL: VISUAL & BRANDING HERO (50:50 Split)         */}
-      {/* ======================================================== */}
+      {/* LEFT PANEL: VISUAL & BRANDING HERO */}
       <div className="hidden md:flex md:w-1/2 lg:w-7/12 relative overflow-hidden bg-slate-950 flex-col justify-between p-8 lg:p-12 text-white select-none">
-        
-        {/* Background Image of Modern Retail Environment */}
         <img
           src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?q=80&w=1600&auto=format&fit=crop"
           alt="DailyMart Retail POS System"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
         />
-
-        {/* Gradient Overlay for Deep Contrast & Readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/40 to-slate-900/20 z-10" />
 
-        {/* Top Branding Badge */}
         <div className="relative z-20 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black text-xl flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
             D
@@ -132,7 +129,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Bottom Tagline & Retail System Highlights */}
         <div className="relative z-20 space-y-3 max-w-lg">
           <div className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[10px] font-extrabold uppercase tracking-widest text-amber-300">
             Smart Retail Management System
@@ -146,13 +142,10 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ======================================================== */}
-      {/* RIGHT PANEL: FORM AUTHENTICATION (50:50 Split)           */}
-      {/* ======================================================== */}
+      {/* RIGHT PANEL: FORM AUTHENTICATION */}
       <div className="w-full md:w-1/2 lg:w-5/12 flex-1 flex flex-col justify-center items-center p-6 sm:p-8 lg:p-12 bg-white relative">
         <div className="w-full max-w-sm space-y-6">
           
-          {/* Mobile Only Header */}
           <div className="md:hidden text-center mb-2">
             <div className="w-12 h-12 rounded-xl bg-slate-900 text-amber-400 font-black text-xl shadow-xs flex items-center justify-center mb-3 mx-auto border border-slate-800">
               D
@@ -165,7 +158,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Form Header */}
           <div>
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">
               Masuk ke Sistem
@@ -175,7 +167,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Error Alert Notification */}
           {error && (
             <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex items-start gap-2.5 animate-shake">
               <svg className="w-4 h-4 text-red-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -188,7 +179,6 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
