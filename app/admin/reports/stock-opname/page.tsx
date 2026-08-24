@@ -437,84 +437,86 @@ export default function AdminStockOpnameReportPage() {
         </div>
 
         {/* ==================== SCREEN CONTAINER ==================== */}
-        <div className="print:hidden space-y-6">
-          <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="print:hidden space-y-3">
+          {/* 1. Header Bar Compact */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 p-0">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+              <h1 className="text-lg font-black text-slate-900 tracking-tight">
                 Laporan Audit Stock Opname
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Analisis hasil verifikasi stok fisik, persentase akurasi, nilai kerugian/surplus, dan temuan selisih.
+              <p className="hidden sm:block text-[11px] text-slate-500 font-bold mt-0.5">
+                Analisis verifikasi stok fisik vs sistem, persentase akurasi, nilai kerugian/surplus, dan temuan selisih.
               </p>
             </div>
 
-            <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
               {/* Unified Export Dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsExportOpen(!isExportOpen)}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-[#0F172A] hover:bg-slate-800 active:bg-slate-950 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                  className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs py-1.5 px-3.5 rounded-xl border-2 border-slate-900 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                   </svg>
-                  <span>Cetak</span>
-                  <svg className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-200 ${isExportOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  <span>Cetak / Ekspor PDF</span>
+                  <svg className={`w-3 h-3 text-white/80 transition-transform duration-200 ${isExportOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
                 {/* Dropdown Menu Modal */}
                 {isExportOpen && (
-                  <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white p-1.5 shadow-xl border border-slate-200 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    {/* Opsi 1: Cetak / Simpan PDF (Nuansa Merah) */}
+                  <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white p-2 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    {/* Opsi 1: Cetak / Simpan PDF */}
                     <button
                       type="button"
                       onClick={handlePrintPDF}
-                      className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-rose-50 text-left transition-colors cursor-pointer group"
+                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 text-left transition-colors cursor-pointer border border-transparent hover:border-slate-900"
                     >
-                      <div className="p-2 rounded-lg bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-lg bg-rose-100 border border-slate-900 text-rose-700">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-slate-900 group-hover:text-rose-900">Cetak Dokumen (PDF)</div>
-                        <div className="text-[10px] text-slate-500">Format formal A4 Landscape</div>
+                        <div className="text-xs font-black text-slate-900">Cetak Dokumen (PDF)</div>
+                        <div className="text-[10px] font-semibold text-slate-500">Format resmi A4 Landscape</div>
                       </div>
                     </button>
 
-                    <div className="my-1 border-t border-slate-100" />
+                    <div className="my-1 border-t-2 border-slate-200" />
 
-                    {/* Opsi 2: Ekspor CSV Excel (Nuansa Hijau) */}
+                    {/* Opsi 2: Ekspor CSV Excel */}
                     <button
                       type="button"
                       onClick={handleExportCSV}
-                      className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-emerald-50 text-left transition-colors cursor-pointer group"
+                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 text-left transition-colors cursor-pointer border border-transparent hover:border-slate-900"
                     >
-                      <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-lg bg-emerald-100 border border-slate-900 text-emerald-700">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-900">Ekspor CSV (Excel)</div>
-                        <div className="text-[10px] text-slate-500">Unduh lembar kerja mentah (.csv)</div>
+                        <div className="text-xs font-black text-slate-900">Ekspor CSV (Excel)</div>
+                        <div className="text-[10px] font-semibold text-slate-500">Unduh lembar kerja mentah (.csv)</div>
                       </div>
                     </button>
                   </div>
                 )}
               </div>
 
+              {/* Secondary Refresh Button */}
               <button
                 type="button"
                 onClick={loadStockOpnameReport}
                 title="Refresh Data"
-                className="p-2.5 rounded-2xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer"
+                className="bg-white hover:bg-slate-100 border-2 border-slate-900 p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900 transition-all cursor-pointer"
               >
                 <svg
-                  className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+                  className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -522,7 +524,7 @@ export default function AdminStockOpnameReportPage() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth="2"
+                    strokeWidth="2.5"
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
@@ -530,128 +532,102 @@ export default function AdminStockOpnameReportPage() {
             </div>
           </div>
 
-          {/* 4 CARD KPI RINGKASAN AUDIT */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Total Item Diverifikasi
-                </span>
-                <span className="text-2xl font-black text-slate-900 mt-1 block font-mono">
-                  {reportData?.summary.totalAudited || 0}{" "}
-                  <span className="text-xs font-normal text-slate-400">item</span>
-                </span>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-              </div>
+          {/* 2. KPI Stat Cards (4 Grid Opname Metrics - Compact) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+            {/* Card 1 (Total Item Diverifikasi) */}
+            <div className="bg-white border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
+                Total Item Diverifikasi
+              </span>
+              <span className="text-lg font-black font-mono text-slate-900 tracking-tight block">
+                {reportData?.summary.totalAudited || 0}{" "}
+                <span className="text-[10px] font-bold text-slate-500">item</span>
+              </span>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Tingkat Akurasi Stok
-                </span>
-                <span className="text-2xl font-black text-emerald-600 mt-1 block font-mono">
-                  {reportData?.summary.accuracyRate || 0}%
-                </span>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+            {/* Card 2 (Tingkat Akurasi Stok) */}
+            <div className="bg-[#E8F5E9] border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
+                Tingkat Akurasi Stok
+              </span>
+              <span className="text-[#065F46] font-mono font-black text-lg tracking-tight block">
+                {reportData?.summary.accuracyRate || 0}%
+              </span>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Total Nilai Kerugian (Loss)
-                </span>
-                <span className="text-2xl font-black text-rose-600 mt-1 block font-mono">
-                  {formatRupiah(reportData?.summary.totalLossRp || 0)}
-                </span>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
-                </svg>
-              </div>
+            {/* Card 3 (Total Nilai Kerugian / Loss) */}
+            <div className="bg-[#FFE4E6] border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
+                Total Kerugian (Loss)
+              </span>
+              <span className="text-[#E11D48] font-mono font-black text-lg tracking-tight block">
+                {formatRupiah(reportData?.summary.totalLossRp || 0)}
+              </span>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Total Nilai Surplus
-                </span>
-                <span className="text-2xl font-black text-blue-600 mt-1 block font-mono">
-                  {formatRupiah(reportData?.summary.totalSurplusRp || 0)}
-                </span>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-              </div>
+            {/* Card 4 (Total Nilai Surplus) */}
+            <div className="bg-[#EEF2FF] border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
+                Total Surplus
+              </span>
+              <span className="text-[#4338CA] font-mono font-black text-lg tracking-tight block">
+                {formatRupiah(reportData?.summary.totalSurplusRp || 0)}
+              </span>
             </div>
           </div>
 
-          {/* TOOLBAR FILTER PERIODE & STATUS SELISIH */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-6">
-            <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
-              <div className="flex items-center gap-1.5 min-w-[150px]">
-                <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Periode:</label>
-                <select
-                  value={periodFilter}
-                  onChange={(e) => setPeriodFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none"
-                >
-                  <option value="all">Semua Waktu</option>
-                  <option value="today">Hari Ini</option>
-                  <option value="7days">7 Hari Terakhir</option>
-                  <option value="thisMonth">Bulan Ini</option>
-                  <option value="custom">Kustom Tanggal</option>
-                </select>
-              </div>
-
-              {periodFilter === "custom" && (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800"
-                  />
-                  <span className="text-xs text-slate-400">s/d</span>
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800"
-                  />
-                </div>
-              )}
-
-              <div className="flex items-center gap-1.5 min-w-[160px]">
-                <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Status Selisih:</label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none"
-                >
-                  <option value="ALL">Semua Status</option>
-                  <option value="MATCHED">Sesuai (Match)</option>
-                  <option value="DEFICIT">Selisih Kurang (Loss)</option>
-                  <option value="SURPLUS">Selisih Lebih (Surplus)</option>
-                </select>
-              </div>
+          {/* 3. Inline Filter Bar */}
+          <div className="bg-white border-2 border-slate-900 rounded-xl p-2 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] flex flex-wrap items-center gap-2.5 mb-3">
+            <div className="flex items-center gap-1.5">
+              <label className="text-[10px] font-black text-slate-800 uppercase tracking-wider whitespace-nowrap">PERIODE:</label>
+              <select
+                value={periodFilter}
+                onChange={(e) => setPeriodFilter(e.target.value)}
+                className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+              >
+                <option value="all">Semua Waktu</option>
+                <option value="today">Hari Ini</option>
+                <option value="7days">7 Hari Terakhir</option>
+                <option value="thisMonth">Bulan Ini</option>
+                <option value="custom">Kustom Tanggal</option>
+              </select>
             </div>
 
-            <div className="relative min-w-[220px]">
+            {periodFilter === "custom" && (
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                />
+                <span className="text-[10px] font-black text-slate-600">s/d</span>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                />
+              </div>
+            )}
+
+            <div className="flex items-center gap-1.5">
+              <label className="text-[10px] font-black text-slate-800 uppercase tracking-wider whitespace-nowrap">STATUS SELISIH:</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+              >
+                <option value="ALL">Semua Status</option>
+                <option value="MATCHED">Sesuai (Match)</option>
+                <option value="DEFICIT">Selisih Kurang (Loss)</option>
+                <option value="SURPLUS">Selisih Lebih (Surplus)</option>
+              </select>
+            </div>
+
+            <div className="relative flex-1 min-w-[180px]">
               <svg
-                className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -659,7 +635,7 @@ export default function AdminStockOpnameReportPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
@@ -668,158 +644,159 @@ export default function AdminStockOpnameReportPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari Produk, SKU, Auditor..."
-                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none"
+                className="w-full bg-slate-50 border-2 border-slate-900 rounded-full pl-8 pr-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white placeholder:text-slate-400 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
               />
             </div>
           </div>
-        </div>
 
-        {/* ========================================================================= */}
-        {/* 3. VISUALISASI GRAFIK RECHARTS (SEMBUNYI SAAT CETAK)                       */}
-        {/* ========================================================================= */}
-        <div className="print:hidden grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-          {/* Donut Chart Komposisi Status Audit (40% Width - 5 Cols) */}
-          <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-            <div className="mb-2">
-              <h2 className="text-base font-bold text-slate-900">
-                Komposisi Hasil Audit
-              </h2>
-              <p className="text-xs text-slate-500">
-                Proporsi kesesuaian fisik vs sistem
-              </p>
-            </div>
+          {/* 4. Chart Section (Komposisi Hasil Audit & Top 5 Dampak Selisih) */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-3">
+            {/* Komposisi Hasil Audit (lg:col-span-1) */}
+            <div className="lg:col-span-1 bg-white border-2 border-slate-900 rounded-xl p-3.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+              <div className="mb-1">
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
+                  Komposisi Hasil Audit
+                </h2>
+              </div>
 
-            <div className="w-full h-56">
-              {reportData?.statusDistribution && reportData.statusDistribution.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={reportData.statusDistribution}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={75}
-                      paddingAngle={4}
-                      dataKey="value"
-                    >
-                      {reportData.statusDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip
-                      formatter={(val: any) => [`${val} Item`, "Jumlah Item"]}
-                      contentStyle={{ backgroundColor: "#0F172A", borderRadius: "12px", color: "#FFF", fontSize: "12px" }}
-                    />
-                    <Legend
-                      verticalAlign="bottom"
-                      height={36}
-                      formatter={(value, entry: any) => (
-                        <span className="text-xs font-semibold text-slate-700">
-                          {value} ({entry.payload.value})
-                        </span>
-                      )}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-xs text-slate-400">
-                  Belum ada data audit untuk grafik.
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Horizontal Bar Chart Top 5 Dampak Selisih Rupiah (60% Width - 7 Cols) */}
-          <div className="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-            <div className="mb-2">
-              <h2 className="text-base font-bold text-slate-900">
-                Top 5 Produk Dampak Selisih (Rp)
-              </h2>
-              <p className="text-xs text-slate-500">
-                Produk dengan nilai nominal selisih terbesar
-              </p>
-            </div>
-
-            <div className="w-full h-56">
-              {reportData?.topDiscrepancies && reportData.topDiscrepancies.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={reportData.topDiscrepancies} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
-                    <XAxis type="number" tick={{ fontSize: 10, fill: '#64748B' }} tickFormatter={(v) => `Rp ${(v / 1000)}k`} />
-                    <YAxis dataKey="productName" type="category" width={130} tick={{ fontSize: 10, fontWeight: 'bold', fill: '#1E293B' }} />
-                    <RechartsTooltip
-                      formatter={(val: any) => [formatRupiah(Number(val)), "Dampak Selisih"]}
-                      contentStyle={{ backgroundColor: "#0F172A", borderRadius: "12px", color: "#FFF", fontSize: "12px" }}
-                    />
-                    <Bar dataKey="discrepancyValue" fill="#EF4444" radius={[0, 8, 8, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-xs text-slate-400">
-                  Tidak ada temuan selisih produk.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* 4. TABEL AUDIT FIT-WIDTH (100% FIT NO HORIZONTAL SCROLL)                  */}
-        {/* ========================================================================= */}
-        <div className="print:hidden bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          {isLoading ? (
-            <div className="p-12 text-center text-slate-500 space-y-3">
-              <div className="w-8 h-8 border-4 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-medium">Memuat data audit stock opname...</p>
-            </div>
-          ) : error ? (
-            <div className="p-12 text-center text-red-600 space-y-3">
-              <p className="text-sm font-bold">{error}</p>
-              <button
-                type="button"
-                onClick={loadStockOpnameReport}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
-              >
-                Coba Lagi
-              </button>
-            </div>
-          ) : !reportData?.audits || reportData.audits.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 space-y-3">
-              <p className="text-sm font-bold text-slate-800">
-                Belum ada data audit stock opname yang tercatat pada periode ini.
-              </p>
-              <p className="text-xs text-slate-400">
-                Klik tombol seeder di bawah untuk mengisi data sampel audit stok.
-              </p>
-              <button
-                type="button"
-                onClick={handleTriggerSeeder}
-                disabled={seedingLoading}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
-              >
-                {seedingLoading && (
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-full h-[150px] sm:h-[160px]">
+                {reportData?.statusDistribution && reportData.statusDistribution.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={reportData.statusDistribution}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={35}
+                        outerRadius={55}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {reportData.statusDistribution.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} stroke="#0F172A" strokeWidth={1.5} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip
+                        formatter={(val: any) => [`${val} Item`, "Jumlah Item"]}
+                        contentStyle={{
+                          backgroundColor: "#0F172A",
+                          border: "2px solid #0F172A",
+                          borderRadius: "10px",
+                          color: "#FFF",
+                          fontSize: "11px",
+                          fontWeight: "bold",
+                        }}
+                      />
+                      <Legend
+                        verticalAlign="bottom"
+                        height={32}
+                        formatter={(value, entry: any) => (
+                          <span className="font-mono text-[10px] font-bold text-slate-700">
+                            {value} ({entry.payload.value})
+                          </span>
+                        )}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400">
+                    Belum ada data audit untuk grafik.
+                  </div>
                 )}
-                <span>Generate Data Dummy Audit (Seeder)</span>
-              </button>
+              </div>
             </div>
-          ) : (
-            <div className="w-full overflow-hidden">
-              {/* Screen Table (Fit-Width 100%) */}
-              <div className="print:hidden">
-                <table className="w-full table-fixed text-left border-collapse text-xs text-slate-600">
+
+            {/* Top 5 Produk Dampak Selisih (lg:col-span-2) */}
+            <div className="lg:col-span-2 bg-white border-2 border-slate-900 rounded-xl p-3.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+              <div className="mb-1">
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
+                  Top 5 Produk Dampak Selisih (Rp)
+                </h2>
+              </div>
+
+              <div className="w-full h-[150px] sm:h-[160px]">
+                {reportData?.topDiscrepancies && reportData.topDiscrepancies.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={reportData.topDiscrepancies} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: -5 }}>
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
+                      <XAxis type="number" tick={{ fontSize: 10, fontWeight: 'bold', fill: '#0F172A' }} tickFormatter={(v) => `Rp${(v / 1000).toFixed(0)}k`} />
+                      <YAxis dataKey="productName" type="category" width={130} tick={{ fontSize: 10, fontWeight: '700', fill: '#0F172A' }} />
+                      <RechartsTooltip
+                        formatter={(val: any) => [formatRupiah(Number(val)), "Dampak Selisih"]}
+                        contentStyle={{
+                          backgroundColor: "#0F172A",
+                          border: "2px solid #0F172A",
+                          borderRadius: "10px",
+                          color: "#FFF",
+                          fontSize: "11px",
+                          fontWeight: "bold",
+                        }}
+                      />
+                      <Bar dataKey="discrepancyValue" fill="#E11D48" stroke="#0F172A" strokeWidth={1.5} radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400">
+                    Tidak ada temuan selisih produk.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Table Data Audit Stock Opname */}
+          <div className="bg-white border-2 border-slate-900 rounded-xl shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
+            {isLoading ? (
+              <div className="p-12 text-center text-slate-500 space-y-3">
+                <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs font-bold text-slate-700">Memuat data audit stock opname...</p>
+              </div>
+            ) : error ? (
+              <div className="p-12 text-center text-red-600 space-y-3">
+                <p className="text-sm font-bold">{error}</p>
+                <button
+                  type="button"
+                  onClick={loadStockOpnameReport}
+                  className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+                >
+                  Coba Lagi
+                </button>
+              </div>
+            ) : !reportData?.audits || reportData.audits.length === 0 ? (
+              <div className="p-12 text-center text-slate-500 space-y-3">
+                <p className="text-sm font-black text-slate-900">
+                  Belum ada data audit stock opname yang tercatat pada periode ini.
+                </p>
+                <p className="text-xs font-medium text-slate-500">
+                  Klik tombol seeder di bawah untuk mengisi data sampel audit stok.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleTriggerSeeder}
+                  disabled={seedingLoading}
+                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
+                >
+                  {seedingLoading && (
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  )}
+                  <span>Generate Data Dummy Audit (Seeder)</span>
+                </button>
+              </div>
+            ) : (
+              <div className="w-full overflow-x-auto">
+                <table className="w-full table-auto text-left border-collapse text-xs text-slate-700">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="w-[16%] px-3 py-3">Waktu & Kode Audit</th>
-                      <th className="w-[24%] px-3 py-3">Produk & SKU</th>
-                      <th className="w-[14%] px-3 py-3">Auditor</th>
-                      <th className="w-[9%] px-2 py-3 text-center">Sistem</th>
-                      <th className="w-[9%] px-2 py-3 text-center">Fisik</th>
-                      <th className="w-[10%] px-2 py-3 text-center">Selisih</th>
-                      <th className="w-[18%] px-3 py-3 text-right">Dampak Nilai (Rp)</th>
+                    <tr className="bg-slate-100 border-b-2 border-slate-900 text-slate-900 font-black text-[10px] uppercase tracking-wider">
+                      <th className="px-3 py-3">Waktu & Kode Audit</th>
+                      <th className="px-3 py-3">Produk & SKU</th>
+                      <th className="px-3 py-3">Auditor</th>
+                      <th className="px-2 py-3 text-center">Sistem</th>
+                      <th className="px-2 py-3 text-center">Fisik</th>
+                      <th className="px-2 py-3 text-center">Selisih</th>
+                      <th className="px-3 py-3 text-right">Dampak Nilai (Rp)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 text-xs">
+                  <tbody className="divide-y divide-slate-200 text-xs">
                     {paginatedAudits.map((item) => {
                       const isLoss = item.diff < 0;
                       const isSurplus = item.diff > 0;
@@ -828,72 +805,74 @@ export default function AdminStockOpnameReportPage() {
                         <tr
                           key={item.id}
                           onClick={() => setSelectedAudit(item)}
-                          className="hover:bg-slate-50/75 transition-colors cursor-pointer"
+                          className="hover:bg-slate-50/80 transition-colors cursor-pointer border-b border-slate-200"
                           title="Klik untuk melihat catatan alasan audit"
                         >
                           {/* Waktu & Kode Audit */}
-                          <td className="px-3 py-3 align-top">
+                          <td className="px-3 py-3 align-middle">
                             <div className="font-mono font-bold text-slate-900">
                               {item.auditCode}
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">
+                            <div className="text-[10px] text-slate-500 font-medium mt-0.5">
                               {item.date}
                             </div>
                           </td>
 
                           {/* Produk & SKU */}
-                          <td className="px-3 py-3 align-top">
+                          <td className="px-3 py-3 align-middle">
                             <div
-                              className="font-semibold text-slate-900 leading-snug truncate"
+                              className="font-bold text-slate-900 leading-snug truncate"
                               title={item.productName}
                             >
                               {item.productName}
                             </div>
                             <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                              <span className="font-mono font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
+                              <span className="font-mono text-[10px] font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300">
                                 {item.sku}
                               </span>
                             </div>
                           </td>
 
                           {/* Auditor */}
-                          <td className="px-3 py-3 align-top font-semibold text-slate-800 truncate">
+                          <td className="px-3 py-3 align-middle font-bold text-slate-900 truncate">
                             {item.auditorName}
                           </td>
 
                           {/* Sistem */}
-                          <td className="px-2 py-3 align-top text-center font-mono font-semibold text-slate-700">
+                          <td className="px-2 py-3 align-middle text-center font-mono font-semibold text-slate-700">
                             {item.systemStock}
                           </td>
 
                           {/* Fisik */}
-                          <td className="px-2 py-3 align-top text-center font-mono font-bold text-slate-900">
+                          <td className="px-2 py-3 align-middle text-center font-mono font-black text-slate-900">
                             {item.physicalStock}
                           </td>
 
                           {/* Selisih */}
-                          <td className="px-2 py-3 align-top text-center font-mono font-black text-xs">
-                            <span
-                              className={`inline-block px-2 py-0.5 rounded-full ${
-                                isLoss
-                                  ? "bg-rose-50 text-rose-700 border border-rose-200"
-                                  : isSurplus
-                                  ? "bg-blue-50 text-blue-700 border border-blue-200"
-                                  : "bg-slate-100 text-slate-600 border border-slate-200"
-                              }`}
-                            >
-                              {isSurplus ? `+${item.diff}` : item.diff}
-                            </span>
+                          <td className="px-2 py-3 align-middle text-center font-mono font-black text-[10px]">
+                            {isLoss ? (
+                              <span className="bg-[#FFE4E6] text-[#E11D48] border-1.5 border-slate-900 font-mono font-black text-[10px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                                {item.diff}
+                              </span>
+                            ) : isSurplus ? (
+                              <span className="bg-[#EEF2FF] text-[#4338CA] border-1.5 border-slate-900 font-mono font-black text-[10px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                                +{item.diff}
+                              </span>
+                            ) : (
+                              <span className="bg-slate-100 text-slate-600 border border-slate-400 font-mono font-bold text-[10px] px-1.5 py-0.5 rounded-md inline-block">
+                                0
+                              </span>
+                            )}
                           </td>
 
                           {/* Dampak Nilai (Rp) */}
-                          <td className="px-3 py-3 align-top text-right font-mono font-black text-xs">
+                          <td className="px-3 py-3 align-middle text-right font-mono font-black text-xs">
                             <span
                               className={
                                 isLoss
-                                  ? "text-rose-600"
+                                  ? "text-[#E11D48]"
                                   : isSurplus
-                                  ? "text-blue-600"
+                                  ? "text-[#4338CA]"
                                   : "text-slate-500 font-normal"
                               }
                             >
@@ -906,104 +885,103 @@ export default function AdminStockOpnameReportPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Integrated Reusable Pagination */}
-          <div className="print:hidden">
-            <Pagination
-              currentPage={currentPage}
-              totalItems={reportData?.audits.length || 0}
-              itemsPerPage={ITEMS_PER_PAGE}
-              onPageChange={setCurrentPage}
-            />
+            {/* Integrated Reusable Pagination */}
+            <div className="border-t-2 border-slate-900">
+              <Pagination
+                currentPage={currentPage}
+                totalItems={reportData?.audits.length || 0}
+                itemsPerPage={ITEMS_PER_PAGE}
+                onPageChange={setCurrentPage}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ========================================================================= */}
-      {/* 6. MODAL QUICK VIEW DETAIL TEMUAN AUDIT                                   */}
-      {/* ========================================================================= */}
-      {selectedAudit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 print:hidden">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <div>
-                <span className="text-[10px] font-mono font-bold bg-slate-200 text-slate-800 px-2 py-0.5 rounded">
-                  {selectedAudit.auditCode}
-                </span>
-                <h3 className="font-extrabold text-base text-slate-900 mt-1">
-                  Detail Temuan Audit
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedAudit(null)}
-                className="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center font-bold text-sm transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4 text-xs text-slate-700">
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Produk</span>
-                <span className="font-extrabold text-slate-900 text-sm">{selectedAudit.productName}</span>
-                <span className="text-slate-500 font-mono block">SKU: {selectedAudit.sku}</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 text-center">
+        {/* ========================================================================= */}
+        {/* 6. MODAL QUICK VIEW DETAIL TEMUAN AUDIT                                   */}
+        {/* ========================================================================= */}
+        {selectedAudit && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 print:hidden">
+            <div className="bg-white border-3 border-slate-900 rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] max-w-md w-full animate-in fade-in zoom-in-95 duration-150">
+              <div className="pb-3 border-b-2 border-slate-900 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-500 block">SISTEM</span>
-                  <span className="font-mono font-bold text-sm text-slate-800">{selectedAudit.systemStock}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 block">FISIK</span>
-                  <span className="font-mono font-bold text-sm text-slate-900">{selectedAudit.physicalStock}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-slate-500 block">SELISIH</span>
-                  <span className={`font-mono font-black text-sm ${selectedAudit.diff < 0 ? "text-rose-600" : selectedAudit.diff > 0 ? "text-blue-600" : "text-emerald-600"}`}>
-                    {selectedAudit.diff > 0 ? `+${selectedAudit.diff}` : selectedAudit.diff}
+                  <span className="text-[10px] font-mono font-black bg-slate-100 text-slate-900 px-2 py-0.5 rounded border border-slate-900">
+                    {selectedAudit.auditCode}
                   </span>
+                  <h3 className="font-black text-base text-slate-900 mt-1">
+                    Detail Temuan Audit
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedAudit(null)}
+                  className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 border-2 border-slate-900 text-slate-900 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="py-4 space-y-3 text-xs text-slate-700">
+                <div>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Produk</span>
+                  <span className="font-black text-slate-900 text-sm">{selectedAudit.productName}</span>
+                  <span className="text-slate-500 font-mono text-[11px] block">SKU: {selectedAudit.sku}</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border-2 border-slate-900 text-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
+                  <div>
+                    <span className="text-[9px] font-black text-slate-500 block uppercase">SISTEM</span>
+                    <span className="font-mono font-black text-sm text-slate-800">{selectedAudit.systemStock}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-black text-slate-500 block uppercase">FISIK</span>
+                    <span className="font-mono font-black text-sm text-slate-900">{selectedAudit.physicalStock}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-black text-slate-500 block uppercase">SELISIH</span>
+                    <span className={`font-mono font-black text-sm ${selectedAudit.diff < 0 ? "text-[#E11D48]" : selectedAudit.diff > 0 ? "text-[#4338CA]" : "text-emerald-700"}`}>
+                      {selectedAudit.diff > 0 ? `+${selectedAudit.diff}` : selectedAudit.diff}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Dampak Nilai (Rp)</span>
+                  <span className="font-mono font-black text-base text-slate-900">{formatRupiah(selectedAudit.impactValueRp)}</span>
+                </div>
+
+                <div>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Kategori Alasan</span>
+                  <span className="font-bold text-slate-900">{selectedAudit.reason}</span>
+                </div>
+
+                <div>
+                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Catatan Auditor</span>
+                  <p className="p-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl font-bold text-slate-800 leading-relaxed mt-1 text-xs">
+                    {selectedAudit.notes}
+                  </p>
+                </div>
+
+                <div className="pt-1 text-[10px] text-slate-500 font-bold flex items-center justify-between">
+                  <span>Auditor: <strong className="text-slate-900">{selectedAudit.auditorName}</strong></span>
+                  <span>{selectedAudit.date}</span>
                 </div>
               </div>
 
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Dampak Nilai (Rp)</span>
-                <span className="font-mono font-black text-base text-slate-900">{formatRupiah(selectedAudit.impactValueRp)}</span>
+              <div className="pt-3 border-t-2 border-slate-900 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setSelectedAudit(null)}
+                  className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+                >
+                  Tutup
+                </button>
               </div>
-
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Kategori Alasan</span>
-                <span className="font-semibold text-slate-800">{selectedAudit.reason}</span>
-              </div>
-
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Catatan Auditor</span>
-                <p className="p-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-800 leading-relaxed mt-1">
-                  {selectedAudit.notes}
-                </p>
-              </div>
-
-              <div className="pt-2 text-[11px] text-slate-400 flex items-center justify-between">
-                <span>Auditor: <strong>{selectedAudit.auditorName}</strong></span>
-                <span>{selectedAudit.date}</span>
-              </div>
-            </div>
-
-            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setSelectedAudit(null)}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
-              >
-                Tutup
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Global Print Styling */}
       <style jsx global>{`
@@ -1025,5 +1003,6 @@ export default function AdminStockOpnameReportPage() {
         }
       `}</style>
     </div>
-  );
+  </div>
+);
 }

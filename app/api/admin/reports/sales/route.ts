@@ -94,7 +94,10 @@ export async function GET(req: NextRequest) {
       paymentMap[method].count += 1;
 
       // Daily chart aggregation
-      const d = tx.createdAt ? new Date(tx.createdAt) : new Date();
+      let d = tx.createdAt ? new Date(tx.createdAt) : new Date();
+      if (isNaN(d.getTime())) {
+        d = new Date();
+      }
       const dateKey = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1)
         .toString()
         .padStart(2, '0')}`;

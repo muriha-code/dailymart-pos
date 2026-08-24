@@ -412,38 +412,37 @@ export default function AdminSalesReportPage() {
                 <p className="font-bold text-slate-900">
                   ( .................................................... )
                 </p>
-                <p className="text-[10px] text-slate-500">Store Manager / Owner</p>
-              </div>
             </div>
           </div>
         </div>
+      </div>
 
         {/* ==================== SCREEN CONTAINER ==================== */}
-        <div className="print:hidden space-y-6">
-          {/* 1. Header Bar & Action Group */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="print:hidden space-y-3">
+          {/* 1. Header Bar Compact */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 p-0">
             <div>
-              <h1 className="text-xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-lg font-black text-slate-900 tracking-tight">
                 Laporan Penjualan & Performa Retail
               </h1>
-              <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                Monitoring omset penjualan, tren grafik harian, metode pembayaran, dan produk terlaris.
+              <p className="hidden sm:block text-[11px] text-slate-500 font-bold mt-0.5">
+                Monitoring omzet penjualan, tren grafik harian, metode pembayaran, dan produk terlaris.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0 flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
               {/* Primary: Cetak / Ekspor Dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsExportOpen(!isExportOpen)}
-                  className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-4 py-2.5 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center gap-2 cursor-pointer"
+                  className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs py-1.5 px-3 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                   </svg>
                   <span>Cetak / Ekspor PDF</span>
-                  <svg className={`w-3.5 h-3.5 text-white/80 transition-transform duration-200 ${isExportOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className={`w-3 h-3 text-white/80 transition-transform duration-200 ${isExportOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -495,10 +494,10 @@ export default function AdminSalesReportPage() {
                 type="button"
                 onClick={loadSalesReport}
                 title="Refresh Data"
-                className="bg-white hover:bg-slate-100 border-2 border-slate-900 p-2.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900 transition-all cursor-pointer hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                className="bg-white hover:bg-slate-100 border-2 border-slate-900 p-1.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900 transition-all cursor-pointer hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
               >
                 <svg
-                  className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+                  className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -514,59 +513,59 @@ export default function AdminSalesReportPage() {
             </div>
           </div>
 
-          {/* 2. KPI Stat Cards (4 Grid Sales Metric) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {/* 2. Kompresi 4 Cards KPI Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
             {/* Card 1 (Total Omset Penjualan) */}
-            <div className="bg-[#E8F5E9] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-              <span className="text-slate-600 font-black text-[10px] uppercase tracking-wider block">
+            <div className="bg-[#E8F5E9] border-2 border-slate-900 rounded-xl p-2.5 sm:p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
                 Total Omset Penjualan
               </span>
-              <span className="text-[#065F46] font-mono font-black text-xl mt-1 block">
+              <span className="text-[#065F46] font-mono font-black text-base sm:text-lg tracking-tight block">
                 {formatRupiah(reportData?.summary.totalRevenue || 0)}
               </span>
             </div>
 
             {/* Card 2 (Total Transaksi) */}
-            <div className="bg-white border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-              <span className="text-slate-500 font-black text-[10px] uppercase tracking-wider block">
+            <div className="bg-white border-2 border-slate-900 rounded-xl p-2.5 sm:p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
                 Total Transaksi
               </span>
-              <span className="text-xl font-black font-mono text-slate-900 mt-1 block">
+              <span className="text-base sm:text-lg font-black font-mono text-slate-900 tracking-tight block">
                 {reportData?.summary.totalTransactions || 0}{" "}
-                <span className="text-xs font-bold text-slate-500">transaksi</span>
+                <span className="text-[10px] font-bold text-slate-500">tx</span>
               </span>
             </div>
 
             {/* Card 3 (Total Unit Terjual) */}
-            <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-              <span className="text-slate-600 font-black text-[10px] uppercase tracking-wider block">
+            <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-2.5 sm:p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
                 Total Unit Terjual
               </span>
-              <span className="text-[#B45309] font-mono font-black text-xl mt-1 block">
+              <span className="text-[#B45309] font-mono font-black text-base sm:text-lg tracking-tight block">
                 {reportData?.summary.totalItemsSold || 0}{" "}
-                <span className="text-xs font-bold text-amber-800">unit</span>
+                <span className="text-[10px] font-bold text-amber-800">unit</span>
               </span>
             </div>
 
             {/* Card 4 (Rata-Rata Transaksi / AOV) */}
-            <div className="bg-[#EEF2FF] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-              <span className="text-slate-600 font-black text-[10px] uppercase tracking-wider block">
+            <div className="bg-[#EEF2FF] border-2 border-slate-900 rounded-xl p-2.5 sm:p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
                 Rata-Rata Transaksi (AOV)
               </span>
-              <span className="text-[#4338CA] font-mono font-black text-xl mt-1 block">
+              <span className="text-[#4338CA] font-mono font-black text-base sm:text-lg tracking-tight block">
                 {formatRupiah(reportData?.summary.averageTransactionValue || 0)}
               </span>
             </div>
           </div>
 
-          {/* 3. Filter Bar Area */}
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-wrap items-center gap-3 mb-6">
-            <div className="flex items-center gap-1.5 min-w-[150px]">
-              <label className="text-xs font-black text-slate-800 whitespace-nowrap">Periode:</label>
+          {/* 3. Inline Filter Bar */}
+          <div className="bg-white border-2 border-slate-900 rounded-xl p-2 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex flex-wrap items-center gap-2.5 mb-3">
+            <div className="flex items-center gap-1.5">
+              <label className="text-[10px] font-black text-slate-800 uppercase tracking-wider whitespace-nowrap">PERIODE:</label>
               <select
                 value={periodFilter}
                 onChange={(e) => setPeriodFilter(e.target.value)}
-                className="bg-slate-50 border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white"
+                className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
               >
                 <option value="all">Semua Waktu</option>
                 <option value="today">Hari Ini</option>
@@ -578,29 +577,29 @@ export default function AdminSalesReportPage() {
             </div>
 
             {periodFilter === "custom" && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-slate-50 border-2 border-slate-900 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white"
+                  className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
                 />
-                <span className="text-xs font-black text-slate-600">s/d</span>
+                <span className="text-[10px] font-black text-slate-600">s/d</span>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-slate-50 border-2 border-slate-900 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white"
+                  className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
                 />
               </div>
             )}
 
-            <div className="flex items-center gap-1.5 min-w-[160px]">
-              <label className="text-xs font-black text-slate-800 whitespace-nowrap">Pembayaran:</label>
+            <div className="flex items-center gap-1.5">
+              <label className="text-[10px] font-black text-slate-800 uppercase tracking-wider whitespace-nowrap">PEMBAYARAN:</label>
               <select
                 value={paymentFilter}
                 onChange={(e) => setPaymentFilter(e.target.value)}
-                className="bg-slate-50 border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white"
+                className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
               >
                 <option value="ALL">Semua Pembayaran</option>
                 <option value="CASH">CASH (Tunai)</option>
@@ -609,9 +608,9 @@ export default function AdminSalesReportPage() {
               </select>
             </div>
 
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative flex-1 min-w-[180px]">
               <svg
-                className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+                className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -628,28 +627,25 @@ export default function AdminSalesReportPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari No. Invoice / Kasir..."
-                className="w-full bg-slate-50 border-2 border-slate-900 rounded-lg pl-9 pr-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white placeholder:text-slate-400"
+                className="w-full bg-slate-50 border-2 border-slate-900 rounded-full pl-8 pr-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white placeholder:text-slate-400 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
               />
             </div>
           </div>
 
           {/* 4. Chart Section (Grafik Tren Omset & Metode Pembayaran) */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-3">
             {/* Grafik Tren Omset Penjualan (2 Kolom) */}
-            <div className="lg:col-span-2 bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
-              <div className="mb-4">
-                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-1">
+            <div className="lg:col-span-2 bg-white border-2 border-slate-900 rounded-xl p-3.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+              <div className="mb-2">
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
                   Grafik Tren Omset Penjualan
                 </h2>
-                <p className="text-xs font-semibold text-slate-500">
-                  Fluktuasi omset harian per tanggal transaksi
-                </p>
               </div>
 
-              <div className="w-full h-64">
+              <div className="w-full h-[190px] sm:h-[210px]">
                 {reportData?.dailyChart && reportData.dailyChart.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={reportData.dailyChart}>
+                    <AreaChart data={reportData.dailyChart} margin={{ top: 10, right: 10, left: 5, bottom: -5 }}>
                       <defs>
                         <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#6366F1" stopOpacity={0.35} />
@@ -657,8 +653,8 @@ export default function AdminSalesReportPage() {
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                      <XAxis dataKey="date" tick={{ fontSize: 11, fontWeight: 'bold', fill: '#0F172A' }} />
-                      <YAxis tick={{ fontSize: 11, fontWeight: 'bold', fill: '#0F172A' }} tickFormatter={(v) => `Rp ${(v / 1000)}k`} />
+                      <XAxis dataKey="date" tick={{ fontSize: 10, fontWeight: 'bold', fill: '#0F172A' }} />
+                      <YAxis width={60} tick={{ fontSize: 10, fontWeight: 'bold', fill: '#0F172A' }} tickFormatter={(v) => `Rp${(v / 1000).toFixed(0)}k`} />
                       <Tooltip
                         formatter={(val: any) => [formatRupiah(Number(val)), "Omset Penjualan"]}
                         labelFormatter={(lbl) => `Tanggal: ${lbl}`}
@@ -690,23 +686,20 @@ export default function AdminSalesReportPage() {
             </div>
 
             {/* Analisis Metode Pembayaran (1 Kolom) */}
-            <div className="bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
-              <div className="mb-4">
-                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-1">
+            <div className="bg-white border-2 border-slate-900 rounded-xl p-3.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+              <div className="mb-2">
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
                   Analisis Metode Pembayaran
                 </h2>
-                <p className="text-xs font-semibold text-slate-500">
-                  Distribusi total omset berdasarkan metode bayar
-                </p>
               </div>
 
-              <div className="w-full h-40 mb-3">
+              <div className="w-full h-[130px] sm:h-[140px] mb-1">
                 {reportData?.paymentBreakdown && reportData.paymentBreakdown.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={reportData.paymentBreakdown} layout="vertical">
+                    <BarChart data={reportData.paymentBreakdown} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: -5 }}>
                       <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
-                      <XAxis type="number" tick={{ fontSize: 10, fontWeight: 'bold', fill: '#0F172A' }} tickFormatter={(v) => `Rp ${(v / 1000)}k`} />
-                      <YAxis dataKey="method" type="category" tick={{ fontSize: 11, fontWeight: '900', fill: '#0F172A' }} />
+                      <XAxis type="number" tick={{ fontSize: 10, fontWeight: 'bold', fill: '#0F172A' }} tickFormatter={(v) => `Rp${(v / 1000).toFixed(0)}k`} />
+                      <YAxis dataKey="method" type="category" width={45} tick={{ fontSize: 10, fontWeight: '900', fill: '#0F172A' }} />
                       <Tooltip
                         formatter={(val: any) => [formatRupiah(Number(val)), "Total Pembayaran"]}
                         contentStyle={{
@@ -733,23 +726,23 @@ export default function AdminSalesReportPage() {
               </div>
 
               {/* List Legend Persentase Pembayaran */}
-              <div className="space-y-2 pt-2 border-t-2 border-slate-200">
+              <div className="space-y-1 pt-1.5 border-t-2 border-slate-200">
                 {reportData?.paymentBreakdown.map((pb) => (
                   <div
                     key={pb.method}
-                    className="bg-slate-50 border-[1.5px] border-slate-900 rounded-lg p-2 font-mono text-xs font-bold shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between"
+                    className="py-1 px-2 text-[10px] font-mono font-bold mb-1 bg-slate-50 border-[1.5px] border-slate-900 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between"
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span
-                        className="w-3 h-3 rounded border border-slate-900"
+                        className="w-2.5 h-2.5 rounded border border-slate-900"
                         style={{ backgroundColor: METHOD_COLORS[pb.method] || "#6366F1" }}
                       />
                       <span className="font-black text-slate-900">{pb.method}</span>
-                      <span className="text-[10px] text-slate-500 font-bold">({pb.count} tx)</span>
+                      <span className="text-[9px] text-slate-500 font-bold">({pb.count} tx)</span>
                     </div>
                     <div className="text-slate-900 font-black">
                       {formatRupiah(pb.amount)}{" "}
-                      <span className="text-slate-500 font-bold text-[10px]">({pb.percentage}%)</span>
+                      <span className="text-slate-500 font-bold text-[9px]">({pb.percentage}%)</span>
                     </div>
                   </div>
                 ))}
