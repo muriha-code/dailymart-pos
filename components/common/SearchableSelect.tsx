@@ -95,37 +95,33 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl flex items-center justify-between text-left transition-all ${
-          isOpen
-            ? "border-amber-500 ring-2 ring-amber-500/20 bg-white"
-            : "border-slate-300 hover:border-slate-400 bg-slate-50"
+        className={`w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl flex items-center justify-between text-left shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all ${
+          isOpen ? "bg-white ring-2 ring-slate-900/10" : "bg-slate-50 hover:bg-white"
         } ${
-          disabled
-            ? "opacity-50 cursor-not-allowed"
-            : "cursor-pointer"
+          disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
         }`}
       >
         <div className="flex items-center gap-2 overflow-hidden mr-2">
           {selectedOption ? (
             <div className="truncate">
-              <span className="font-bold text-slate-900">
+              <span className="font-black text-slate-900">
                 {selectedOption.label}
               </span>
               {selectedOption.sublabel && (
-                <span className="ml-2 font-mono text-[11px] text-slate-500">
+                <span className="ml-2 font-mono font-bold text-[11px] text-slate-600">
                   ({selectedOption.sublabel})
                 </span>
               )}
             </div>
           ) : (
-            <span className="text-slate-400 font-medium">{placeholder}</span>
+            <span className="text-slate-400 font-bold">{placeholder}</span>
           )}
         </div>
 
         {/* Chevron Icon */}
         <svg
-          className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
-            isOpen ? "rotate-180 text-amber-600" : ""
+          className={`w-4 h-4 text-slate-900 shrink-0 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
           }`}
           fill="none"
           stroke="currentColor"
@@ -134,7 +130,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth="2"
+            strokeWidth="2.5"
             d="M19 9l-7 7-7-7"
           />
         </svg>
@@ -142,12 +138,12 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
       {/* Dropdown Menu (Always opens downward: top-full mt-1.5 z-50) */}
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
           {/* Search Box */}
-          <div className="p-2 border-b border-slate-100 bg-slate-50/50">
+          <div className="p-2 border-b-2 border-slate-900 bg-slate-100">
             <div className="relative flex items-center">
               <svg
-                className="w-3.5 h-3.5 text-slate-400 absolute left-3 pointer-events-none"
+                className="w-3.5 h-3.5 text-slate-700 absolute left-3 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -155,7 +151,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
@@ -165,7 +161,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="w-full pl-8 pr-7 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full pl-8 pr-7 py-1.5 bg-white border-2 border-slate-900 rounded-lg text-xs font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
               {searchQuery && (
                 <button

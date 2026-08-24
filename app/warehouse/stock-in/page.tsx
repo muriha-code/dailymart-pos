@@ -276,22 +276,16 @@ export default function WarehouseStockInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] p-4 sm:p-6 lg:p-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 lg:p-8 font-sans">
+      <div className="max-w-7xl mx-auto">
         {/* ========================================================================= */}
         {/* 1. PAGE HEADER                                                            */}
         {/* ========================================================================= */}
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold text-[11px] uppercase tracking-wider">
-              Manajemen Gudang
-            </span>
-            <span className="text-xs text-slate-400">• Restock Inventaris</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
+        <div className="flex flex-col gap-1 mb-6">
+          <h1 className="text-xl font-black text-slate-900 tracking-tight">
             Penerimaan Barang Masuk (Stock-In)
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+          <p className="text-xs font-bold text-slate-500">
             Formulir penerimaan stok dari distributor/supplier, pembaruan harga modal beli, dan pencatatan audit log mutasi gudang.
           </p>
         </div>
@@ -299,17 +293,17 @@ export default function WarehouseStockInPage() {
         {/* Status Alert Banner */}
         {statusMessage && (
           <div
-            className={`p-4 rounded-2xl border text-xs font-semibold flex items-center justify-between animate-in fade-in duration-200 ${
+            className={`p-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] text-xs font-black flex items-center justify-between mb-6 ${
               statusMessage.type === "success"
-                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-                : "bg-red-50 border-red-200 text-red-800"
+                ? "bg-[#D1FAE5] text-[#065F46]"
+                : "bg-rose-100 text-rose-800"
             }`}
           >
             <span>{statusMessage.text}</span>
             <button
               type="button"
               onClick={() => setStatusMessage(null)}
-              className="text-xs font-bold px-2 py-0.5 hover:opacity-75"
+              className="w-6 h-6 rounded-md bg-white border border-slate-900 flex items-center justify-center text-xs font-black hover:bg-slate-100 cursor-pointer"
             >
               ✕
             </button>
@@ -321,12 +315,12 @@ export default function WarehouseStockInPage() {
           {/* ========================================================================= */}
           {/* SISI KIRI (Dokumen & Ringkasan Restock - 5/12 Cols)                      */}
           {/* ========================================================================= */}
-          <div className="lg:col-span-5 space-y-5">
-            {/* Card 1: Informasional Dokumen Pengiriman */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
-              <h3 className="text-sm font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+          <div className="lg:col-span-5 space-y-6">
+            {/* Card 1: Dokumen Penerimaan Barang */}
+            <div className="bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 pb-2 border-b-2 border-slate-900/10 flex items-center gap-2">
                 <svg
-                  className="w-4 h-4 text-slate-500"
+                  className="w-4 h-4 text-slate-900"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -334,7 +328,7 @@ export default function WarehouseStockInPage() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth="2"
+                    strokeWidth="2.5"
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
@@ -342,9 +336,9 @@ export default function WarehouseStockInPage() {
               </h3>
 
               {/* Input Supplier */}
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  Pemasok / Supplier <span className="text-red-500">*</span>
+              <div className="mb-3">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
+                  Pemasok / Supplier <span className="text-rose-600">*</span>
                 </label>
                 <SearchableSelect
                   options={supplierOptions}
@@ -357,8 +351,8 @@ export default function WarehouseStockInPage() {
               </div>
 
               {/* Input No Faktur / Surat Jalan */}
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
+              <div className="mb-3">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
                   No. Faktur / Surat Jalan (Opsional)
                 </label>
                 <input
@@ -366,31 +360,31 @@ export default function WarehouseStockInPage() {
                   value={invoiceNumber}
                   onChange={(e) => setInvoiceNumber(e.target.value)}
                   placeholder="Contoh: INV-2026/08/109"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full font-mono"
                 />
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  *Akan dibuat otomatis dengan format IN-YYYYMMDD-XXXX jika dikosongkan.
+                <span className="text-[10px] font-bold text-slate-500 mt-1 block">
+                  *Format otomatis: IN-YYYYMMDD-XXXX jika dikosongkan.
                 </span>
               </div>
 
               {/* Input Petugas Gudang */}
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  Petugas Penerima (Staf Gudang) <span className="text-red-500">*</span>
+              <div className="mb-3">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
+                  Petugas Penerima (Staf Gudang) <span className="text-rose-600">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   value={receivedBy}
                   onChange={(e) => setReceivedBy(e.target.value)}
-                  placeholder="Ketikan Nama Lengkap"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                  placeholder="Ketikkan Nama Lengkap"
+                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full"
                 />
               </div>
 
               {/* Input Catatan */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
                   Catatan Penerimaan / Pengiriman
                 </label>
                 <textarea
@@ -398,51 +392,51 @@ export default function WarehouseStockInPage() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Contoh: Kemasan dus rapi, garansi retur 7 hari jika terdapat cacat."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none"
+                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full"
                 />
               </div>
             </div>
 
-            {/* Card 2: Ringkasan Nilai Restock */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            {/* Card 2: Ringkasan Nilai Restock & Submit Final */}
+            <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b-2 border-slate-900/20">
                 Ringkasan Nilai Penerimaan
               </h3>
 
-              <div className="space-y-2 text-xs border-b border-slate-100 pb-3">
-                <div className="flex justify-between text-slate-600">
+              <div className="space-y-1">
+                <div className="text-xs font-bold text-slate-800 flex justify-between py-1">
                   <span>Jumlah Varian Barang:</span>
-                  <span className="font-bold font-mono text-slate-900">
+                  <span className="font-black font-mono text-slate-950">
                     {totalItemTypes} jenis
                   </span>
                 </div>
-                <div className="flex justify-between text-slate-600">
+                <div className="text-xs font-bold text-slate-800 flex justify-between py-1">
                   <span>Total Kuantitas Fisik:</span>
-                  <span className="font-bold font-mono text-slate-900">
+                  <span className="font-black font-mono text-slate-950">
                     {totalPhysicalQuantity} unit
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-1">
-                <span className="text-xs font-extrabold text-slate-700">
+              <div className="text-xl font-black font-mono text-slate-950 flex justify-between items-center pt-2 border-t-2 border-slate-900/20 my-3">
+                <span className="text-xs font-black text-slate-900 uppercase">
                   Total Nilai Pembelian (Modal):
                 </span>
-                <span className="text-xl font-black text-amber-600 font-mono">
+                <span className="text-xl font-black text-[#065F46] font-mono">
                   {formatRupiah(totalEstimatedCost)}
                 </span>
               </div>
 
-              {/* Tombol Utama: Konfirmasi Penerimaan Barang (Warm Amber Accent) */}
+              {/* Tombol Primary: Konfirmasi Penerimaan Barang */}
               <button
                 type="button"
                 disabled={isSubmitting || queueItems.length === 0}
                 onClick={handleSubmitStockIn}
-                className="w-full py-3.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-3 shrink-0"
+                className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs py-3.5 px-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all w-full uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
                     <span>Menyimpan ke Database...</span>
                   </>
                 ) : (
@@ -470,25 +464,25 @@ export default function WarehouseStockInPage() {
           {/* ========================================================================= */}
           {/* SISI KANAN (Selector & Antrean Barang Masuk - 7/12 Cols)                  */}
           {/* ========================================================================= */}
-          <div className="lg:col-span-7 space-y-5">
-            {/* Box Input Selector Barang Masuk */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
-              <h3 className="text-sm font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
+          <div className="lg:col-span-7 space-y-6">
+            {/* Form Card 2: Pilih Barang Dari Katalog */}
+            <div className="bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 pb-2 border-b-2 border-slate-900/10 flex items-center justify-between">
                 <span>Pilih Barang Dari Katalog</span>
-                <span className="text-xs font-normal text-slate-400">
+                <span className="text-xs font-mono font-bold text-slate-600">
                   {products.length} barang tersedia
                 </span>
               </h3>
 
               {isLoadingProducts ? (
-                <div className="p-4 text-center text-slate-400 font-medium">
+                <div className="p-4 text-center text-slate-500 font-bold">
                   Memuat katalog produk...
                 </div>
               ) : (
                 <div className="space-y-3">
                   {/* Dropdown Produk */}
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
                       Pilih Produk Ritel
                     </label>
                     <SearchableSelect
@@ -504,7 +498,7 @@ export default function WarehouseStockInPage() {
                   {/* Input Kuantitas & Harga Beli Baru */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
                         Jumlah Masuk (Qty)
                       </label>
                       <input
@@ -513,12 +507,12 @@ export default function WarehouseStockInPage() {
                         disabled={!selectedProductId}
                         value={inputQuantity}
                         onChange={(e) => setInputQuantity(Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-bold text-slate-700 mb-1">
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
                         Harga Beli / Modal Baru (Rp)
                       </label>
                       <input
@@ -527,16 +521,16 @@ export default function WarehouseStockInPage() {
                         disabled={!selectedProductId}
                         value={inputPurchasePrice}
                         onChange={(e) => setInputPurchasePrice(Number(e.target.value))}
-                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
 
-                  {/* Tombol Tambah ke Antrean */}
+                  {/* Tombol "+ Tambah ke Antrean Restok" */}
                   <button
                     type="button"
                     onClick={handleAddItemToQueue}
-                    className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs py-3 px-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all w-full mt-4 uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2"
                   >
                     <svg
                       className="w-4 h-4"
@@ -557,10 +551,10 @@ export default function WarehouseStockInPage() {
               )}
             </div>
 
-            {/* Tabel Antrean Barang Masuk */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-              <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
+            {/* List / Table Antrean Penerimaan Barang */}
+            <div className="bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-900/10">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">
                   Daftar Antrean Penerimaan Barang ({queueItems.length})
                 </h3>
                 {queueItems.length > 0 && (
@@ -570,7 +564,7 @@ export default function WarehouseStockInPage() {
                       setQueueItems([]);
                       setCurrentPage(1);
                     }}
-                    className="text-[11px] font-bold text-red-600 hover:text-red-800 cursor-pointer"
+                    className="text-xs font-black text-rose-600 hover:text-rose-800 cursor-pointer"
                   >
                     Kosongkan Antrean
                   </button>
@@ -578,113 +572,115 @@ export default function WarehouseStockInPage() {
               </div>
 
               {queueItems.length === 0 ? (
-                <div className="p-10 text-center text-slate-400 text-xs space-y-1">
-                  <p className="font-bold text-slate-600">
+                <div className="bg-slate-50 border-2 border-dashed border-slate-900 rounded-xl p-8 text-center">
+                  <p className="text-xs font-black text-slate-900 mb-1">
                     Antrean barang masuk masih kosong.
                   </p>
-                  <p>
+                  <p className="text-[11px] font-mono text-slate-500">
                     Pilih produk dari dropdown di atas dan klik "+ Tambah ke Antrean Restok".
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                        <th className="py-3 px-4">Produk</th>
-                        <th className="py-3 px-3 text-center">Stok Awal</th>
-                        <th className="py-3 px-3 text-center">Qty Masuk</th>
-                        <th className="py-3 px-4 text-right">Harga Beli Baru</th>
-                        <th className="py-3 px-4 text-right">Subtotal</th>
-                        <th className="py-3 px-3 text-center">Hapus</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 text-xs text-slate-800">
-                      {paginatedQueueItems.map((item) => {
-                        const subtotal = item.quantity * item.purchasePrice;
+                <div className="space-y-2">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 border-b-2 border-slate-900 text-[10px] font-black text-slate-900 uppercase tracking-wider">
+                          <th className="py-2.5 px-3">Produk</th>
+                          <th className="py-2.5 px-2 text-center">Stok Awal</th>
+                          <th className="py-2.5 px-2 text-center">Qty Masuk</th>
+                          <th className="py-2.5 px-3 text-right">Harga Beli Baru</th>
+                          <th className="py-2.5 px-3 text-right">Subtotal</th>
+                          <th className="py-2.5 px-2 text-center">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-xs text-slate-900 font-bold">
+                        {paginatedQueueItems.map((item) => {
+                          const subtotal = item.quantity * item.purchasePrice;
 
-                        return (
-                          <tr
-                            key={item.productId}
-                            className="hover:bg-slate-50/80 transition-colors"
-                          >
-                            {/* Produk Name & SKU */}
-                            <td className="py-3 px-4">
-                              <div className="font-bold text-slate-900 max-w-xs truncate">
-                                {item.productName}
-                              </div>
-                              <span className="font-mono text-[10px] text-slate-400">
-                                SKU: {item.sku}
-                              </span>
-                            </td>
+                          return (
+                            <tr
+                              key={item.productId}
+                              className="hover:bg-slate-50 transition-colors"
+                            >
+                              {/* Produk Name & SKU */}
+                              <td className="py-2.5 px-3">
+                                <div className="font-black text-slate-900 max-w-xs truncate">
+                                  {item.productName}
+                                </div>
+                                <span className="font-mono text-[10px] text-slate-500">
+                                  SKU: {item.sku}
+                                </span>
+                              </td>
 
-                            {/* Stok Awal */}
-                            <td className="py-3 px-3 text-center font-mono text-slate-500 whitespace-nowrap">
-                              {item.currentStock} {item.unit}
-                            </td>
+                              {/* Stok Awal */}
+                              <td className="py-2.5 px-2 text-center font-mono text-slate-600 whitespace-nowrap">
+                                {item.currentStock} {item.unit}
+                              </td>
 
-                            {/* Input Qty Masuk */}
-                            <td className="py-3 px-3 text-center">
-                              <input
-                                type="number"
-                                min="1"
-                                value={item.quantity}
-                                onChange={(e) =>
-                                  handleUpdateQueueItemQty(
-                                    item.productId,
-                                    Number(e.target.value)
-                                  )
-                                }
-                                className="w-16 px-2 py-1 bg-slate-50 border border-slate-300 rounded-lg text-center font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
-                              />
-                            </td>
+                              {/* Input Qty Masuk */}
+                              <td className="py-2.5 px-2 text-center">
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={item.quantity}
+                                  onChange={(e) =>
+                                    handleUpdateQueueItemQty(
+                                      item.productId,
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                  className="w-16 px-2 py-1 bg-slate-50 border-2 border-slate-900 rounded-lg text-center font-mono text-xs font-black text-slate-900 focus:bg-white focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                                />
+                              </td>
 
-                            {/* Input Harga Beli Baru */}
-                            <td className="py-3 px-4 text-right">
-                              <input
-                                type="number"
-                                min="0"
-                                value={item.purchasePrice}
-                                onChange={(e) =>
-                                  handleUpdateQueueItemPrice(
-                                    item.productId,
-                                    Number(e.target.value)
-                                  )
-                                }
-                                className="w-28 px-2 py-1 bg-slate-50 border border-slate-300 rounded-lg text-right font-mono text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
-                              />
-                            </td>
+                              {/* Input Harga Beli Baru */}
+                              <td className="py-2.5 px-3 text-right">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={item.purchasePrice}
+                                  onChange={(e) =>
+                                    handleUpdateQueueItemPrice(
+                                      item.productId,
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                  className="w-28 px-2 py-1 bg-slate-50 border-2 border-slate-900 rounded-lg text-right font-mono text-xs font-black text-slate-900 focus:bg-white focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                                />
+                              </td>
 
-                            {/* Subtotal */}
-                            <td className="py-3 px-4 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
-                              {formatRupiah(subtotal)}
-                            </td>
+                              {/* Subtotal */}
+                              <td className="py-2.5 px-3 text-right font-mono font-black text-[#065F46] whitespace-nowrap">
+                                {formatRupiah(subtotal)}
+                              </td>
 
-                            {/* Hapus Button */}
-                            <td className="py-3 px-3 text-center">
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveQueueItem(item.productId)}
-                                className="w-7 h-7 rounded-lg text-red-600 hover:bg-red-50 font-bold transition-colors cursor-pointer"
-                                title="Hapus dari antrean"
-                              >
-                                ✕
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                              {/* Hapus Button */}
+                              <td className="py-2.5 px-2 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveQueueItem(item.productId)}
+                                  className="w-7 h-7 rounded-lg bg-white border-2 border-slate-900 hover:bg-rose-50 text-rose-600 font-black transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center mx-auto"
+                                  title="Hapus dari antrean"
+                                >
+                                  ✕
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <Pagination
+                    currentPage={currentPage}
+                    totalItems={queueItems.length}
+                    itemsPerPage={ITEMS_PER_PAGE}
+                    onPageChange={setCurrentPage}
+                  />
                 </div>
               )}
-
-              <Pagination
-                currentPage={currentPage}
-                totalItems={queueItems.length}
-                itemsPerPage={ITEMS_PER_PAGE}
-                onPageChange={setCurrentPage}
-              />
             </div>
           </div>
         </div>
