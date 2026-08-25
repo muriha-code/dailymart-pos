@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
       role: role as UserRole,
       isActive: true,
       phone: phone || '',
+      themePreference: 'light',
       createdAt: new Date().toISOString(),
     };
 

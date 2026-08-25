@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 interface ThemeToggleProps {
   className?: string;
@@ -10,6 +11,7 @@ interface ThemeToggleProps {
 
 export default function ThemeToggle({ className, showLabel = false }: ThemeToggleProps) {
   const { theme, setTheme, resolvedTheme } = useTheme();
+  const { updateThemePreference } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -20,7 +22,12 @@ export default function ThemeToggle({ className, showLabel = false }: ThemeToggl
   const isDark = activeTheme === "dark";
 
   const toggleTheme = () => {
-    setTheme(isDark ? "light" : "dark");
+    const newTheme = isDark ? "light" : "dark";
+    if (updateThemePreference) {
+      updateThemePreference(newTheme);
+    } else {
+      setTheme(newTheme);
+    }
   };
 
   return (
@@ -64,3 +71,4 @@ export default function ThemeToggle({ className, showLabel = false }: ThemeToggl
     </button>
   );
 }
+

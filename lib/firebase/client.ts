@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, setPersistence, browserSessionPersistence, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
@@ -26,6 +27,7 @@ function getFirebaseApp(): FirebaseApp {
 
 export const app: FirebaseApp = getFirebaseApp();
 export const clientAuth: Auth = getAuth(app);
+export const clientDb: Firestore = getFirestore(app);
 
 // Enforce Session-Only persistence (Clears auth session on tab/browser close)
 setPersistence(clientAuth, browserSessionPersistence).catch((err) => {

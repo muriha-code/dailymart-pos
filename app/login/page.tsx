@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { clientAuth } from '@/lib/firebase/client';
 import { UserRole } from '@/types/auth.types';
+import { useTheme } from 'next-themes';
 
 const ROLE_REDIRECT_MAP: Record<UserRole, string> = {
   ADMIN: '/admin/dashboard',
@@ -14,6 +15,7 @@ const ROLE_REDIRECT_MAP: Record<UserRole, string> = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -69,7 +71,12 @@ export default function LoginPage() {
         throw new Error(result.message || result.error || 'Gagal membuat sesi login.');
       }
 
-      // 4. Tandai tab aktif untuk Strict Single-Tab Session Guard secara non-blocking
+      // 4. Sinkronkan preferensi tema user dari Firestore
+      const userTheme: 'light' | 'dark' =
+        result.data?.themePreference || result.user?.themePreference || 'light';
+      setTheme(userTheme);
+
+      // 5. Tandai tab aktif untuk Strict Single-Tab Session Guard secara non-blocking
       setTimeout(() => {
         try {
           sessionStorage.setItem('pos_tab_active', 'true');
@@ -78,7 +85,7 @@ export default function LoginPage() {
         }
       }, 0);
 
-      // 5. Zero-Waterfall Navigation: Prefetch halaman tujuan secara instan
+      // 6. Zero-Waterfall Navigation: Prefetch halaman tujuan secara instan
       const userRole: UserRole = result.user?.role || result.data?.role || 'CASHIER';
       const targetPath = result.redirectTo || ROLE_REDIRECT_MAP[userRole] || '/cashier/transactions';
 

@@ -32,38 +32,38 @@ export async function POST(req: NextRequest) {
     let role: UserRole = (decodedToken.role || decodedToken.userRole) as UserRole;
     let displayName = decodedToken.name || email.split('@')[0] || 'User';
     let isActive = true;
+    let themePreference: 'light' | 'dark' = 'light';
 
-    if (!role) {
-      try {
-        const userDocRef = adminDb.collection('users').doc(uid);
-        const userDoc = await userDocRef.get();
+    try {
+      const userDocRef = adminDb.collection('users').doc(uid);
+      const userDoc = await userDocRef.get();
 
-        if (userDoc.exists) {
-          const userData = userDoc.data() as AppUser;
-          if (userData.isActive === false) {
-            return NextResponse.json(
-              {
-                success: false,
-                message: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
-              },
-              { status: 403 }
-            );
-          }
-          role = userData.role || 'CASHIER';
-          displayName = userData.displayName || displayName;
-          isActive = userData.isActive ?? true;
-
-          // Sematkan custom claim secara asinkron
-          adminAuth.setCustomUserClaims(uid, { role, displayName }).catch((cErr) => {
-            console.warn('[Custom Claims Set Warning]:', cErr);
-          });
-        } else {
-          role = 'CASHIER';
+      if (userDoc.exists) {
+        const userData = userDoc.data() as AppUser;
+        if (userData.isActive === false) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
+            },
+            { status: 403 }
+          );
         }
-      } catch (dbErr) {
-        console.warn('Gagal mengambil data user dari Firestore, menggunakan fallback default role:', dbErr);
-        role = 'CASHIER';
+        role = userData.role || role || 'CASHIER';
+        displayName = userData.displayName || displayName;
+        isActive = userData.isActive ?? true;
+        themePreference = userData.themePreference || 'light';
+
+        // Sematkan custom claim secara asinkron
+        adminAuth.setCustomUserClaims(uid, { role, displayName, themePreference }).catch((cErr) => {
+          console.warn('[Custom Claims Set Warning]:', cErr);
+        });
+      } else {
+        role = role || 'CASHIER';
       }
+    } catch (dbErr) {
+      console.warn('Gagal mengambil data user dari Firestore, menggunakan fallback default role:', dbErr);
+      role = role || 'CASHIER';
     }
 
     // 3. Buat Session Cookie Firebase (Masa berlaku 5 hari)
@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
           email,
           name: displayName,
           role,
+          themePreference,
         },
         data: {
           uid,
@@ -97,6 +98,7 @@ export async function POST(req: NextRequest) {
           displayName,
           role,
           isActive,
+          themePreference,
           photoURL: null,
         },
       },
@@ -188,6 +190,7 @@ export async function GET(req: NextRequest) {
     let displayName = decodedClaims.name || decodedClaims.email?.split('@')[0] || 'User';
     let role: UserRole = 'CASHIER';
     let isActive = true;
+    let themePreference: 'light' | 'dark' = (decodedClaims.themePreference as any) || 'light';
 
     try {
       const userDoc = await adminDb.collection('users').doc(decodedClaims.uid).get();
@@ -202,6 +205,7 @@ export async function GET(req: NextRequest) {
         displayName = userData.displayName || displayName;
         role = userData.role || role;
         isActive = userData.isActive ?? true;
+        themePreference = userData.themePreference || themePreference;
       }
     } catch (e) {
       console.warn('Gagal mengambil data user dari Firestore pada GET session:', e);
@@ -215,6 +219,7 @@ export async function GET(req: NextRequest) {
         displayName,
         role,
         isActive,
+        themePreference,
         photoURL: null,
       },
       user: {
@@ -222,6 +227,7 @@ export async function GET(req: NextRequest) {
         email: decodedClaims.email,
         name: displayName,
         role,
+        themePreference,
       },
     });
   } catch (error) {

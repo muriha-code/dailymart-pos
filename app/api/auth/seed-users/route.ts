@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
           displayName: userData.displayName,
           role: userData.role,
           isActive: true,
+          themePreference: 'light',
           updatedAt: now,
           createdAt: now,
         },

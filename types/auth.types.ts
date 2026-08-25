@@ -8,6 +8,7 @@ export interface AppUser {
   isActive: boolean;
   phone?: string;
   photoURL?: string;
+  themePreference?: 'light' | 'dark';
   createdAt?: string | Date;
 }
 
@@ -15,3 +16,4 @@ export interface AuthSession {
   user: AppUser;
   token: string;
 }
+

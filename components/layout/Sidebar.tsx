@@ -9,6 +9,7 @@ import { AppUser, UserRole } from "@/types/auth.types";
 import { useSidebarContext } from "@/context/SidebarContext";
 import { useTheme } from "next-themes";
 import ThemeToggle from "@/components/common/ThemeToggle";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 /**
  * Generates 2-letter uppercase initials from display name or email.
@@ -48,6 +49,7 @@ interface MenuSection {
  */
 function SidebarThemeToggleCard({ isCollapsed }: { isCollapsed: boolean }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
+  const { updateThemePreference } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -58,7 +60,12 @@ function SidebarThemeToggleCard({ isCollapsed }: { isCollapsed: boolean }) {
   const isDark = activeTheme === "dark";
 
   const toggleTheme = () => {
-    setTheme(isDark ? "light" : "dark");
+    const newTheme = isDark ? "light" : "dark";
+    if (updateThemePreference) {
+      updateThemePreference(newTheme);
+    } else {
+      setTheme(newTheme);
+    }
   };
 
   if (isCollapsed) {
@@ -133,8 +140,9 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isCollapsed, toggleSidebar } = useSidebarContext();
+  const { user: authUser, logout } = useAuth();
 
-  const [user, setUser] = useState<AppUser | null>(null);
+  const [user, setUser] = useState<AppUser | null>(authUser || null);
   const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
   const [imageError, setImageError] = useState<boolean>(false);
@@ -143,8 +151,16 @@ export default function Sidebar() {
   const [openKasir, setOpenKasir] = useState<boolean>(false);
   const [openGudang, setOpenGudang] = useState<boolean>(false);
 
-  // Fetch session user info on mount
+  // Sinkronisasi dengan authUser saat sesi terverifikasi
+  useEffect(() => {
+    if (authUser) {
+      setUser(authUser);
+    }
+  }, [authUser]);
+
+  // Fetch session user info on mount if authUser is not yet populated
   const fetchUserData = useCallback(async () => {
+    if (authUser) return;
     try {
       const res = await fetch("/api/auth/session", { cache: "no-store" });
       if (res.ok) {
@@ -170,7 +186,7 @@ export default function Sidebar() {
         photoURL: currentUser.photoURL || undefined,
       });
     }
-  }, []);
+  }, [authUser]);
 
   useEffect(() => {
     fetchUserData();
@@ -181,15 +197,19 @@ export default function Sidebar() {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
     try {
-      try {
-        sessionStorage.removeItem("pos_tab_active");
-      } catch (sErr) {
-        console.warn("Gagal menghapus pos_tab_active dari sessionStorage:", sErr);
+      if (logout) {
+        await logout();
+      } else {
+        try {
+          sessionStorage.removeItem("pos_tab_active");
+        } catch (sErr) {
+          console.warn("Gagal menghapus pos_tab_active dari sessionStorage:", sErr);
+        }
+        await fetch("/api/auth/logout", { method: "POST" });
+        await fetch("/api/auth/session", { method: "DELETE" });
+        await signOut(clientAuth);
+        window.location.href = "/login";
       }
-      await fetch("/api/auth/logout", { method: "POST" });
-      await fetch("/api/auth/session", { method: "DELETE" });
-      await signOut(clientAuth);
-      window.location.href = "/login";
     } catch (err) {
       console.error("Gagal melakukan logout:", err);
       setIsLoggingOut(false);
