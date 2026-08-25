@@ -8,6 +8,7 @@ export interface AppUser {
   isActive: boolean;
   phone?: string;
   photoURL?: string;
+  photoPublicId?: string;
   themePreference?: 'light' | 'dark';
   createdAt?: string | Date;
 }

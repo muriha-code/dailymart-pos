@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Cloudinary Configuration
+cloudinary.config({
+  cloud_name:
+    process.env.CLOUDINARY_CLOUD_NAME ||
+    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+    'dailymart-pos',
+  api_key: process.env.CLOUDINARY_API_KEY || '123456789012345',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'secret',
+  secure: true,
+});
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -7,13 +19,13 @@ interface Params {
 
 /**
  * PUT /api/admin/users/[id]
- * Memperbarui profil pengguna (displayName, role, isActive, phone)
+ * Memperbarui profil pengguna (displayName, role, isActive, phone, photoURL, photoPublicId)
  */
 export async function PUT(req: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
     const body = await req.json();
-    const { displayName, role, isActive, phone, photoURL } = body;
+    const { displayName, role, isActive, phone, photoURL, photoPublicId } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -29,6 +41,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     if (isActive !== undefined) updateData.isActive = Boolean(isActive);
     if (phone !== undefined) updateData.phone = phone;
     if (photoURL !== undefined) updateData.photoURL = photoURL;
+    if (photoPublicId !== undefined) updateData.photoPublicId = photoPublicId;
 
     await adminDb.collection('users').doc(id).update(updateData);
 
@@ -100,7 +113,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 /**
  * DELETE /api/admin/users/[id]
- * Menghapus pengguna dari Firebase Auth & Firestore dengan proteksi self-delete
+ * Menghapus pengguna dari Firebase Auth & Firestore dengan proteksi self-delete & auto-delete foto Cloudinary
  */
 export async function DELETE(req: NextRequest, { params }: Params) {
   try {
@@ -126,6 +139,25 @@ export async function DELETE(req: NextRequest, { params }: Params) {
         }
       } catch (e) {
         // Abaikan verifikasi jika sesi tidak aktif
+      }
+    }
+
+    // Fetch data user dari Firestore untuk dapatkan photoPublicId
+    let photoPublicId = '';
+    try {
+      const docSnap = await adminDb.collection('users').doc(id).get();
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        photoPublicId = data?.photoPublicId || '';
+      }
+    } catch (_) {}
+
+    // Hapus foto Cloudinary jika ada
+    if (photoPublicId) {
+      try {
+        await cloudinary.uploader.destroy(photoPublicId, { invalidate: true });
+      } catch (cloudErr: any) {
+        console.warn(`[Cloudinary User Photo Delete Warning] ${photoPublicId}:`, cloudErr?.message || cloudErr);
       }
     }
 

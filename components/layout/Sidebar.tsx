@@ -217,7 +217,8 @@ export default function Sidebar() {
     }
   };
 
-  const userRole: UserRole = user?.role || "ADMIN";
+  const currentUser = authUser || user;
+  const userRole: UserRole = currentUser?.role || "ADMIN";
 
   // Helper check active link
   const isLinkActive = (href: string): boolean => {
@@ -498,7 +499,7 @@ export default function Sidebar() {
         ? warehouseSections
         : cashierSections;
 
-  const initials = getInitials(user?.displayName || user?.email);
+  const initials = getInitials(currentUser?.displayName || currentUser?.email);
 
   return (
     <>
@@ -732,30 +733,30 @@ export default function Sidebar() {
           {/* 2. User Info Card */}
           <div className={`flex items-center rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] ${isCollapsed ? "justify-center" : "gap-3"}`}>
             {/* Avatar Container with Image or Initials Fallback */}
-            <div
-              className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 overflow-hidden shrink-0 bg-amber-400 font-black text-slate-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
-              title={isCollapsed ? `${user?.displayName || "User"} (${userRole})` : undefined}
-            >
-              {user?.photoURL && !imageError ? (
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || "User"}
-                  className="w-full h-full object-cover"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
+            {currentUser?.photoURL && !imageError ? (
+              <img
+                src={currentUser.photoURL}
+                alt={currentUser.displayName || "User"}
+                className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 object-cover shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] shrink-0"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div
+                className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 overflow-hidden shrink-0 bg-amber-400 font-black text-slate-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                title={isCollapsed ? `${currentUser?.displayName || "User"} (${userRole})` : undefined}
+              >
                 <span>{initials}</span>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* User Name, Email, & Role Badge (Hidden when Collapsed) */}
             {!isCollapsed && (
               <div className="min-w-0 flex-1">
                 <h4 className="text-xs font-black text-slate-900 dark:text-slate-100 truncate">
-                  {user?.displayName || "Pengguna POS"}
+                  {currentUser?.displayName || "Pengguna POS"}
                 </h4>
                 <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate">
-                  {user?.email || "user@dailymart.id"}
+                  {currentUser?.email || "user@dailymart.id"}
                 </p>
                 <div className="mt-1">
                   <span

@@ -7,6 +7,7 @@ export interface CreateUserPayload {
   role: UserRole;
   phone?: string;
   photoURL?: string;
+  photoPublicId?: string;
 }
 
 export interface UpdateUserPayload {
@@ -15,6 +16,7 @@ export interface UpdateUserPayload {
   isActive: boolean;
   phone?: string;
   photoURL?: string;
+  photoPublicId?: string;
 }
 
 export const userManagementService = {

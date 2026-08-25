@@ -8,8 +8,11 @@ import {
   CreateUserPayload,
   UpdateUserPayload,
 } from "@/services/userManagement.service";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function UserManagementPage() {
+  const { user: currentUser, setUser: setCurrentUser } = useAuth();
+
   // Data States
   const [users, setUsers] = useState<AppUser[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -34,6 +37,7 @@ export default function UserManagementPage() {
     role: "" as any,
     phone: "",
     photoURL: "",
+    photoPublicId: "",
   });
 
   // Form States - Edit
@@ -43,6 +47,7 @@ export default function UserManagementPage() {
     isActive: true,
     phone: "",
     photoURL: "",
+    photoPublicId: "",
   });
 
   // Photo Upload States
@@ -121,12 +126,13 @@ export default function UserManagementPage() {
       role: "" as any,
       phone: "",
       photoURL: "",
+      photoPublicId: "",
     });
     setShowAddPassword(false);
     setIsAddModalOpen(true);
   };
 
-  // Handle Photo Upload (Cloudinary / API)
+  // Handle Photo Upload (Cloudinary to dailymart-pos/store/foto-profil)
   const handlePhotoUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
     isEdit: boolean
@@ -146,7 +152,7 @@ export default function UserManagementPage() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("folderType", "dailymart-pos/users");
+    formData.append("folderType", "dailymart-pos/store/foto-profil");
 
     try {
       if (isEdit) setIsUploadingEditPhoto(true);
@@ -160,9 +166,30 @@ export default function UserManagementPage() {
 
       if (res.ok && json.success && json.imageUrl) {
         if (isEdit) {
-          setEditForm((prev) => ({ ...prev, photoURL: json.imageUrl }));
+          // Hapus foto lama di Cloudinary jika foto diganti
+          if (editForm.photoPublicId && editForm.photoPublicId !== json.publicId) {
+            try {
+              await fetch("/api/cloudinary/delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ public_id: editForm.photoPublicId }),
+              });
+            } catch (delErr) {
+              console.warn("Gagal menghapus foto lama di Cloudinary:", delErr);
+            }
+          }
+
+          setEditForm((prev) => ({
+            ...prev,
+            photoURL: json.imageUrl,
+            photoPublicId: json.publicId || "",
+          }));
         } else {
-          setAddForm((prev) => ({ ...prev, photoURL: json.imageUrl }));
+          setAddForm((prev) => ({
+            ...prev,
+            photoURL: json.imageUrl,
+            photoPublicId: json.publicId || "",
+          }));
         }
         toast.success("Foto profil berhasil diunggah.");
       } else {
@@ -174,6 +201,29 @@ export default function UserManagementPage() {
       if (isEdit) setIsUploadingEditPhoto(false);
       else setIsUploadingAddPhoto(false);
     }
+  };
+
+  // Handle Remove Photo (Destroy in Cloudinary & clear state)
+  const handleRemovePhoto = async (isEdit: boolean) => {
+    const targetPublicId = isEdit ? editForm.photoPublicId : addForm.photoPublicId;
+    if (targetPublicId) {
+      try {
+        await fetch("/api/cloudinary/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ public_id: targetPublicId }),
+        });
+      } catch (err) {
+        console.warn("Gagal menghapus foto di Cloudinary:", err);
+      }
+    }
+
+    if (isEdit) {
+      setEditForm((prev) => ({ ...prev, photoURL: "", photoPublicId: "" }));
+    } else {
+      setAddForm((prev) => ({ ...prev, photoURL: "", photoPublicId: "" }));
+    }
+    toast.success("Foto profil berhasil dihapus.");
   };
 
   // Handle Submit Create User
@@ -201,6 +251,7 @@ export default function UserManagementPage() {
         role: "" as any,
         phone: "",
         photoURL: "",
+        photoPublicId: "",
       });
       loadUsers();
     } catch (err: any) {
@@ -219,6 +270,7 @@ export default function UserManagementPage() {
       isActive: user.isActive,
       phone: user.phone || "",
       photoURL: user.photoURL || "",
+      photoPublicId: user.photoPublicId || "",
     });
     setIsEditModalOpen(true);
   };
@@ -236,6 +288,14 @@ export default function UserManagementPage() {
     try {
       await userManagementService.updateUser(selectedUser.uid, editForm);
       toast.success("Profil pengguna berhasil diperbarui");
+
+      // Sinkronisasi real-time dengan AuthContext jika user yang diedit adalah user yang sedang aktif
+      if (selectedUser.uid === currentUser?.uid && setCurrentUser) {
+        setCurrentUser((prev) =>
+          prev ? { ...prev, ...editForm } : null
+        );
+      }
+
       setIsEditModalOpen(false);
       setSelectedUser(null);
       loadUsers();
@@ -694,7 +754,7 @@ export default function UserManagementPage() {
                     {addForm.photoURL && (
                       <button
                         type="button"
-                        onClick={() => setAddForm((prev) => ({ ...prev, photoURL: "" }))}
+                        onClick={() => handleRemovePhoto(false)}
                         className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline cursor-pointer"
                       >
                         Hapus Foto
@@ -899,7 +959,7 @@ export default function UserManagementPage() {
                     {editForm.photoURL && (
                       <button
                         type="button"
-                        onClick={() => setEditForm((prev) => ({ ...prev, photoURL: "" }))}
+                        onClick={() => handleRemovePhoto(true)}
                         className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline cursor-pointer"
                       >
                         Hapus Foto

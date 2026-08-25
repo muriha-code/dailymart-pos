@@ -21,6 +21,7 @@ export async function GET() {
         isActive: data.isActive ?? true,
         phone: data.phone || '',
         photoURL: data.photoURL || '',
+        photoPublicId: data.photoPublicId || '',
         createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt) : undefined,
       });
     });
@@ -45,7 +46,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { displayName, email, password, role, phone, photoURL } = body;
+    const { displayName, email, password, role, phone, photoURL, photoPublicId } = body;
 
     if (!displayName || !email || !password || !role) {
       return NextResponse.json(
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
       isActive: true,
       phone: phone || '',
       photoURL: photoURL || '',
+      photoPublicId: photoPublicId || '',
       themePreference: 'light',
       createdAt: new Date().toISOString(),
     };
