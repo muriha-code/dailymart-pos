@@ -20,6 +20,7 @@ export async function GET() {
         role: (data.role as UserRole) || 'CASHIER',
         isActive: data.isActive ?? true,
         phone: data.phone || '',
+        photoURL: data.photoURL || '',
         createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt) : undefined,
       });
     });
@@ -44,7 +45,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { displayName, email, password, role, phone } = body;
+    const { displayName, email, password, role, phone, photoURL } = body;
 
     if (!displayName || !email || !password || !role) {
       return NextResponse.json(
@@ -65,6 +66,7 @@ export async function POST(req: NextRequest) {
       email,
       password,
       displayName,
+      ...(photoURL ? { photoURL } : {}),
     });
 
     // 2. Simpan profil user di Firestore
@@ -75,6 +77,7 @@ export async function POST(req: NextRequest) {
       role: role as UserRole,
       isActive: true,
       phone: phone || '',
+      photoURL: photoURL || '',
       themePreference: 'light',
       createdAt: new Date().toISOString(),
     };

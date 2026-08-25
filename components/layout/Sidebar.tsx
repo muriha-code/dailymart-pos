@@ -155,6 +155,7 @@ export default function Sidebar() {
   useEffect(() => {
     if (authUser) {
       setUser(authUser);
+      setImageError(false);
     }
   }, [authUser]);
 
@@ -732,7 +733,7 @@ export default function Sidebar() {
           <div className={`flex items-center rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] ${isCollapsed ? "justify-center" : "gap-3"}`}>
             {/* Avatar Container with Image or Initials Fallback */}
             <div
-              className="w-10 h-10 rounded-xl bg-[#FFB800] text-slate-950 flex items-center justify-center font-black text-sm border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] shrink-0 overflow-hidden"
+              className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 overflow-hidden shrink-0 bg-amber-400 font-black text-slate-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
               title={isCollapsed ? `${user?.displayName || "User"} (${userRole})` : undefined}
             >
               {user?.photoURL && !imageError ? (

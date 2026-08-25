@@ -33,6 +33,7 @@ export default function UserManagementPage() {
     password: "",
     role: "" as any,
     phone: "",
+    photoURL: "",
   });
 
   // Form States - Edit
@@ -41,7 +42,12 @@ export default function UserManagementPage() {
     role: "CASHIER",
     isActive: true,
     phone: "",
+    photoURL: "",
   });
+
+  // Photo Upload States
+  const [isUploadingAddPhoto, setIsUploadingAddPhoto] = useState<boolean>(false);
+  const [isUploadingEditPhoto, setIsUploadingEditPhoto] = useState<boolean>(false);
 
   // Form States - Reset Password
   const [newPassword, setNewPassword] = useState<string>("");
@@ -114,9 +120,60 @@ export default function UserManagementPage() {
       password: "",
       role: "" as any,
       phone: "",
+      photoURL: "",
     });
     setShowAddPassword(false);
     setIsAddModalOpen(true);
+  };
+
+  // Handle Photo Upload (Cloudinary / API)
+  const handlePhotoUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    isEdit: boolean
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("File harus berupa gambar (JPG, PNG, WEBP).");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Ukuran foto maksimal 2MB.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folderType", "dailymart-pos/users");
+
+    try {
+      if (isEdit) setIsUploadingEditPhoto(true);
+      else setIsUploadingAddPhoto(true);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const json = await res.json();
+
+      if (res.ok && json.success && json.imageUrl) {
+        if (isEdit) {
+          setEditForm((prev) => ({ ...prev, photoURL: json.imageUrl }));
+        } else {
+          setAddForm((prev) => ({ ...prev, photoURL: json.imageUrl }));
+        }
+        toast.success("Foto profil berhasil diunggah.");
+      } else {
+        toast.error(json.message || "Gagal mengunggah foto profil.");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Terjadi kesalahan saat mengunggah foto.");
+    } finally {
+      if (isEdit) setIsUploadingEditPhoto(false);
+      else setIsUploadingAddPhoto(false);
+    }
   };
 
   // Handle Submit Create User
@@ -143,6 +200,7 @@ export default function UserManagementPage() {
         password: "",
         role: "" as any,
         phone: "",
+        photoURL: "",
       });
       loadUsers();
     } catch (err: any) {
@@ -160,6 +218,7 @@ export default function UserManagementPage() {
       role: user.role,
       isActive: user.isActive,
       phone: user.phone || "",
+      photoURL: user.photoURL || "",
     });
     setIsEditModalOpen(true);
   };
@@ -462,9 +521,17 @@ export default function UserManagementPage() {
                         {/* Pengguna & Email */}
                         <td className="px-4 py-3.5 align-middle">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-[#FFB800] text-slate-950 font-black text-xs border-1.5 border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center shrink-0">
-                              {initials}
-                            </div>
+                            {user.photoURL ? (
+                              <img
+                                src={user.photoURL}
+                                alt={user.displayName}
+                                className="w-9 h-9 rounded-lg border-2 border-slate-900 dark:border-slate-100 object-cover shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] shrink-0"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-lg bg-[#FFB800] text-slate-950 font-black text-xs border-1.5 border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center shrink-0">
+                                {initials}
+                              </div>
+                            )}
                             <div className="min-w-0 flex-1">
                               <div
                                 className="font-bold text-slate-900 dark:text-slate-100 truncate"
@@ -587,6 +654,56 @@ export default function UserManagementPage() {
             </div>
 
             <form onSubmit={handleCreateUser} className="p-6 space-y-4">
+              {/* Photo Upload Field at Top of Modal */}
+              <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-900 dark:border-slate-100 rounded-xl">
+                <div className="w-16 h-16 border-2 border-slate-900 dark:border-slate-100 rounded-xl overflow-hidden bg-amber-400 font-black text-slate-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] shrink-0 relative">
+                  {addForm.photoURL ? (
+                    <img
+                      src={addForm.photoURL}
+                      alt="Preview Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-xl">
+                      {getInitials(addForm.displayName || "Pengguna")}
+                    </span>
+                  )}
+                  {isUploadingAddPhoto && (
+                    <div className="absolute inset-0 bg-slate-950/60 flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-1.5 min-w-0">
+                  <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200">
+                    Foto Profil Pengguna
+                  </label>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <label className="bg-slate-100 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 text-xs font-bold px-3 py-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-all inline-block">
+                      {isUploadingAddPhoto ? "Mengunggah..." : "Pilih Foto Profil"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploadingAddPhoto}
+                        onChange={(e) => handlePhotoUpload(e, false)}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {addForm.photoURL && (
+                      <button
+                        type="button"
+                        onClick={() => setAddForm((prev) => ({ ...prev, photoURL: "" }))}
+                        className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline cursor-pointer"
+                      >
+                        Hapus Foto
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                   Nama Lengkap <span className="text-red-500">*</span>
@@ -742,6 +859,56 @@ export default function UserManagementPage() {
             </div>
 
             <form onSubmit={handleEditUser} className="p-6 space-y-4">
+              {/* Photo Upload Field at Top of Modal */}
+              <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-900 dark:border-slate-100 rounded-xl">
+                <div className="w-16 h-16 border-2 border-slate-900 dark:border-slate-100 rounded-xl overflow-hidden bg-amber-400 font-black text-slate-950 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] shrink-0 relative">
+                  {editForm.photoURL ? (
+                    <img
+                      src={editForm.photoURL}
+                      alt="Preview Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-xl">
+                      {getInitials(editForm.displayName || "Pengguna")}
+                    </span>
+                  )}
+                  {isUploadingEditPhoto && (
+                    <div className="absolute inset-0 bg-slate-950/60 flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-1.5 min-w-0">
+                  <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200">
+                    Foto Profil Pengguna
+                  </label>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <label className="bg-slate-100 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 text-xs font-bold px-3 py-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-all inline-block">
+                      {isUploadingEditPhoto ? "Mengunggah..." : "Pilih Foto Profil"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={isUploadingEditPhoto}
+                        onChange={(e) => handlePhotoUpload(e, true)}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {editForm.photoURL && (
+                      <button
+                        type="button"
+                        onClick={() => setEditForm((prev) => ({ ...prev, photoURL: "" }))}
+                        className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline cursor-pointer"
+                      >
+                        Hapus Foto
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                   Nama Lengkap <span className="text-red-500">*</span>

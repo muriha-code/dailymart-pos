@@ -13,7 +13,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
     const body = await req.json();
-    const { displayName, role, isActive, phone } = body;
+    const { displayName, role, isActive, phone, photoURL } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -28,15 +28,20 @@ export async function PUT(req: NextRequest, { params }: Params) {
     if (role !== undefined) updateData.role = role;
     if (isActive !== undefined) updateData.isActive = Boolean(isActive);
     if (phone !== undefined) updateData.phone = phone;
+    if (photoURL !== undefined) updateData.photoURL = photoURL;
 
     await adminDb.collection('users').doc(id).update(updateData);
 
-    // 2. Update Auth DisplayName jika ada
-    if (displayName) {
+    // 2. Update Auth DisplayName & PhotoURL jika ada
+    const authUpdatePayload: { displayName?: string; photoURL?: string } = {};
+    if (displayName) authUpdatePayload.displayName = displayName;
+    if (photoURL !== undefined) authUpdatePayload.photoURL = photoURL;
+
+    if (Object.keys(authUpdatePayload).length > 0) {
       try {
-        await adminAuth.updateUser(id, { displayName });
+        await adminAuth.updateUser(id, authUpdatePayload);
       } catch (authErr) {
-        console.warn(`[Auth Update Warning] Gagal update Auth displayName untuk UID ${id}:`, authErr);
+        console.warn(`[Auth Update Warning] Gagal update Auth profile untuk UID ${id}:`, authErr);
       }
     }
 
