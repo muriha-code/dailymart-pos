@@ -27,14 +27,15 @@ export function rotateSize(width: number, height: number, rotation: number) {
 }
 
 /**
- * Memotong gambar dari kanvas dengan sudut rotasi & rasio 1:1 (WebP 500x500px)
+ * Memotong gambar dari kanvas dengan sudut rotasi & rasio 1:1 (PNG/WebP 500x500px)
  */
 export async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
   rotation = 0,
   outputWidth = 500,
-  outputHeight = 500
+  outputHeight = 500,
+  outputFormat: 'image/png' | 'image/webp' = 'image/png'
 ): Promise<{ file: File; url: string } | null> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement('canvas');
@@ -65,7 +66,7 @@ export async function getCroppedImg(
   // Gambar image ter-rotasi
   ctx.drawImage(image, 0, 0);
 
-  // Canvas kedua khusus untuk pemotongan (500x500 WebP)
+  // Canvas kedua khusus untuk pemotongan (500x500 PNG/WebP)
   const croppedCanvas = document.createElement('canvas');
   const croppedCtx = croppedCanvas.getContext('2d');
 
@@ -96,15 +97,16 @@ export async function getCroppedImg(
           resolve(null);
           return;
         }
-        const file = new File([blob], 'product-cropped.webp', {
-          type: 'image/webp',
+        const ext = outputFormat === 'image/png' ? 'png' : 'webp';
+        const file = new File([blob], `product-cropped.${ext}`, {
+          type: outputFormat,
           lastModified: Date.now(),
         });
         const url = URL.createObjectURL(blob);
         resolve({ file, url });
       },
-      'image/webp',
-      0.9
+      outputFormat,
+      0.95
     );
   });
 }

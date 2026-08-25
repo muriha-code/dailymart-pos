@@ -163,7 +163,8 @@ export default function AdminProductsPage() {
         croppedAreaPixels,
         rotation,
         500,
-        500
+        500,
+        "image/png"
       );
       if (result) {
         setSelectedImageFile(result.file);
@@ -1317,12 +1318,12 @@ export default function AdminProductsPage() {
                         Foto Produk (Cloudinary Upload)
                       </label>
                       <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
-                        <div className="w-14 h-14 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden shrink-0 relative shadow-xs">
+                        <div className="w-14 h-14 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-slate-100 dark:bg-slate-900 flex items-center justify-center overflow-hidden shrink-0 relative shadow-xs bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:12px_12px]">
                           {imagePreviewUrl || formData.imageUrl ? (
                             <img
                               src={imagePreviewUrl || formData.imageUrl}
                               alt="Preview Foto"
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain p-0.5"
                             />
                           ) : (
                             <svg className="w-6 h-6 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1957,7 +1958,7 @@ export default function AdminProductsPage() {
             </div>
 
             {/* Cropper Canvas Container */}
-            <div className="relative w-full h-72 sm:h-80 bg-slate-950 overflow-hidden">
+            <div className="relative w-full h-72 sm:h-80 bg-slate-950 overflow-hidden bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px]">
               <Cropper
                 image={imageToCrop}
                 crop={crop}
