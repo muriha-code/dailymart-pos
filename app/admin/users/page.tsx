@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import toast from "react-hot-toast";
+import { updateProfile } from "firebase/auth";
+import { clientAuth } from "@/lib/firebase/client";
 import { AppUser, UserRole } from "@/types/auth.types";
 import {
   userManagementService,
@@ -11,7 +13,7 @@ import {
 import { useAuth } from "@/components/providers/AuthProvider";
 
 export default function UserManagementPage() {
-  const { user: currentUser, setUser: setCurrentUser } = useAuth();
+  const { user: currentUser, setUser: setCurrentUser, refreshUserData } = useAuth();
 
   // Data States
   const [users, setUsers] = useState<AppUser[]>([]);
@@ -289,11 +291,26 @@ export default function UserManagementPage() {
       await userManagementService.updateUser(selectedUser.uid, editForm);
       toast.success("Profil pengguna berhasil diperbarui");
 
-      // Sinkronisasi real-time dengan AuthContext jika user yang diedit adalah user yang sedang aktif
-      if (selectedUser.uid === currentUser?.uid && setCurrentUser) {
-        setCurrentUser((prev) =>
-          prev ? { ...prev, ...editForm } : null
-        );
+      // Sinkronisasi real-time dengan AuthContext & Client Firebase Auth jika user yang diedit adalah user yang sedang aktif
+      if (selectedUser.uid === (currentUser?.uid || clientAuth.currentUser?.uid)) {
+        if (clientAuth.currentUser) {
+          try {
+            await updateProfile(clientAuth.currentUser, {
+              displayName: editForm.displayName,
+              photoURL: editForm.photoURL || "",
+            });
+          } catch (authErr) {
+            console.warn("Gagal update client auth profile:", authErr);
+          }
+        }
+
+        if (setCurrentUser) {
+          setCurrentUser((prev) => (prev ? { ...prev, ...editForm } : null));
+        }
+
+        if (refreshUserData) {
+          await refreshUserData();
+        }
       }
 
       setIsEditModalOpen(false);

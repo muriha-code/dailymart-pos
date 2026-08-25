@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
-import { clientAuth } from "@/lib/firebase/client";
+import { doc, onSnapshot } from "firebase/firestore";
+import { clientAuth, clientDb } from "@/lib/firebase/client";
 import { AppUser, UserRole } from "@/types/auth.types";
 import { useSidebarContext } from "@/context/SidebarContext";
 import { useTheme } from "next-themes";
@@ -151,6 +152,29 @@ export default function Sidebar() {
   const [openKasir, setOpenKasir] = useState<boolean>(false);
   const [openGudang, setOpenGudang] = useState<boolean>(false);
 
+  // Listener real-time Firestore onSnapshot untuk dokumen user aktif
+  useEffect(() => {
+    const activeUid = authUser?.uid || user?.uid || clientAuth.currentUser?.uid;
+    if (!activeUid) return;
+
+    const userDocRef = doc(clientDb, "users", activeUid);
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.data() as AppUser;
+          setUser(userData);
+          setImageError(false);
+        }
+      },
+      (err) => {
+        console.warn("[Sidebar] Real-time onSnapshot listener error:", err);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [authUser?.uid, user?.uid]);
+
   // Sinkronisasi dengan authUser saat sesi terverifikasi
   useEffect(() => {
     if (authUser) {
@@ -218,6 +242,7 @@ export default function Sidebar() {
   };
 
   const currentUser = authUser || user;
+  const photoURL = user?.photoURL || authUser?.photoURL || clientAuth.currentUser?.photoURL;
   const userRole: UserRole = currentUser?.role || "ADMIN";
 
   // Helper check active link
@@ -733,10 +758,10 @@ export default function Sidebar() {
           {/* 2. User Info Card */}
           <div className={`flex items-center rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] ${isCollapsed ? "justify-center" : "gap-3"}`}>
             {/* Avatar Container with Image or Initials Fallback */}
-            {currentUser?.photoURL && !imageError ? (
+            {photoURL && !imageError ? (
               <img
-                src={currentUser.photoURL}
-                alt={currentUser.displayName || "User"}
+                src={photoURL}
+                alt={currentUser?.displayName || "User"}
                 className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 object-cover shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] shrink-0"
                 onError={() => setImageError(true)}
               />

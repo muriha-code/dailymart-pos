@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { clientAuth, clientDb } from '@/lib/firebase/client';
 import { AppUser } from '@/types/auth.types';
 import { useTheme } from 'next-themes';
@@ -15,6 +15,7 @@ interface AuthContextType {
   markTabActive: () => void;
   clearTabActive: () => void;
   updateThemePreference: (newTheme: 'light' | 'dark') => Promise<void>;
+  refreshUserData: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -25,6 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   markTabActive: () => {},
   clearTabActive: () => {},
   updateThemePreference: async () => {},
+  refreshUserData: async () => {},
   logout: async () => {},
 });
 
@@ -168,6 +170,44 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }
   }, [setTheme]);
 
+  // Explicit refresh user profile data from Firestore
+  const refreshUserData = useCallback(async () => {
+    const activeUid = user?.uid || clientAuth.currentUser?.uid;
+    if (!activeUid) return;
+    try {
+      const userDocRef = doc(clientDb, 'users', activeUid);
+      const userSnap = await getDoc(userDocRef);
+      if (userSnap.exists()) {
+        const userData = userSnap.data() as AppUser;
+        setUser(userData);
+      }
+    } catch (err) {
+      console.warn('[AuthProvider] refreshUserData error:', err);
+    }
+  }, [user?.uid]);
+
+  // Listener real-time onSnapshot untuk dokumen Firestore users/{activeUid}
+  useEffect(() => {
+    const activeUid = user?.uid || clientAuth.currentUser?.uid;
+    if (!activeUid) return;
+
+    const userDocRef = doc(clientDb, 'users', activeUid);
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.data() as AppUser;
+          setUser(userData);
+        }
+      },
+      (err) => {
+        console.warn('[AuthProvider] Real-time onSnapshot listener error:', err);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [user?.uid]);
+
   // Listener onAuthStateChanged untuk sinkronisasi otomatis status autentikasi & tema
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(clientAuth, async (fbUser) => {
@@ -261,6 +301,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         markTabActive,
         clearTabActive,
         updateThemePreference,
+        refreshUserData,
         logout,
       }}
     >
