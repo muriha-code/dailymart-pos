@@ -127,7 +127,7 @@ export default function CashierHistoryPage() {
   const isAdmin = cashierInfo?.role === "ADMIN";
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 lg:p-8 font-sans">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-200">
       {/* CSS @media print khusus cetak Thermal Receipt 80mm presisi */}
       <style jsx global>{`
         @media print {
@@ -203,7 +203,7 @@ export default function CashierHistoryPage() {
         <div className="flex flex-wrap items-center justify-between mb-6 gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="bg-[#EEF2FF] text-[#4338CA] border-[1.5px] border-slate-900 font-mono font-bold text-[10px] px-2.5 py-1 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-flex items-center gap-1.5">
+              <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2.5 py-1 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>
                   {isAdmin ? "Admin Overview" : cashierInfo?.displayName || "Kasir POS"}
@@ -212,10 +212,10 @@ export default function CashierHistoryPage() {
               </span>
             </div>
 
-            <h1 className="text-xl font-black text-slate-900 tracking-tight mt-1.5">
+            <h1 className="text-xl font-black text-slate-900 dark:text-slate-50 tracking-tight mt-1.5">
               {isAdmin ? "Riwayat & Ringkasan Penjualan Kasir" : "Riwayat Transaksi Saya"}
             </h1>
-            <p className="text-xs font-bold text-slate-500 mt-0.5">
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mt-0.5">
               Daftar transaksi penjualan terisolasi kasir, analisis omset harian, dan cetak ulang struk thermal.
             </p>
           </div>
@@ -223,12 +223,12 @@ export default function CashierHistoryPage() {
           <div className="flex items-center gap-3 shrink-0">
             {/* Date Picker Filter */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-slate-700">Tanggal:</span>
+              <span className="text-xs font-black text-slate-700 dark:text-slate-300">Tanggal:</span>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="bg-white border-2 border-slate-900 rounded-xl px-3 py-2 text-xs font-black text-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:outline-none cursor-pointer"
+                className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3 py-2 text-xs font-black text-slate-900 dark:text-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] focus:outline-none cursor-pointer"
               />
             </div>
 
@@ -236,7 +236,7 @@ export default function CashierHistoryPage() {
             <button
               type="button"
               onClick={loadTransactions}
-              className="bg-white hover:bg-slate-100 border-2 border-slate-900 p-2 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900 transition-all cursor-pointer"
+              className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-slate-900 dark:border-slate-100 p-2 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] text-slate-900 dark:text-slate-100 transition-all cursor-pointer hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
               title="Refresh Data"
             >
               <svg
@@ -261,32 +261,32 @@ export default function CashierHistoryPage() {
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {/* Card 1: Total Transaksi */}
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-700 block mb-1">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 block mb-1">
               Total Transaksi
             </span>
-            <span className="text-xl font-black font-mono text-slate-900 block">
+            <span className="text-xl font-black font-mono text-slate-900 dark:text-slate-50 block">
               {summary.totalTransactions}{" "}
-              <span className="text-xs font-bold text-slate-500">struk</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">struk</span>
             </span>
           </div>
 
           {/* Card 2: Total Omset Penjualan */}
-          <div className="bg-[#E8F5E9] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-xs font-black uppercase tracking-wider text-[#065F46] block mb-1">
+          <div className="bg-[#E8F5E9] dark:bg-emerald-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-xs font-black uppercase tracking-wider text-[#065F46] dark:text-emerald-300 block mb-1">
               Total Omset Penjualan
             </span>
-            <span className="text-[#065F46] font-mono font-black text-xl block">
+            <span className="text-[#065F46] dark:text-emerald-300 font-mono font-black text-xl block">
               {formatRupiah(summary.totalRevenue)}
             </span>
           </div>
 
           {/* Card 3: Rata-rata Basket Size */}
-          <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-xs font-black uppercase tracking-wider text-[#B45309] block mb-1">
+          <div className="bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-xs font-black uppercase tracking-wider text-[#B45309] dark:text-amber-300 block mb-1">
               Rata-Rata / Basket Size
             </span>
-            <span className="text-[#B45309] font-mono font-black text-xl block">
+            <span className="text-[#B45309] dark:text-amber-300 font-mono font-black text-xl block">
               {formatRupiah(summary.averageBasketSize)}
             </span>
           </div>
@@ -295,38 +295,38 @@ export default function CashierHistoryPage() {
         {/* ========================================================================= */}
         {/* 3. REKONSILIASI SETORAN KAS SHIFT CARD                                    */}
         {/* ========================================================================= */}
-        <div className="bg-white border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] mb-6">
-          <div className="text-xs font-black uppercase tracking-wider text-slate-900 mb-3 flex items-center justify-between flex-wrap gap-2">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] mb-6 transition-colors">
+          <div className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100 mb-3 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span>💵 Rekonsiliasi Setoran Kas Shift</span>
             </div>
             {/* Badges */}
             <div className="flex items-center gap-3">
-              <span className="bg-[#D1FAE5] text-[#065F46] border-[1.5px] border-slate-900 font-mono font-bold text-xs px-2.5 py-1 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+              <span className="bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-bold text-xs px-2.5 py-1 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                 Fisik Tunai: {formatRupiah(summary.cashTotal)}
               </span>
-              <span className="bg-[#EEF2FF] text-[#4338CA] border-[1.5px] border-slate-900 font-mono font-bold text-xs px-2.5 py-1 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+              <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-bold text-xs px-2.5 py-1 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                 Non-Tunai: {formatRupiah(summary.nonCashTotal)}
               </span>
             </div>
           </div>
 
-          <p className="text-[11px] font-bold text-slate-500 mb-2">
+          <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2">
             Pembagian fisik uang tunai dalam laci kas vs penerimaan non-tunai (QRIS / Debit / Transfer).
           </p>
 
           {/* Progress Bar Track */}
-          <div className="w-full h-3 bg-slate-100 border-2 border-slate-900 rounded-full overflow-hidden flex my-2">
+          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full overflow-hidden flex my-2">
             <div
               style={{ width: `${cashPercentage}%` }}
-              className="bg-[#065F46] h-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
+              className="bg-[#065F46] dark:bg-emerald-600 h-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
               title={`Tunai: ${cashPercentage}%`}
             >
               {cashPercentage > 10 ? `${cashPercentage}%` : ""}
             </div>
             <div
               style={{ width: `${nonCashPercentage}%` }}
-              className="bg-[#4338CA] h-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
+              className="bg-[#4338CA] dark:bg-indigo-600 h-full transition-all duration-300 flex items-center justify-center text-[9px] font-black text-white"
               title={`Non-Tunai: ${nonCashPercentage}%`}
             >
               {nonCashPercentage > 10 ? `${nonCashPercentage}%` : ""}
@@ -334,12 +334,12 @@ export default function CashierHistoryPage() {
           </div>
 
           {/* Percentage Labels */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] font-bold text-slate-600 gap-1 pt-0.5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] font-bold text-slate-600 dark:text-slate-400 gap-1 pt-0.5">
             <span>
-              Uang Fisik Laci (Tunai): <strong className="text-slate-900 font-mono">{cashPercentage}%</strong>
+              Uang Fisik Laci (Tunai): <strong className="text-slate-900 dark:text-slate-100 font-mono">{cashPercentage}%</strong>
             </span>
             <span>
-              Uang Digital (QRIS/Debit): <strong className="text-slate-900 font-mono">{nonCashPercentage}%</strong>
+              Uang Digital (QRIS/Debit): <strong className="text-slate-900 dark:text-slate-100 font-mono">{nonCashPercentage}%</strong>
             </span>
           </div>
         </div>
@@ -347,7 +347,7 @@ export default function CashierHistoryPage() {
         {/* ========================================================================= */}
         {/* 4. TOOLBAR SEARCH & FILTER AREA                                           */}
         {/* ========================================================================= */}
-        <div className="bg-white border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-wrap items-center gap-3 mb-6">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-wrap items-center gap-3 mb-6 transition-colors">
           {/* Search Input Field */}
           <div className="relative flex-1 min-w-[200px]">
             <input
@@ -355,13 +355,13 @@ export default function CashierHistoryPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari Nomor Invoice (TRX-...), Nama Kasir, atau Item Produk..."
-              className="bg-slate-50 border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white flex-1 w-full"
+              className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 placeholder:text-slate-400 dark:placeholder:text-slate-500 flex-1 w-full"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-900 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-900 dark:text-slate-100 hover:text-slate-600 dark:hover:text-slate-400"
               >
                 ✕
               </button>
@@ -372,13 +372,13 @@ export default function CashierHistoryPage() {
             {/* Admin Cashier Filter Dropdown (Role ADMIN only) */}
             {isAdmin && (
               <div className="flex items-center gap-2">
-                <label className="text-xs font-black text-slate-700 whitespace-nowrap">
+                <label className="text-xs font-black text-slate-700 dark:text-slate-300 whitespace-nowrap">
                   Kasir:
                 </label>
                 <select
                   value={selectedCashierFilter}
                   onChange={(e) => setSelectedCashierFilter(e.target.value)}
-                  className="bg-white border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+                  className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
                 >
                   <option value="ALL">Semua Kasir</option>
                   {cashierList.map((kasir) => (
@@ -392,13 +392,13 @@ export default function CashierHistoryPage() {
 
             {/* Payment Method Dropdown Select */}
             <div className="flex items-center gap-2">
-              <label className="text-xs font-black text-slate-700 whitespace-nowrap">
+              <label className="text-xs font-black text-slate-700 dark:text-slate-300 whitespace-nowrap">
                 Metode:
               </label>
               <select
                 value={selectedPaymentMethod}
                 onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                className="bg-white border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+                className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
               >
                 <option value="ALL">Semua Metode</option>
                 <option value="CASH">Tunai (CASH)</option>
@@ -415,36 +415,36 @@ export default function CashierHistoryPage() {
         {/* 5. TABEL RIWAYAT TRANSAKSI & EMPTY STATE                                  */}
         {/* ========================================================================= */}
         {isLoading ? (
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-12 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-12 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-colors">
             <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-            <p className="text-xs font-black text-slate-700">Memuat riwayat transaksi kasir...</p>
+            <p className="text-xs font-black text-slate-700 dark:text-slate-300">Memuat riwayat transaksi kasir...</p>
           </div>
         ) : fetchError ? (
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-12 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-            <p className="text-sm font-black text-rose-600 mb-2">{fetchError}</p>
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-12 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-colors">
+            <p className="text-sm font-black text-rose-600 dark:text-rose-400 mb-2">{fetchError}</p>
             <button
               type="button"
               onClick={loadTransactions}
-              className="px-4 py-2 bg-[#6366F1] text-white border-2 border-slate-900 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:bg-[#4F46E5] cursor-pointer"
+              className="px-4 py-2 bg-[#6366F1] text-white border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:bg-[#4F46E5] cursor-pointer"
             >
               Coba Lagi
             </button>
           </div>
         ) : transactions.length === 0 ? (
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-12 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-            <p className="text-sm font-black text-slate-900 mb-1">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-12 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-colors">
+            <p className="text-sm font-black text-slate-900 dark:text-slate-100 mb-1">
               Belum ada transaksi pada tanggal {selectedDate}.
             </p>
-            <p className="text-xs font-mono text-slate-500">
+            <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
               Transaksi kasir yang diproses pada tanggal ini akan tercatat di sini.
             </p>
           </div>
         ) : (
-          <div className="bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 border-b-2 border-slate-900 text-[11px] font-black text-slate-900 uppercase tracking-wider">
+                  <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-[11px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                     <th className="py-3.5 px-4">No. Invoice</th>
                     <th className="py-3.5 px-4">Waktu Transaksi</th>
                     <th className="py-3.5 px-4">Kasir</th>
@@ -454,7 +454,7 @@ export default function CashierHistoryPage() {
                     <th className="py-3.5 px-4 text-center">Aksi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 text-xs text-slate-900 font-bold">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs text-slate-900 dark:text-slate-100 font-bold">
                   {transactions.map((trx) => {
                     const totalQty = trx.items.reduce((sum, i) => sum + i.quantity, 0);
                     const itemNames = trx.items.map((i) => i.productName).join(", ");
@@ -462,31 +462,31 @@ export default function CashierHistoryPage() {
                     return (
                       <tr
                         key={trx.id || trx.transactionNumber}
-                        className="hover:bg-slate-50 transition-colors"
+                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors"
                       >
                         {/* No Invoice */}
-                        <td className="py-3.5 px-4 font-mono font-black text-slate-900 whitespace-nowrap">
+                        <td className="py-3.5 px-4 font-mono font-black text-slate-900 dark:text-slate-100 whitespace-nowrap">
                           {trx.transactionNumber}
                         </td>
 
                         {/* Waktu & Tanggal */}
-                        <td className="py-3.5 px-4 text-slate-700 whitespace-nowrap">
+                        <td className="py-3.5 px-4 text-slate-700 dark:text-slate-300 whitespace-nowrap">
                           {formatDate(trx.createdAt)}
                         </td>
 
                         {/* Kasir */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <span className="px-2.5 py-1 rounded-lg bg-slate-100 border-1.5 border-slate-900 text-slate-900 font-bold text-[11px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                          <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 font-bold text-[11px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                             {trx.cashierName || trx.cashierId || "Kasir POS"}
                           </span>
                         </td>
 
                         {/* Ringkasan Item */}
                         <td className="py-3.5 px-4">
-                          <div className="font-black text-slate-900">
+                          <div className="font-black text-slate-900 dark:text-slate-100">
                             {totalQty} item ({trx.items.length} jenis)
                           </div>
-                          <div className="text-[11px] font-medium text-slate-500 truncate max-w-xs">
+                          <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-xs">
                             {itemNames}
                           </div>
                         </td>
@@ -494,30 +494,30 @@ export default function CashierHistoryPage() {
                         {/* Metode Pembayaran Badge */}
                         <td className="py-3.5 px-4 text-center whitespace-nowrap">
                           {trx.paymentMethod === "CASH" && (
-                            <span className="px-2.5 py-1 rounded-lg bg-[#D1FAE5] text-[#065F46] border-[1.5px] border-slate-900 font-mono font-bold text-[10px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                            <span className="px-2.5 py-1 rounded-lg bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                               💵 TUNAI
                             </span>
                           )}
                           {trx.paymentMethod === "QRIS" && (
-                            <span className="px-2.5 py-1 rounded-lg bg-[#EEF2FF] text-[#4338CA] border-[1.5px] border-slate-900 font-mono font-bold text-[10px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                            <span className="px-2.5 py-1 rounded-lg bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                               📱 QRIS
                             </span>
                           )}
                           {(trx.paymentMethod === "DEBIT" ||
                             trx.paymentMethod === "CREDIT") && (
-                            <span className="px-2.5 py-1 rounded-lg bg-[#EEF2FF] text-[#4338CA] border-[1.5px] border-slate-900 font-mono font-bold text-[10px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                            <span className="px-2.5 py-1 rounded-lg bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                               💳 {trx.paymentMethod}
                             </span>
                           )}
                           {trx.paymentMethod === "TRANSFER" && (
-                            <span className="px-2.5 py-1 rounded-lg bg-[#F3E8FF] text-[#6B21A8] border-[1.5px] border-slate-900 font-mono font-bold text-[10px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                            <span className="px-2.5 py-1 rounded-lg bg-[#F3E8FF] dark:bg-purple-950/60 text-[#6B21A8] dark:text-purple-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                               🏦 TRANSFER
                             </span>
                           )}
                         </td>
 
                         {/* Total Belanja */}
-                        <td className="py-3.5 px-4 text-right font-mono font-black text-slate-900 text-sm whitespace-nowrap">
+                        <td className="py-3.5 px-4 text-right font-mono font-black text-slate-900 dark:text-slate-100 text-sm whitespace-nowrap">
                           {formatRupiah(trx.total)}
                         </td>
 
@@ -526,7 +526,7 @@ export default function CashierHistoryPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedTransaction(trx)}
-                            className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-3 py-1.5 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer inline-flex items-center gap-1.5"
+                            className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-3 py-1.5 rounded-lg border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer inline-flex items-center gap-1.5"
                           >
                             <svg
                               className="w-4 h-4"
@@ -558,24 +558,24 @@ export default function CashierHistoryPage() {
       {/* 6. MODAL DETAIL & REPRINT STRUK THERMAL                                   */}
       {/* ========================================================================= */}
       {selectedTransaction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 print-backdrop">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 print-backdrop">
           {/* Modal Card Wrapper */}
-          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-[380px] max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 print-modal-card">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-[380px] max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 print-modal-card transition-colors">
             
             {/* REGION 1: MODAL HEADER */}
-            <div className="px-4 py-3 bg-slate-100 border-b-2 border-slate-900 flex items-center justify-between shrink-0 no-print">
+            <div className="px-4 py-3 bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between shrink-0 no-print transition-colors">
               <div>
-                <h3 className="text-sm font-black text-slate-900">
+                <h3 className="text-sm font-black text-slate-900 dark:text-slate-50">
                   Struk Pembayaran Kasir
                 </h3>
-                <p className="text-[11px] text-slate-600 font-mono font-bold">
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-mono font-bold">
                   {selectedTransaction.transactionNumber}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedTransaction(null)}
-                className="w-7 h-7 rounded-lg bg-white border-2 border-slate-900 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
                 title="Tutup Modal"
               >
                 ✕
@@ -583,7 +583,7 @@ export default function CashierHistoryPage() {
             </div>
 
             {/* REGION 2: MODAL BODY */}
-            <div className="flex-1 overflow-y-auto p-4 bg-slate-100 flex justify-center print-body-container">
+            <div className="flex-1 overflow-y-auto p-4 bg-slate-100 dark:bg-slate-950 flex justify-center print-body-container transition-colors">
               <div
                 id="printable-receipt"
                 className="bg-white p-4 rounded-md border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] w-[300px] font-mono text-[11px] text-slate-900 leading-tight my-auto"
@@ -697,11 +697,11 @@ export default function CashierHistoryPage() {
             </div>
 
             {/* REGION 3: MODAL FOOTER */}
-            <div className="px-4 py-3 bg-slate-100 border-t-2 border-slate-900 flex items-center justify-end gap-2.5 shrink-0 no-print">
+            <div className="px-4 py-3 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end gap-2.5 shrink-0 no-print transition-colors">
               <button
                 type="button"
                 onClick={() => setSelectedTransaction(null)}
-                className="bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs px-3.5 py-2 rounded-xl border-2 border-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-colors cursor-pointer"
+                className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs px-3.5 py-2 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-colors cursor-pointer"
               >
                 Tutup
               </button>
@@ -709,7 +709,7 @@ export default function CashierHistoryPage() {
               <button
                 type="button"
                 onClick={handlePrintReceipt}
-                className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-4 py-2 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer flex items-center gap-1.5"
+                className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-4 py-2 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer flex items-center gap-1.5"
               >
                 <span>🖨️ Cetak Struk</span>
               </button>

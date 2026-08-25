@@ -42,15 +42,15 @@ export default function AdminDashboardPage() {
   }, [data?.chartData]);
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] text-slate-900 p-6 font-sans">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 p-6 font-sans transition-colors duration-200">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* ========================================== */}
         {/* HEADER & QUICK ACTIONS */}
         {/* ========================================== */}
-        <div className="bg-white border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 transition-all">
           <div>
-            <h1 className="text-lg font-black text-slate-900 tracking-tight">
+            <h1 className="text-lg font-black text-slate-900 dark:text-slate-50 tracking-tight">
               Dashboard Analitik & Penjualan
             </h1>
           </div>
@@ -60,11 +60,11 @@ export default function AdminDashboardPage() {
             <button
               onClick={loadDashboardData}
               disabled={isLoading}
-              className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-900 font-bold text-xs px-3.5 py-2 rounded-lg border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs px-3.5 py-2 rounded-lg border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer disabled:opacity-50"
               title="Refresh Data"
             >
               <svg
-                className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-amber-600" : ""}`}
+                className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-amber-600 dark:text-amber-400" : ""}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -81,9 +81,9 @@ export default function AdminDashboardPage() {
 
             <Link
               href="/admin/products"
-              className="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-900 font-bold text-xs px-3.5 py-2 rounded-lg border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs px-3.5 py-2 rounded-lg border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
             >
-              <svg className="w-3.5 h-3.5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
 
             <Link
               href="/warehouse/stock-in"
-              className="inline-flex items-center gap-2 bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-4 py-2 rounded-lg border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-4 py-2 rounded-lg border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
@@ -108,16 +108,16 @@ export default function AdminDashboardPage() {
 
         {/* ERROR NOTIFICATION */}
         {error && (
-          <div className="p-4 rounded-xl bg-rose-100 border-2 border-slate-900 text-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-rose-100 dark:bg-rose-950/60 border-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-rose-100 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <svg className="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span className="text-xs font-bold">{error}</span>
             </div>
             <button
               onClick={loadDashboardData}
-              className="text-xs font-black underline hover:text-rose-700 cursor-pointer"
+              className="text-xs font-black underline hover:text-rose-700 dark:hover:text-rose-300 cursor-pointer"
             >
               Coba Lagi
             </button>
@@ -129,98 +129,98 @@ export default function AdminDashboardPage() {
         {/* ========================================== */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           
-          {/* Card 1: Omset Hari Ini (White Card + Green LIVE Badge) */}
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+          {/* Card 1: Omset Hari Ini (White Card / Dark Slate + Green LIVE Badge) */}
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-black uppercase tracking-wider text-slate-700">
+              <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 Omset Hari Ini
               </span>
-              <span className="inline-flex items-center gap-1 bg-[#10B981] text-white border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+              <span className="inline-flex items-center gap-1 bg-[#10B981] text-white border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                 LIVE
               </span>
             </div>
             <div className="mt-3">
               {isLoading ? (
-                <div className="h-6 bg-slate-200/60 rounded animate-pulse w-3/4"></div>
+                <div className="h-6 bg-slate-200/60 dark:bg-slate-800 rounded animate-pulse w-3/4"></div>
               ) : (
-                <span className="text-xl font-black text-slate-900 font-mono tabular-nums mt-1">
+                <span className="text-xl font-black text-slate-900 dark:text-slate-50 font-mono tabular-nums mt-1">
                   {formatRupiah(data?.metrics.todayRevenue || 0)}
                 </span>
               )}
-              <p className="text-[11px] font-medium text-slate-600 mt-1">
+              <p className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-1">
                 {isLoading ? "..." : `${data?.metrics.todayOrders || 0} transaksi berhasil`}
               </p>
             </div>
           </div>
 
-          {/* Card 2: Total Akumulasi Omset (Soft Indigo Tint #EEF2FF + Deep Indigo Text #4338CA) */}
-          <div className="bg-[#EEF2FF] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+          {/* Card 2: Total Akumulasi Omset (Soft Indigo Tint #EEF2FF / dark:bg-indigo-950/40) */}
+          <div className="bg-[#EEF2FF] dark:bg-indigo-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-black uppercase tracking-wider text-indigo-900">
+              <span className="text-[11px] font-black uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
                 Total Omset
               </span>
             </div>
             <div className="mt-3">
               {isLoading ? (
-                <div className="h-6 bg-indigo-200/60 rounded animate-pulse w-3/4"></div>
+                <div className="h-6 bg-indigo-200/60 dark:bg-indigo-900/50 rounded animate-pulse w-3/4"></div>
               ) : (
-                <span className="text-xl font-black text-[#4338CA] font-mono tabular-nums mt-1">
+                <span className="text-xl font-black text-[#4338CA] dark:text-indigo-300 font-mono tabular-nums mt-1">
                   {formatRupiah(data?.metrics.totalRevenue || 0)}
                 </span>
               )}
-              <p className="text-[11px] font-medium text-indigo-700 mt-1">
+              <p className="text-[11px] font-medium text-indigo-700 dark:text-indigo-300/80 mt-1">
                 Akumulasi seluruh transaksi
               </p>
             </div>
           </div>
 
-          {/* Card 3: Total Varian Produk Aktif (Warm Amber Tint #FEF3C7 + Deep Amber Text #B45309) */}
-          <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+          {/* Card 3: Total Varian Produk Aktif (Warm Amber Tint #FEF3C7 / dark:bg-amber-950/40) */}
+          <div className="bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-black uppercase tracking-wider text-amber-900">
+              <span className="text-[11px] font-black uppercase tracking-wider text-amber-900 dark:text-amber-200">
                 Produk Aktif
               </span>
             </div>
             <div className="mt-3">
               {isLoading ? (
-                <div className="h-6 bg-amber-200/60 rounded animate-pulse w-1/2"></div>
+                <div className="h-6 bg-amber-200/60 dark:bg-amber-900/50 rounded animate-pulse w-1/2"></div>
               ) : (
-                <span className="text-xl font-black text-[#B45309] font-mono tabular-nums mt-1">
+                <span className="text-xl font-black text-[#B45309] dark:text-amber-400 font-mono tabular-nums mt-1">
                   {data?.metrics.totalProducts || 0} SKU
                 </span>
               )}
-              <p className="text-[11px] font-medium text-amber-800 mt-1">
+              <p className="text-[11px] font-medium text-amber-800 dark:text-amber-300/80 mt-1">
                 Katalog varian siap jual
               </p>
             </div>
           </div>
 
-          {/* Card 4: Status Peringatan Stok Kritis (Soft Rose Tint #FFE4E6 + Deep Rose Text #E11D48) */}
-          <div className="bg-[#FFE4E6] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
+          {/* Card 4: Status Peringatan Stok Kritis (Soft Rose Tint #FFE4E6 / dark:bg-rose-950/40) */}
+          <div className="bg-[#FFE4E6] dark:bg-rose-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-black uppercase tracking-wider text-rose-900">
+              <span className="text-[11px] font-black uppercase tracking-wider text-rose-900 dark:text-rose-200">
                 Stok Kritis
               </span>
               {(data?.metrics.lowStockCount || 0) > 0 ? (
-                <span className="bg-[#E11D48] text-white border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                <span className="bg-[#E11D48] text-white border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                   Urgent Restock
                 </span>
               ) : (
-                <span className="bg-[#10B981] text-white border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                <span className="bg-[#10B981] text-white border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                   Stok Aman
                 </span>
               )}
             </div>
             <div className="mt-3">
               {isLoading ? (
-                <div className="h-6 bg-rose-200/60 rounded animate-pulse w-1/2"></div>
+                <div className="h-6 bg-rose-200/60 dark:bg-rose-900/50 rounded animate-pulse w-1/2"></div>
               ) : (
-                <span className="text-xl font-black text-[#E11D48] font-mono tabular-nums mt-1">
+                <span className="text-xl font-black text-[#E11D48] dark:text-rose-400 font-mono tabular-nums mt-1">
                   {data?.metrics.lowStockCount || 0} Item
                 </span>
               )}
-              <p className="text-[11px] font-medium text-rose-800 mt-1">
+              <p className="text-[11px] font-medium text-rose-800 dark:text-rose-300/80 mt-1">
                 {(data?.metrics.lowStockCount || 0) > 0
                   ? "Membutuhkan restock segera!"
                   : "Stok inventaris aman"}
@@ -236,27 +236,27 @@ export default function AdminDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* BAR CHART: Tren Penjualan 7 Hari terakhir (Col-Span 2) */}
-          <div className="lg:col-span-2 bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4">
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-50">
                   Tren Penjualan 7 Hari Terakhir
                 </h2>
-                <div className="flex items-center gap-1.5 text-xs text-slate-700 font-bold">
-                  <span className="w-2.5 h-2.5 rounded-xs bg-[#6366F1] border border-slate-900 inline-block"></span>
+                <div className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-bold">
+                  <span className="w-2.5 h-2.5 rounded-xs bg-[#6366F1] border border-slate-900 dark:border-slate-100 inline-block"></span>
                   <span>Omset Penjualan</span>
                 </div>
               </div>
 
               {/* Bar Visual Container */}
               {isLoading ? (
-                <div className="h-64 bg-slate-100/60 rounded-xl animate-pulse flex items-center justify-center text-slate-400 text-xs font-semibold">
+                <div className="h-64 bg-slate-100/60 dark:bg-slate-800 rounded-xl animate-pulse flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs font-semibold">
                   Memuat visualisasi tren...
                 </div>
               ) : (
                 <div className="relative pt-6">
                   {/* Bars Container */}
-                  <div className="h-56 flex items-end justify-between gap-2 sm:gap-4 px-2 border-b-2 border-slate-900 pb-2">
+                  <div className="h-56 flex items-end justify-between gap-2 sm:gap-4 px-2 border-b-2 border-slate-900 dark:border-slate-100 pb-2">
                     {data?.chartData.map((item, index) => {
                       const heightPercent = Math.max(
                         8,
@@ -273,22 +273,22 @@ export default function AdminDashboardPage() {
                         >
                           {/* Hover Tooltip Card */}
                           {isHovered && (
-                            <div className="absolute -top-14 z-20 bg-slate-900 text-white text-[11px] px-3 py-1.5 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] pointer-events-none whitespace-nowrap animate-fade-in flex flex-col items-center">
+                            <div className="absolute -top-14 z-20 bg-slate-900 dark:bg-slate-800 text-white text-[11px] px-3 py-1.5 rounded-lg border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] pointer-events-none whitespace-nowrap animate-fade-in flex flex-col items-center">
                               <span className="font-black text-[#A5B4FC]">{formatRupiah(item.revenue)}</span>
                               <span className="text-[10px] text-slate-300">{item.orders} Transaksi • {item.date}</span>
-                              <div className="w-2 h-2 bg-slate-900 rotate-45 -mb-2 mt-0.5"></div>
+                              <div className="w-2 h-2 bg-slate-900 dark:bg-slate-800 rotate-45 -mb-2 mt-0.5 border-b border-r border-slate-900 dark:border-slate-100"></div>
                             </div>
                           )}
 
                           {/* CSS Bar Element */}
                           <div
                             style={{ height: `${heightPercent}%` }}
-                            className={`w-full max-w-[48px] rounded-t-lg transition-all duration-200 relative flex items-start justify-center pt-1.5 border-t-2 border-x-2 border-slate-900 ${
+                            className={`w-full max-w-[48px] rounded-t-lg transition-all duration-200 relative flex items-start justify-center pt-1.5 border-t-2 border-x-2 border-slate-900 dark:border-slate-100 ${
                               isHovered
-                                ? "bg-[#4F46E5] scale-x-105 shadow-[2px_0px_0px_0px_rgba(15,23,42,1)]"
+                                ? "bg-[#4F46E5] scale-x-105 shadow-[2px_0px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_0px_0px_0px_rgba(255,255,255,1)]"
                                 : item.revenue > 0
                                 ? "bg-[#6366F1]"
-                                : "bg-slate-200"
+                                : "bg-slate-200 dark:bg-slate-800"
                             }`}
                           >
                             {item.revenue > 0 && (
@@ -306,10 +306,10 @@ export default function AdminDashboardPage() {
                   <div className="flex justify-between gap-2 sm:gap-4 px-2 pt-3">
                     {data?.chartData.map((item) => (
                       <div key={item.date} className="flex-1 text-center">
-                        <span className="block text-xs font-black text-slate-900">
+                        <span className="block text-xs font-black text-slate-900 dark:text-slate-200">
                           {item.dayName}
                         </span>
-                        <span className="block text-[10px] font-mono font-bold text-slate-500">
+                        <span className="block text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
                           {item.date.slice(8, 10)}/{item.date.slice(5, 7)}
                         </span>
                       </div>
@@ -319,27 +319,27 @@ export default function AdminDashboardPage() {
               )}
             </div>
 
-            <div className="mt-4 pt-3 border-t-2 border-slate-900/10 flex items-center justify-between text-xs text-slate-600 font-medium">
+            <div className="mt-4 pt-3 border-t-2 border-slate-900/10 dark:border-slate-800 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-medium">
               <span>* Arahkan kursor ke atas batang grafik untuk detail nominal harian</span>
-              <span className="font-bold text-slate-900">Skala Otomatis</span>
+              <span className="font-bold text-slate-900 dark:text-slate-200">Skala Otomatis</span>
             </div>
           </div>
 
           {/* CARD B: Top 5 Produk Terlaris (Col-Span 1) */}
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
             <div>
-              <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4">
+              <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-50 mb-4">
                 Top 5 Produk Terlaris
               </h2>
 
               {isLoading ? (
                 <div className="space-y-3">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="h-10 bg-slate-100 rounded-xl animate-pulse"></div>
+                    <div key={i} className="h-10 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"></div>
                   ))}
                 </div>
               ) : !data?.topProducts || data.topProducts.length === 0 ? (
-                <div className="py-12 text-center text-slate-400 text-xs font-medium">
+                <div className="py-12 text-center text-slate-400 dark:text-slate-500 text-xs font-medium">
                   Belum ada data penjualan tercatat.
                 </div>
               ) : (
@@ -347,23 +347,23 @@ export default function AdminDashboardPage() {
                   {data.topProducts.map((prod, index) => (
                     <div
                       key={prod.id || index}
-                      className="flex items-center justify-between gap-3 py-1.5 border-b border-slate-200 last:border-0"
+                      className="flex items-center justify-between gap-3 py-1.5 border-b border-slate-200 dark:border-slate-800 last:border-0"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         {/* Rank Badge Industrial Cyber Punch */}
-                        <div className="w-6 h-6 bg-[#6366F1] border-1.5 border-slate-900 text-white font-mono text-[10px] font-black rounded flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                        <div className="w-6 h-6 bg-[#6366F1] border-1.5 border-slate-900 dark:border-slate-100 text-white font-mono text-[10px] font-black rounded flex items-center justify-center shrink-0 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                           #{index + 1}
                         </div>
 
                         {/* Product Title */}
-                        <h4 className="text-xs font-bold text-slate-900 truncate">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
                           {prod.name}
                         </h4>
                       </div>
 
                       {/* Sales Stats */}
-                      <div className="text-right shrink-0 font-mono text-xs font-black text-slate-900">
-                        <span>{prod.quantity} <span className="text-[10px] text-slate-500 font-sans font-normal">terjual</span></span>
+                      <div className="text-right shrink-0 font-mono text-xs font-black text-slate-900 dark:text-slate-100">
+                        <span>{prod.quantity} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-sans font-normal">terjual</span></span>
                       </div>
                     </div>
                   ))}
@@ -371,10 +371,10 @@ export default function AdminDashboardPage() {
               )}
             </div>
 
-            <div className="mt-4 pt-3 border-t-2 border-slate-900/10 text-center">
+            <div className="mt-4 pt-3 border-t-2 border-slate-900/10 dark:border-slate-800 text-center">
               <Link
                 href="/admin/products"
-                className="text-xs font-black text-[#6366F1] hover:text-[#4F46E5] inline-flex items-center gap-1 cursor-pointer transition-colors"
+                className="text-xs font-black text-[#6366F1] hover:text-[#4F46E5] dark:text-indigo-400 dark:hover:text-indigo-300 inline-flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <span>Katalog Produk Selengkapnya</span>
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,27 +389,27 @@ export default function AdminDashboardPage() {
         {/* ========================================== */}
         {/* CRITICAL STOCK ALERT TABLE */}
         {/* ========================================== */}
-        <div className="bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
-          <div className="p-6 border-b-2 border-slate-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-all">
+          <div className="p-6 border-b-2 border-slate-900 dark:border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-black text-slate-900 tracking-tight">
+                <h2 className="text-lg font-black text-slate-900 dark:text-slate-50 tracking-tight">
                   Peringatan Stok Kritis (Restock Urgent)
                 </h2>
                 {data?.lowStockProducts && data.lowStockProducts.length > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-black text-xs border border-slate-900">
+                  <span className="px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 font-black text-xs border border-slate-900 dark:border-slate-100">
                     {data.lowStockProducts.length} Item
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 Daftar produk aktif dengan posisi sisa stok berada di bawah batas minimum safety stock.
               </p>
             </div>
 
             <Link
               href="/warehouse/stock-in"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all cursor-pointer shrink-0"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all cursor-pointer shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
@@ -421,7 +421,7 @@ export default function AdminDashboardPage() {
           {/* Table Content */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 text-slate-900 font-black uppercase tracking-wider border-b-2 border-slate-900">
+              <thead className="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-black uppercase tracking-wider border-b-2 border-slate-900 dark:border-slate-100">
                 <tr>
                   <th className="py-3.5 px-4 sm:px-6">SKU</th>
                   <th className="py-3.5 px-4 sm:px-6">Nama Produk</th>
@@ -432,10 +432,10 @@ export default function AdminDashboardPage() {
                   <th className="py-3.5 px-4 sm:px-6 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-400 font-medium">
+                    <td colSpan={7} className="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
                       Memuat daftar stok kritis...
                     </td>
                   </tr>
@@ -444,8 +444,8 @@ export default function AdminDashboardPage() {
                     <td colSpan={7} className="py-12 text-center">
                       <div className="max-w-xs mx-auto text-center space-y-1">
                         <span className="text-2xl">🎉</span>
-                        <h4 className="text-sm font-bold text-slate-800">Seluruh Stok Aman!</h4>
-                        <p className="text-xs text-slate-400">
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Seluruh Stok Aman!</h4>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">
                           Tidak ada produk aktif yang berada di bawah batas minimum stok saat ini.
                         </p>
                       </div>
@@ -453,33 +453,33 @@ export default function AdminDashboardPage() {
                   </tr>
                 ) : (
                   data.lowStockProducts.map((prod) => (
-                    <tr key={prod.id} className="hover:bg-indigo-50/50 transition-colors">
-                      <td className="py-3.5 px-4 sm:px-6 font-mono font-bold text-slate-700">
+                    <tr key={prod.id} className="hover:bg-indigo-50/50 dark:hover:bg-slate-800/60 transition-colors">
+                      <td className="py-3.5 px-4 sm:px-6 font-mono font-bold text-slate-700 dark:text-slate-300">
                         {prod.sku}
                       </td>
-                      <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900">
+                      <td className="py-3.5 px-4 sm:px-6 font-bold text-slate-900 dark:text-slate-100">
                         {prod.name}
                       </td>
-                      <td className="py-3.5 px-4 sm:px-6 text-slate-500">
+                      <td className="py-3.5 px-4 sm:px-6 text-slate-500 dark:text-slate-400">
                         {prod.categoryName || "Umum"}
                       </td>
                       <td className="py-3.5 px-4 sm:px-6 text-center font-mono">
-                        <span className="px-2.5 py-1 rounded-lg bg-rose-200 text-rose-950 border border-slate-900 font-black text-xs inline-block">
+                        <span className="px-2.5 py-1 rounded-lg bg-rose-200 dark:bg-rose-950/60 text-rose-950 dark:text-rose-200 border border-slate-900 dark:border-slate-100 font-black text-xs inline-block">
                           {prod.stock} {prod.unit}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 sm:px-6 text-center font-mono text-slate-600 font-bold">
+                      <td className="py-3.5 px-4 sm:px-6 text-center font-mono text-slate-600 dark:text-slate-400 font-bold">
                         {prod.minimumStock} {prod.unit}
                       </td>
                       <td className="py-3.5 px-4 sm:px-6 text-center">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-slate-900 text-[11px] font-black">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-slate-900 dark:border-slate-100 text-[11px] font-black">
                           ● Stok Kritis
                         </span>
                       </td>
                       <td className="py-3.5 px-4 sm:px-6 text-right">
                         <Link
                           href={`/warehouse/stock-in?productId=${encodeURIComponent(prod.id)}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs border border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs border border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all cursor-pointer"
                         >
                           <span>+ Restock</span>
                         </Link>

@@ -276,16 +276,16 @@ export default function WarehouseStockInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-6 lg:p-8 font-sans">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-200">
       <div className="max-w-7xl mx-auto">
         {/* ========================================================================= */}
         {/* 1. PAGE HEADER                                                            */}
         {/* ========================================================================= */}
         <div className="flex flex-col gap-1 mb-6">
-          <h1 className="text-xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-xl font-black text-slate-900 dark:text-slate-50 tracking-tight">
             Penerimaan Barang Masuk (Stock-In)
           </h1>
-          <p className="text-xs font-bold text-slate-500">
+          <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
             Formulir penerimaan stok dari distributor/supplier, pembaruan harga modal beli, dan pencatatan audit log mutasi gudang.
           </p>
         </div>
@@ -293,17 +293,17 @@ export default function WarehouseStockInPage() {
         {/* Status Alert Banner */}
         {statusMessage && (
           <div
-            className={`p-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] text-xs font-black flex items-center justify-between mb-6 ${
+            className={`p-4 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] text-xs font-black flex items-center justify-between mb-6 ${
               statusMessage.type === "success"
-                ? "bg-[#D1FAE5] text-[#065F46]"
-                : "bg-rose-100 text-rose-800"
+                ? "bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300"
+                : "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300"
             }`}
           >
             <span>{statusMessage.text}</span>
             <button
               type="button"
               onClick={() => setStatusMessage(null)}
-              className="w-6 h-6 rounded-md bg-white border border-slate-900 flex items-center justify-center text-xs font-black hover:bg-slate-100 cursor-pointer"
+              className="w-6 h-6 rounded-md bg-white dark:bg-slate-800 border border-slate-900 dark:border-slate-100 flex items-center justify-center text-xs font-black hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 cursor-pointer"
             >
               ✕
             </button>
@@ -317,10 +317,10 @@ export default function WarehouseStockInPage() {
           {/* ========================================================================= */}
           <div className="lg:col-span-5 space-y-6">
             {/* Card 1: Dokumen Penerimaan Barang */}
-            <div className="bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 pb-2 border-b-2 border-slate-900/10 flex items-center gap-2">
+            <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-colors">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b-2 border-slate-900/10 dark:border-slate-100/10 flex items-center gap-2">
                 <svg
-                  className="w-4 h-4 text-slate-900"
+                  className="w-4 h-4 text-slate-900 dark:text-slate-100"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -337,8 +337,8 @@ export default function WarehouseStockInPage() {
 
               {/* Input Supplier */}
               <div className="mb-3">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
-                  Pemasok / Supplier <span className="text-rose-600">*</span>
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 block">
+                  Pemasok / Supplier <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
                 <SearchableSelect
                   options={supplierOptions}
@@ -352,7 +352,7 @@ export default function WarehouseStockInPage() {
 
               {/* Input No Faktur / Surat Jalan */}
               <div className="mb-3">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 block">
                   No. Faktur / Surat Jalan (Opsional)
                 </label>
                 <input
@@ -360,17 +360,17 @@ export default function WarehouseStockInPage() {
                   value={invoiceNumber}
                   onChange={(e) => setInvoiceNumber(e.target.value)}
                   placeholder="Contoh: INV-2026/08/109"
-                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full font-mono"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full font-mono placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
-                <span className="text-[10px] font-bold text-slate-500 mt-1 block">
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 block">
                   *Format otomatis: IN-YYYYMMDD-XXXX jika dikosongkan.
                 </span>
               </div>
 
               {/* Input Petugas Gudang */}
               <div className="mb-3">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
-                  Petugas Penerima (Staf Gudang) <span className="text-rose-600">*</span>
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 block">
+                  Petugas Penerima (Staf Gudang) <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
                 <input
                   type="text"
@@ -378,13 +378,13 @@ export default function WarehouseStockInPage() {
                   value={receivedBy}
                   onChange={(e) => setReceivedBy(e.target.value)}
                   placeholder="Ketikkan Nama Lengkap"
-                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Input Catatan */}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 block">
                   Catatan Penerimaan / Pengiriman
                 </label>
                 <textarea
@@ -392,37 +392,37 @@ export default function WarehouseStockInPage() {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Contoh: Kemasan dus rapi, garansi retur 7 hari jika terdapat cacat."
-                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
 
             {/* Card 2: Ringkasan Nilai Restock & Submit Final */}
-            <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b-2 border-slate-900/20">
+            <div className="bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-colors">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-amber-200 mb-3 pb-2 border-b-2 border-slate-900/20 dark:border-slate-100/20">
                 Ringkasan Nilai Penerimaan
               </h3>
 
               <div className="space-y-1">
-                <div className="text-xs font-bold text-slate-800 flex justify-between py-1">
+                <div className="text-xs font-bold text-slate-800 dark:text-amber-100 flex justify-between py-1">
                   <span>Jumlah Varian Barang:</span>
-                  <span className="font-black font-mono text-slate-950">
+                  <span className="font-black font-mono text-slate-950 dark:text-amber-300">
                     {totalItemTypes} jenis
                   </span>
                 </div>
-                <div className="text-xs font-bold text-slate-800 flex justify-between py-1">
+                <div className="text-xs font-bold text-slate-800 dark:text-amber-100 flex justify-between py-1">
                   <span>Total Kuantitas Fisik:</span>
-                  <span className="font-black font-mono text-slate-950">
+                  <span className="font-black font-mono text-slate-950 dark:text-amber-300">
                     {totalPhysicalQuantity} unit
                   </span>
                 </div>
               </div>
 
-              <div className="text-xl font-black font-mono text-slate-950 flex justify-between items-center pt-2 border-t-2 border-slate-900/20 my-3">
-                <span className="text-xs font-black text-slate-900 uppercase">
+              <div className="text-xl font-black font-mono text-slate-950 dark:text-amber-100 flex justify-between items-center pt-2 border-t-2 border-slate-900/20 dark:border-slate-100/20 my-3">
+                <span className="text-xs font-black text-slate-900 dark:text-amber-200 uppercase">
                   Total Nilai Pembelian (Modal):
                 </span>
-                <span className="text-xl font-black text-[#065F46] font-mono">
+                <span className="text-xl font-black text-[#065F46] dark:text-emerald-400 font-mono">
                   {formatRupiah(totalEstimatedCost)}
                 </span>
               </div>
@@ -432,7 +432,7 @@ export default function WarehouseStockInPage() {
                 type="button"
                 disabled={isSubmitting || queueItems.length === 0}
                 onClick={handleSubmitStockIn}
-                className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs py-3.5 px-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all w-full uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs py-3.5 px-4 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all w-full uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -466,23 +466,23 @@ export default function WarehouseStockInPage() {
           {/* ========================================================================= */}
           <div className="lg:col-span-7 space-y-6">
             {/* Form Card 2: Pilih Barang Dari Katalog */}
-            <div className="bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 pb-2 border-b-2 border-slate-900/10 flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-colors">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100 mb-4 pb-2 border-b-2 border-slate-900/10 dark:border-slate-100/10 flex items-center justify-between">
                 <span>Pilih Barang Dari Katalog</span>
-                <span className="text-xs font-mono font-bold text-slate-600">
+                <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
                   {products.length} barang tersedia
                 </span>
               </h3>
 
               {isLoadingProducts ? (
-                <div className="p-4 text-center text-slate-500 font-bold">
+                <div className="p-4 text-center text-slate-500 dark:text-slate-400 font-bold">
                   Memuat katalog produk...
                 </div>
               ) : (
                 <div className="space-y-3">
                   {/* Dropdown Produk */}
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 block">
                       Pilih Produk Ritel
                     </label>
                     <SearchableSelect
@@ -498,7 +498,7 @@ export default function WarehouseStockInPage() {
                   {/* Input Kuantitas & Harga Beli Baru */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 block">
                         Jumlah Masuk (Qty)
                       </label>
                       <input
@@ -507,12 +507,12 @@ export default function WarehouseStockInPage() {
                         disabled={!selectedProductId}
                         value={inputQuantity}
                         onChange={(e) => setInputQuantity(Number(e.target.value))}
-                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1 block">
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1 block">
                         Harga Beli / Modal Baru (Rp)
                       </label>
                       <input
@@ -521,7 +521,7 @@ export default function WarehouseStockInPage() {
                         disabled={!selectedProductId}
                         value={inputPurchasePrice}
                         onChange={(e) => setInputPurchasePrice(Number(e.target.value))}
-                        className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -530,7 +530,7 @@ export default function WarehouseStockInPage() {
                   <button
                     type="button"
                     onClick={handleAddItemToQueue}
-                    className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs py-3 px-4 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all w-full mt-4 uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2"
+                    className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs py-3 px-4 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all w-full mt-4 uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2"
                   >
                     <svg
                       className="w-4 h-4"
@@ -552,9 +552,9 @@ export default function WarehouseStockInPage() {
             </div>
 
             {/* List / Table Antrean Penerimaan Barang */}
-            <div className="bg-white border-2 border-slate-900 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-              <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-900/10">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">
+            <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-5 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] transition-colors">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b-2 border-slate-900/10 dark:border-slate-100/10">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100">
                   Daftar Antrean Penerimaan Barang ({queueItems.length})
                 </h3>
                 {queueItems.length > 0 && (
@@ -564,7 +564,7 @@ export default function WarehouseStockInPage() {
                       setQueueItems([]);
                       setCurrentPage(1);
                     }}
-                    className="text-xs font-black text-rose-600 hover:text-rose-800 cursor-pointer"
+                    className="text-xs font-black text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 cursor-pointer"
                   >
                     Kosongkan Antrean
                   </button>
@@ -572,12 +572,12 @@ export default function WarehouseStockInPage() {
               </div>
 
               {queueItems.length === 0 ? (
-                <div className="bg-slate-50 border-2 border-dashed border-slate-900 rounded-xl p-8 text-center">
-                  <p className="text-xs font-black text-slate-900 mb-1">
+                <div className="bg-slate-50 dark:bg-slate-800/60 border-2 border-dashed border-slate-900 dark:border-slate-100 rounded-xl p-8 text-center transition-colors">
+                  <p className="text-xs font-black text-slate-900 dark:text-slate-100 mb-1">
                     Antrean barang masuk masih kosong.
                   </p>
-                  <p className="text-[11px] font-mono text-slate-500">
-                    Pilih produk dari dropdown di atas dan klik "+ Tambah ke Antrean Restok".
+                  <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                    Pilih produk dari dropdown di atas dan klik &quot;+ Tambah ke Antrean Restok&quot;.
                   </p>
                 </div>
               ) : (
@@ -585,7 +585,7 @@ export default function WarehouseStockInPage() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-100 border-b-2 border-slate-900 text-[10px] font-black text-slate-900 uppercase tracking-wider">
+                        <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
                           <th className="py-2.5 px-3">Produk</th>
                           <th className="py-2.5 px-2 text-center">Stok Awal</th>
                           <th className="py-2.5 px-2 text-center">Qty Masuk</th>
@@ -594,27 +594,27 @@ export default function WarehouseStockInPage() {
                           <th className="py-2.5 px-2 text-center">Aksi</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-200 text-xs text-slate-900 font-bold">
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs text-slate-900 dark:text-slate-100 font-bold">
                         {paginatedQueueItems.map((item) => {
                           const subtotal = item.quantity * item.purchasePrice;
 
                           return (
                             <tr
                               key={item.productId}
-                              className="hover:bg-slate-50 transition-colors"
+                              className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors"
                             >
                               {/* Produk Name & SKU */}
                               <td className="py-2.5 px-3">
-                                <div className="font-black text-slate-900 max-w-xs truncate">
+                                <div className="font-black text-slate-900 dark:text-slate-100 max-w-xs truncate">
                                   {item.productName}
                                 </div>
-                                <span className="font-mono text-[10px] text-slate-500">
+                                <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400">
                                   SKU: {item.sku}
                                 </span>
                               </td>
 
                               {/* Stok Awal */}
-                              <td className="py-2.5 px-2 text-center font-mono text-slate-600 whitespace-nowrap">
+                              <td className="py-2.5 px-2 text-center font-mono text-slate-600 dark:text-slate-400 whitespace-nowrap">
                                 {item.currentStock} {item.unit}
                               </td>
 
@@ -630,7 +630,7 @@ export default function WarehouseStockInPage() {
                                       Number(e.target.value)
                                     )
                                   }
-                                  className="w-16 px-2 py-1 bg-slate-50 border-2 border-slate-900 rounded-lg text-center font-mono text-xs font-black text-slate-900 focus:bg-white focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                                  className="w-16 px-2 py-1 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg text-center font-mono text-xs font-black text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
                                 />
                               </td>
 
@@ -646,12 +646,12 @@ export default function WarehouseStockInPage() {
                                       Number(e.target.value)
                                     )
                                   }
-                                  className="w-28 px-2 py-1 bg-slate-50 border-2 border-slate-900 rounded-lg text-right font-mono text-xs font-black text-slate-900 focus:bg-white focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                                  className="w-28 px-2 py-1 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg text-right font-mono text-xs font-black text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
                                 />
                               </td>
 
                               {/* Subtotal */}
-                              <td className="py-2.5 px-3 text-right font-mono font-black text-[#065F46] whitespace-nowrap">
+                              <td className="py-2.5 px-3 text-right font-mono font-black text-[#065F46] dark:text-emerald-400 whitespace-nowrap">
                                 {formatRupiah(subtotal)}
                               </td>
 
@@ -660,7 +660,7 @@ export default function WarehouseStockInPage() {
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveQueueItem(item.productId)}
-                                  className="w-7 h-7 rounded-lg bg-white border-2 border-slate-900 hover:bg-rose-50 text-rose-600 font-black transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center mx-auto"
+                                  className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-black transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center mx-auto"
                                   title="Hapus dari antrean"
                                 >
                                   ✕

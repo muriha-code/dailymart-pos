@@ -28,15 +28,15 @@ export default function ConfirmModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150 p-6 space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150 p-6 space-y-5 transition-colors">
         {/* Header Icon & Title */}
         <div className="flex items-start gap-4">
           <div
-            className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${
+            className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] ${
               isDestructive
-                ? "bg-red-50 text-red-600 border-red-100"
-                : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                ? "bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400"
+                : "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
             }`}
           >
             {isDestructive ? (
@@ -49,7 +49,7 @@ export default function ConfirmModal({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
@@ -63,7 +63,7 @@ export default function ConfirmModal({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
@@ -71,10 +71,10 @@ export default function ConfirmModal({
           </div>
 
           <div className="space-y-1">
-            <h3 className="text-base font-extrabold text-slate-900 leading-tight">
+            <h3 className="text-base font-black text-slate-900 dark:text-slate-50 leading-tight">
               {title}
             </h3>
-            <p className="text-xs text-slate-500 leading-relaxed">{message}</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">{message}</p>
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export default function ConfirmModal({
             type="button"
             disabled={isLoading}
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50"
+            className="px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer disabled:opacity-50"
           >
             {cancelLabel}
           </button>
@@ -93,9 +93,9 @@ export default function ConfirmModal({
             type="button"
             disabled={isLoading}
             onClick={onConfirm}
-            className={`px-5 py-2.5 rounded-xl font-bold text-xs shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
+            className={`px-5 py-2.5 rounded-xl font-black text-xs border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 ${
               isDestructive
-                ? "bg-red-600 hover:bg-red-700 active:bg-red-800 text-white"
+                ? "bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white"
                 : "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white"
             }`}
           >

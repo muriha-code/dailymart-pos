@@ -284,17 +284,17 @@ export default function StockAuditPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 p-3 sm:p-5 lg:p-6 font-sans">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 p-3 sm:p-5 lg:p-6 font-sans transition-colors duration-200">
       <div className="max-w-7xl mx-auto">
         {/* ========================================================================= */}
         {/* 1. PAGE HEADER & PRIMARY ACTION (COMPACT)                                 */}
         {/* ========================================================================= */}
         <div className="mb-2 p-0 flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-lg font-black text-slate-900 tracking-tight">
+            <h1 className="text-lg font-black text-slate-900 dark:text-slate-50 tracking-tight">
               Verifikasi & Audit Stok Fisik (Stock Opname)
             </h1>
-            <p className="hidden sm:block text-[11px] text-slate-500 font-bold">
+            <p className="hidden sm:block text-[11px] text-slate-600 dark:text-slate-400 font-bold">
               Sinkronisasi pencatatan stok fisik barang di gudang dengan stok sistem secara atomik dan akurat.
             </p>
           </div>
@@ -302,7 +302,7 @@ export default function StockAuditPage() {
           <button
             type="button"
             onClick={() => handleOpenModal()}
-            className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs py-1.5 px-3 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+            className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs py-1.5 px-3 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
           >
             <svg
               className="w-3.5 h-3.5"
@@ -324,35 +324,35 @@ export default function StockAuditPage() {
         {/* ========================================================================= */}
         {/* 2. WEEKLY AUDIT PROGRESS BANNER (INLINE & ULTRA-COMPACT)                  */}
         {/* ========================================================================= */}
-        <div className="bg-white border-2 border-slate-900 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] mb-3 flex flex-wrap lg:flex-nowrap items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] mb-3 flex flex-wrap lg:flex-nowrap items-center justify-between gap-3 transition-colors">
           <div className="flex items-center gap-2 shrink-0">
-            <h2 className="text-xs font-black uppercase text-slate-900 tracking-wider">
+            <h2 className="text-xs font-black uppercase text-slate-900 dark:text-slate-100 tracking-wider">
               Siklus Audit Mingguan
             </h2>
-            <span className="bg-slate-100 border-[1.5px] border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] text-slate-900">
+            <span className="bg-slate-100 dark:bg-slate-800 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] text-slate-900 dark:text-slate-100">
               {formatIndonesianDate(startOfWeek)} – {formatIndonesianDate(endOfWeek)}
             </span>
           </div>
 
           {/* Progress Indicators & Track Inline */}
           <div className="flex items-center gap-3 text-xs font-bold shrink-0">
-            <div className="flex items-center gap-2 text-[11px] text-slate-700">
-              <span>Total: <strong className="font-mono text-slate-900 font-black">{totalProductsCount}</strong></span>
+            <div className="flex items-center gap-2 text-[11px] text-slate-700 dark:text-slate-300">
+              <span>Total: <strong className="font-mono text-slate-900 dark:text-slate-100 font-black">{totalProductsCount}</strong></span>
               <span>•</span>
-              <span>Diverifikasi: <strong className="font-mono text-[#065F46] font-black">{weeklyAuditedCount}</strong></span>
+              <span>Diverifikasi: <strong className="font-mono text-[#065F46] dark:text-emerald-400 font-black">{weeklyAuditedCount}</strong></span>
               <span>•</span>
-              <span>Sisa: <strong className="font-mono text-[#B45309] font-black">{Math.max(0, totalProductsCount - weeklyAuditedCount)}</strong></span>
+              <span>Sisa: <strong className="font-mono text-[#B45309] dark:text-amber-400 font-black">{Math.max(0, totalProductsCount - weeklyAuditedCount)}</strong></span>
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="w-24 sm:w-36 h-2 bg-slate-100 border border-slate-900 rounded-full overflow-hidden shrink-0">
+              <div className="w-24 sm:w-36 h-2 bg-slate-100 dark:bg-slate-800 border border-slate-900 dark:border-slate-100 rounded-full overflow-hidden shrink-0">
                 <div
                   style={{ width: `${weeklyProgressPercentage}%` }}
                   className="bg-[#6366F1] h-full transition-all duration-300"
                   title={`Progres: ${weeklyProgressPercentage}%`}
                 />
               </div>
-              <span className="font-mono font-black text-xs text-[#4338CA]">{weeklyProgressPercentage}%</span>
+              <span className="font-mono font-black text-xs text-[#4338CA] dark:text-indigo-400">{weeklyProgressPercentage}%</span>
             </div>
           </div>
         </div>
@@ -362,35 +362,35 @@ export default function StockAuditPage() {
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
           {/* Card 1: Total Audit Diselesaikan */}
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-[9px] font-black uppercase text-slate-500 block mb-0.5">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[9px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-0.5">
               Total Audit Diselesaikan
             </span>
-            <span className="text-base sm:text-lg font-black font-mono text-slate-900 block">
+            <span className="text-base sm:text-lg font-black font-mono text-slate-900 dark:text-slate-50 block">
               {totalAuditCount}{" "}
-              <span className="text-[10px] font-bold text-slate-500">kali</span>
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">kali</span>
             </span>
           </div>
 
           {/* Card 2: Item Defisit (Minus) */}
-          <div className="bg-[#FFE4E6] border-2 border-slate-900 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-[9px] font-black uppercase text-[#E11D48] block mb-0.5">
+          <div className="bg-[#FFE4E6] dark:bg-rose-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[9px] font-black uppercase text-[#E11D48] dark:text-rose-400 block mb-0.5">
               Item Defisit (Minus)
             </span>
-            <span className="text-[#E11D48] font-mono font-black text-base sm:text-lg block">
+            <span className="text-[#E11D48] dark:text-rose-400 font-mono font-black text-base sm:text-lg block">
               {totalDeficitItems}{" "}
-              <span className="text-[10px] font-bold text-[#E11D48]/80">produk</span>
+              <span className="text-[10px] font-bold text-[#E11D48]/80 dark:text-rose-400/80">produk</span>
             </span>
           </div>
 
           {/* Card 3: Item Surplus (Plus) */}
-          <div className="bg-[#EEF2FF] border-2 border-slate-900 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-[9px] font-black uppercase text-[#4338CA] block mb-0.5">
+          <div className="bg-[#EEF2FF] dark:bg-indigo-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[9px] font-black uppercase text-[#4338CA] dark:text-indigo-300 block mb-0.5">
               Item Surplus (Plus)
             </span>
-            <span className="text-[#4338CA] font-mono font-black text-base sm:text-lg block">
+            <span className="text-[#4338CA] dark:text-indigo-300 font-mono font-black text-base sm:text-lg block">
               {totalSurplusItems}{" "}
-              <span className="text-[10px] font-bold text-[#4338CA]/80">produk</span>
+              <span className="text-[10px] font-bold text-[#4338CA]/80 dark:text-indigo-300/80">produk</span>
             </span>
           </div>
         </div>
@@ -398,7 +398,7 @@ export default function StockAuditPage() {
         {/* ========================================================================= */}
         {/* 4. INLINE FILTER BAR                                                      */}
         {/* ========================================================================= */}
-        <div className="p-2 mb-3 bg-white rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        <div className="p-2 mb-3 bg-white dark:bg-slate-900 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center gap-2 flex-wrap sm:flex-nowrap transition-colors">
           {/* Search Input Field */}
           <div className="relative flex-1 min-w-[180px]">
             <input
@@ -406,13 +406,13 @@ export default function StockAuditPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari SKU, Nama Produk, Auditor, atau Alasan..."
-              className="py-1 px-2.5 text-xs font-bold bg-slate-50 border-[1.5px] border-slate-900 rounded-lg focus:outline-none focus:bg-white flex-1 w-full shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+              className="py-1 px-2.5 text-xs font-bold bg-slate-50 dark:bg-slate-800 border-[1.5px] border-slate-900 dark:border-slate-100 rounded-lg text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 placeholder:text-slate-400 dark:placeholder:text-slate-500 flex-1 w-full shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-900 hover:text-slate-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-900 dark:text-slate-100 hover:text-slate-600 dark:hover:text-slate-400"
               >
                 ✕
               </button>
@@ -425,13 +425,13 @@ export default function StockAuditPage() {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="py-1 px-2.5 text-xs font-bold bg-white border-[1.5px] border-slate-900 rounded-lg focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+              className="py-1 px-2.5 text-xs font-bold bg-white dark:bg-slate-800 border-[1.5px] border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 rounded-lg focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
             />
             {selectedDate && (
               <button
                 type="button"
                 onClick={() => setSelectedDate("")}
-                className="text-xs font-black text-rose-600 hover:text-rose-800"
+                className="text-xs font-black text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300"
               >
                 Reset
               </button>
@@ -441,7 +441,7 @@ export default function StockAuditPage() {
             <button
               type="button"
               onClick={loadAuditHistory}
-              className="p-1.5 rounded-lg border-2 border-slate-900 bg-white hover:bg-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] text-slate-900 transition-all cursor-pointer flex items-center justify-center shrink-0"
+              className="p-1.5 rounded-lg border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] text-slate-900 dark:text-slate-100 transition-all cursor-pointer flex items-center justify-center shrink-0"
               title="Refresh Data"
             >
               <svg
@@ -464,29 +464,29 @@ export default function StockAuditPage() {
         {/* ========================================================================= */}
         {/* 5. TABLE DATA AUDIT STOK                                                  */}
         {/* ========================================================================= */}
-        <div className="bg-white border-2 border-slate-900 rounded-xl shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors">
           {isLoadingLogs ? (
-            <div className="p-8 text-center text-slate-700 space-y-2">
+            <div className="p-8 text-center text-slate-700 dark:text-slate-300 space-y-2">
               <div className="w-6 h-6 border-3 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto mb-1" />
               <p className="text-xs font-black">Memuat riwayat verifikasi stok...</p>
             </div>
           ) : logsError ? (
-            <div className="p-8 text-center text-rose-600 space-y-2">
+            <div className="p-8 text-center text-rose-600 dark:text-rose-400 space-y-2">
               <p className="text-xs font-black">{logsError}</p>
               <button
                 type="button"
                 onClick={loadAuditHistory}
-                className="px-3 py-1.5 bg-[#6366F1] text-white border-2 border-slate-900 rounded-lg text-xs font-black shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] hover:bg-[#4F46E5] cursor-pointer"
+                className="px-3 py-1.5 bg-[#6366F1] text-white border-2 border-slate-900 dark:border-slate-100 rounded-lg text-xs font-black shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] hover:bg-[#4F46E5] cursor-pointer"
               >
                 Coba Lagi
               </button>
             </div>
           ) : auditLogs.length === 0 ? (
-            <div className="p-8 text-center text-slate-900 space-y-1">
-              <p className="text-xs font-black text-slate-900">
+            <div className="p-8 text-center text-slate-900 dark:text-slate-100 space-y-1">
+              <p className="text-xs font-black text-slate-900 dark:text-slate-100">
                 Belum ada data verifikasi stok fisik.
               </p>
-              <p className="text-[11px] font-mono text-slate-500">
+              <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
                 Klik tombol &quot;Mulai Opname Stok&quot; untuk mengonfirmasi stok fisik aktual gudang.
               </p>
             </div>
@@ -494,7 +494,7 @@ export default function StockAuditPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 border-b-2 border-slate-900 text-slate-900 font-black text-[10px] uppercase tracking-wider">
+                  <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 font-black text-[10px] uppercase tracking-wider">
                     <th className="py-2 px-3">Waktu Audit</th>
                     <th className="py-2 px-3">Auditor</th>
                     <th className="py-2 px-3">Produk & SKU</th>
@@ -504,7 +504,7 @@ export default function StockAuditPage() {
                     <th className="py-2 px-3">Alasan & Catatan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 text-xs text-slate-900 font-bold">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs text-slate-900 dark:text-slate-100 font-bold">
                   {paginatedLogs.map((log) => {
                     const isMatch = log.difference === 0;
                     const isDeficit = log.difference < 0;
@@ -513,59 +513,59 @@ export default function StockAuditPage() {
                     return (
                       <tr
                         key={log.id}
-                        className="hover:bg-slate-50/80 transition-colors border-b border-slate-200"
+                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors border-b border-slate-200 dark:border-slate-800"
                       >
                         {/* Waktu Audit */}
-                        <td className="py-2 px-3 text-slate-700 font-mono text-[11px] whitespace-nowrap">
+                        <td className="py-2 px-3 text-slate-700 dark:text-slate-300 font-mono text-[11px] whitespace-nowrap">
                           {formatDate(log.createdAt)}
                         </td>
 
                         {/* Auditor Badge */}
                         <td className="py-2 px-3 whitespace-nowrap">
-                          <span className="bg-slate-100 text-slate-800 border border-slate-300 font-bold text-[10px] px-1.5 py-0.5 rounded">
+                          <span className="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 font-bold text-[10px] px-1.5 py-0.5 rounded">
                             {log.auditorName || "Staf Gudang"}
                           </span>
                         </td>
 
                         {/* Produk & SKU Tag */}
                         <td className="py-2 px-3">
-                          <div className="font-black text-slate-900 text-xs leading-tight">
+                          <div className="font-black text-slate-900 dark:text-slate-100 text-xs leading-tight">
                             {log.productName}
                           </div>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="font-mono text-[9px] font-bold text-slate-700 bg-slate-100 px-1 py-0.5 rounded border border-slate-300">
+                            <span className="font-mono text-[9px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700">
                               SKU: {log.sku}
                             </span>
                             {log.categoryName && (
-                              <span className="text-[9px] text-slate-500 font-semibold">• {log.categoryName}</span>
+                              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold">• {log.categoryName}</span>
                             )}
                           </div>
                         </td>
 
                         {/* Stok Sistem */}
-                        <td className="py-2 px-3 text-center font-mono font-bold text-slate-600 text-xs whitespace-nowrap">
+                        <td className="py-2 px-3 text-center font-mono font-bold text-slate-600 dark:text-slate-400 text-xs whitespace-nowrap">
                           {log.systemStock} Pcs
                         </td>
 
                         {/* Stok Fisik */}
-                        <td className="py-2 px-3 text-center font-mono font-black text-slate-900 text-xs whitespace-nowrap">
+                        <td className="py-2 px-3 text-center font-mono font-black text-slate-900 dark:text-slate-100 text-xs whitespace-nowrap">
                           {log.physicalStock} Pcs
                         </td>
 
                         {/* Selisih Variance Badges */}
                         <td className="py-2 px-3 text-center whitespace-nowrap">
                           {isMatch && (
-                            <span className="bg-[#D1FAE5] text-[#065F46] border-[1.5px] border-slate-900 font-mono font-black text-[9px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                            <span className="bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-black text-[9px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                               ✓ COCOK (0)
                             </span>
                           )}
                           {isDeficit && (
-                            <span className="bg-[#FFE4E6] text-[#E11D48] border-[1.5px] border-slate-900 font-mono font-black text-[9px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                            <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-black text-[9px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                               ⚠️ DEFISIT ({log.difference})
                             </span>
                           )}
                           {isSurplus && (
-                            <span className="bg-[#EEF2FF] text-[#4338CA] border-[1.5px] border-slate-900 font-mono font-black text-[9px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+                            <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-[1.5px] border-slate-900 dark:border-slate-100 font-mono font-black text-[9px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                               ℹ️ SURPLUS (+{log.difference})
                             </span>
                           )}
@@ -573,11 +573,11 @@ export default function StockAuditPage() {
 
                         {/* Alasan & Catatan */}
                         <td className="py-2 px-3">
-                          <div className="font-black text-slate-900 text-xs">
+                          <div className="font-black text-slate-900 dark:text-slate-100 text-xs">
                             {log.reason}
                           </div>
                           {log.notes && (
-                            <div className="text-[10px] italic font-medium text-slate-600 truncate max-w-xs">
+                            <div className="text-[10px] italic font-medium text-slate-600 dark:text-slate-400 truncate max-w-xs">
                               &quot;{log.notes}&quot;
                             </div>
                           )}
@@ -603,16 +603,16 @@ export default function StockAuditPage() {
       {/* 6. FORMULIR INPUT OPNAME (QUICK AUDIT MODAL)                              */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] transition-colors">
             
             {/* Modal Header */}
-            <div className="px-5 py-4 bg-slate-100 border-b-2 border-slate-900 flex items-center justify-between shrink-0">
+            <div className="px-5 py-4 bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between shrink-0 transition-colors">
               <div>
-                <h3 className="text-sm font-black text-slate-900">
+                <h3 className="text-sm font-black text-slate-900 dark:text-slate-50">
                   Formulir Audit Stok Fisik (Stock Opname)
                 </h3>
-                <p className="text-[11px] text-slate-600 font-bold mt-0.5">
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-bold mt-0.5">
                   Input kuantitas fisik aktual untuk memperbarui stok produk di database.
                 </p>
               </div>
@@ -620,7 +620,7 @@ export default function StockAuditPage() {
                 type="button"
                 onClick={handleCloseModal}
                 disabled={isSubmitting}
-                className="w-7 h-7 rounded-lg bg-white border-2 border-slate-900 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
                 title="Tutup Modal"
               >
                 ✕
@@ -630,15 +630,15 @@ export default function StockAuditPage() {
             {/* Modal Body Form */}
             <form onSubmit={handleSubmitAudit} className="p-5 overflow-y-auto space-y-4 flex-1">
               {submitError && (
-                <div className="p-3 bg-rose-100 border-2 border-slate-900 rounded-xl text-xs font-black text-rose-800 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
+                <div className="p-3 bg-rose-100 dark:bg-rose-950/60 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black text-rose-800 dark:text-rose-300 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
                   {submitError}
                 </div>
               )}
 
               {/* 1. Pemilihan Produk */}
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block">
-                  Pilih Produk Yang Di-audit <span className="text-rose-600">*</span>
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                  Pilih Produk Yang Di-audit <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
 
                 {/* Modal Search Input */}
@@ -647,7 +647,7 @@ export default function StockAuditPage() {
                   value={productSearchModal}
                   onChange={(e) => setProductSearchModal(e.target.value)}
                   placeholder="Ketik untuk filter nama produk / SKU..."
-                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none mb-1.5 w-full shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 mb-1.5 w-full shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]"
                 />
 
                 <select
@@ -661,7 +661,7 @@ export default function StockAuditPage() {
                     }
                   }}
                   required
-                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full cursor-pointer"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full cursor-pointer"
                 >
                   <option value="">-- Pilih Produk --</option>
                   {modalFilteredProducts.map((p) => {
@@ -677,7 +677,7 @@ export default function StockAuditPage() {
                         key={pId}
                         value={pId}
                         disabled={isAudited}
-                        className={isAudited ? "text-slate-400 bg-slate-100 font-normal" : "text-slate-900 font-bold"}
+                        className={isAudited ? "text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 font-normal" : "text-slate-900 dark:text-slate-100 font-bold bg-white dark:bg-slate-900"}
                       >
                         {p.name} (SKU: {p.sku} | Stok: {p.stock} {p.unit})
                         {isAudited ? " [✓ Sudah Diaudit Minggu Ini]" : ""}
@@ -689,35 +689,35 @@ export default function StockAuditPage() {
 
               {/* 2. Kartu Info Produk Terpilih & Status Audit Minggu Ini */}
               {selectedProduct && (
-                <div className="p-3.5 bg-slate-50 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] space-y-2">
+                <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] space-y-2 transition-colors">
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-black text-xs text-slate-900">
+                        <h4 className="font-black text-xs text-slate-900 dark:text-slate-100">
                           {selectedProduct.name}
                         </h4>
                         {isSelectedProductAuditedThisWeek && (
-                          <span className="px-2 py-0.5 rounded-md bg-[#D1FAE5] text-[#065F46] border border-slate-900 text-[10px] font-black">
+                          <span className="px-2 py-0.5 rounded-md bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border border-slate-900 dark:border-slate-100 text-[10px] font-black">
                             ✓ Sudah Diaudit
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-slate-600 font-mono font-bold mt-0.5">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 font-mono font-bold mt-0.5">
                         SKU: {selectedProduct.sku} • {selectedProduct.categoryName || "Umum"}
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 block">
+                      <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                         Stok Sistem
                       </span>
-                      <span className="text-sm font-black font-mono text-slate-900">
+                      <span className="text-sm font-black font-mono text-slate-900 dark:text-slate-100">
                         {selectedProduct.stock} {selectedProduct.unit}
                       </span>
                     </div>
                   </div>
 
                   {isSelectedProductAuditedThisWeek && (
-                    <div className="p-2.5 bg-amber-100 border border-slate-900 rounded-lg text-xs text-amber-900 font-bold flex items-center gap-2">
+                    <div className="p-2.5 bg-amber-100 dark:bg-amber-950/50 border border-slate-900 dark:border-slate-100 rounded-lg text-xs text-amber-900 dark:text-amber-200 font-bold flex items-center gap-2">
                       <span>⚠️</span>
                       <span>
                         Produk ini telah diverifikasi pada siklus minggu berjalan. Pemilihan produk ini dikunci untuk mencegah duplikasi opname.
@@ -729,8 +729,8 @@ export default function StockAuditPage() {
 
               {/* 3. Input Stok Fisik Aktual & Control Buttons */}
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block">
-                  Stok Fisik Aktual (Fisik Gudang) <span className="text-rose-600">*</span>
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                  Stok Fisik Aktual (Fisik Gudang) <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
 
                 <div className="flex items-center gap-2">
@@ -738,7 +738,7 @@ export default function StockAuditPage() {
                     type="button"
                     onClick={() => handleAdjustQuantity(-1)}
                     disabled={!selectedProduct || numericPhysicalStock <= 0 || isSelectedProductAuditedThisWeek}
-                    className="w-10 h-10 rounded-xl border-2 border-slate-900 bg-white hover:bg-slate-100 text-slate-900 font-black text-base flex items-center justify-center cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] active:translate-y-[1px] disabled:opacity-40"
+                    className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-base flex items-center justify-center cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] active:translate-y-[1px] disabled:opacity-40"
                   >
                     -
                   </button>
@@ -763,14 +763,14 @@ export default function StockAuditPage() {
                     }}
                     placeholder="Masukkan jumlah fisik..."
                     required
-                    className="flex-1 px-4 py-2 bg-slate-50 border-2 border-slate-900 rounded-xl text-base font-black font-mono text-center text-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] disabled:opacity-60"
+                    className="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-base font-black font-mono text-center text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] disabled:opacity-60"
                   />
 
                   <button
                     type="button"
                     onClick={() => handleAdjustQuantity(1)}
                     disabled={!selectedProduct || isSelectedProductAuditedThisWeek}
-                    className="w-10 h-10 rounded-xl border-2 border-slate-900 bg-white hover:bg-slate-100 text-slate-900 font-black text-base flex items-center justify-center cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] active:translate-y-[1px] disabled:opacity-40"
+                    className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-base flex items-center justify-center cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] active:translate-y-[1px] disabled:opacity-40"
                   >
                     +
                   </button>
@@ -780,12 +780,12 @@ export default function StockAuditPage() {
               {/* 4. Live Calculation Difference Alert Box */}
               {selectedProduct && (
                 <div
-                  className={`p-3 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between ${
+                  className={`p-3 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between ${
                     difference === 0
-                      ? "bg-[#D1FAE5] text-[#065F46]"
+                      ? "bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300"
                       : difference < 0
-                      ? "bg-[#FFE4E6] text-[#E11D48]"
-                      : "bg-[#EEF2FF] text-[#4338CA]"
+                      ? "bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-300"
+                      : "bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300"
                   }`}
                 >
                   <div>
@@ -807,14 +807,14 @@ export default function StockAuditPage() {
 
               {/* 5. Alasan Penyesuaian */}
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block">
-                  Alasan Penyesuaian Stok <span className="text-rose-600">*</span>
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                  Alasan Penyesuaian Stok <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
                 <select
                   value={reasonInput}
                   disabled={isSelectedProductAuditedThisWeek}
                   onChange={(e) => setReasonInput(e.target.value)}
-                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full cursor-pointer disabled:opacity-60"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full cursor-pointer disabled:opacity-60"
                 >
                   {AUDIT_REASONS.map((r) => (
                     <option key={r} value={r}>
@@ -826,7 +826,7 @@ export default function StockAuditPage() {
 
               {/* 6. Catatan Tambahan */}
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
                   Catatan Tambahan (Opsional)
                 </label>
                 <textarea
@@ -835,17 +835,17 @@ export default function StockAuditPage() {
                   disabled={isSelectedProductAuditedThisWeek}
                   onChange={(e) => setNotesInput(e.target.value)}
                   placeholder="Keterangan kondisi fisik barang, lokasi rak, dll..."
-                  className="bg-slate-50 border-2 border-slate-900 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full disabled:opacity-60"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full disabled:opacity-60 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Modal Actions */}
-              <div className="pt-3 border-t-2 border-slate-900 flex items-center justify-end gap-2.5 shrink-0">
+              <div className="pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end gap-2.5 shrink-0 transition-colors">
                 <button
                   type="button"
                   onClick={handleCloseModal}
                   disabled={isSubmitting}
-                  className="bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs px-3.5 py-2 rounded-xl border-2 border-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-colors cursor-pointer"
+                  className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs px-3.5 py-2 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
@@ -853,7 +853,7 @@ export default function StockAuditPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting || !selectedProduct || isSelectedProductAuditedThisWeek}
-                  className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs px-5 py-2.5 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs px-5 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSubmitting && (
                     <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />

@@ -204,46 +204,38 @@ export default function RestockRequestsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] p-4 sm:p-6 lg:p-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-200">
+      <div className="max-w-7xl mx-auto">
         {/* ========================================================================= */}
-        {/* 1. PAGE HEADER                                                            */}
+        {/* 1. PAGE HEADER COMPACT & CLEAN (HAPUS BADGE)                             */}
         {/* ========================================================================= */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-800 font-extrabold text-[11px] uppercase tracking-wider">
-                Gudang & Logistik
-              </span>
-              <span className="text-xs text-slate-400">• Pengadaan Barang</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
+            <h1 className="text-lg font-black text-slate-900 dark:text-slate-50 tracking-tight">
               Restock Request List
             </h1>
-
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mt-0.5">
               Kelola dan pantau tiket pengajuan pengadaan stok barang dari tim gudang ke purchasing/admin.
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
             <button
               type="button"
               onClick={handleOpenModal}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+              className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:hover:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
               </svg>
-              <span>+ Buat Pengajuan Baru</span>
+              <span>Buat Pengajuan Baru</span>
             </button>
 
             <button
               type="button"
               onClick={loadRestockRequests}
               title="Refresh Data"
-              className="p-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer"
+              className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-slate-900 dark:border-slate-100 p-2 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] text-slate-900 dark:text-slate-100 transition-all cursor-pointer flex items-center justify-center"
             >
               <svg
                 className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
@@ -254,7 +246,7 @@ export default function RestockRequestsPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
@@ -263,128 +255,87 @@ export default function RestockRequestsPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 2. KPI SUMMARY HEADER CARDS                                               */}
+        {/* 2. KPI SUMMARY HEADER CARDS (4 GRID METRICS - COMPACT)                    */}
         {/* ========================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           {/* Card 1: Total Pengajuan */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Total Pengajuan
-              </span>
-              <span className="text-2xl font-black text-slate-900 mt-1 block font-mono">
-                {summary.total}{" "}
-                <span className="text-xs font-normal text-slate-400">tiket</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-center min-h-[72px] transition-all">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
+              Total Pengajuan
+            </span>
+            <span className="text-lg font-black font-mono text-slate-900 dark:text-slate-50 block">
+              {summary.total}{" "}
+              <span className="text-xs font-bold text-slate-400 dark:text-slate-500">tiket</span>
+            </span>
           </div>
 
           {/* Card 2: Menunggu Persetujuan (Pending) */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Menunggu Persetujuan
-              </span>
-              <span className="text-2xl font-black text-amber-600 mt-1 block font-mono">
-                {summary.pending}{" "}
-                <span className="text-xs font-normal text-slate-400">pending</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+          <div className="bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-center min-h-[72px] transition-all">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#B45309] dark:text-amber-300 block mb-1">
+              Menunggu Persetujuan
+            </span>
+            <span className="text-[#B45309] dark:text-amber-300 font-mono font-black text-lg block">
+              {summary.pending}{" "}
+              <span className="text-xs font-bold text-[#B45309]/80 dark:text-amber-300/80">pending</span>
+            </span>
           </div>
 
           {/* Card 3: Disetujui Admin (Approved) */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Disetujui (Procurement)
-              </span>
-              <span className="text-2xl font-black text-blue-600 mt-1 block font-mono">
-                {summary.approved}{" "}
-                <span className="text-xs font-normal text-slate-400">tiket</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+          <div className="bg-[#EEF2FF] dark:bg-indigo-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-center min-h-[72px] transition-all">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#4338CA] dark:text-indigo-300 block mb-1">
+              Disetujui (Procurement)
+            </span>
+            <span className="text-[#4338CA] dark:text-indigo-300 font-mono font-black text-lg block">
+              {summary.approved}{" "}
+              <span className="text-xs font-bold text-[#4338CA]/80 dark:text-indigo-300/80">tiket</span>
+            </span>
           </div>
 
           {/* Card 4: Selesai Diterima (Completed) */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Selesai Diterima
-              </span>
-              <span className="text-2xl font-black text-emerald-600 mt-1 block font-mono">
-                {summary.completed}{" "}
-                <span className="text-xs font-normal text-slate-400">tiket</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
+          <div className="bg-[#E8F5E9] dark:bg-emerald-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-center min-h-[72px] transition-all">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#065F46] dark:text-emerald-300 block mb-1">
+              Selesai Diterima
+            </span>
+            <span className="text-[#065F46] dark:text-emerald-300 font-mono font-black text-lg block">
+              {summary.completed}{" "}
+              <span className="text-xs font-bold text-[#065F46]/80 dark:text-emerald-300/80">tiket</span>
+            </span>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. TOOLBAR SEARCH & FILTERS                                               */}
+        {/* 3. TOOLBAR SEARCH & FILTERS DENGAN OVAL/PILL INPUTS                       */}
         {/* ========================================================================= */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
-          {/* Search Input Bar */}
-          <div className="relative flex-1">
-            <svg
-              className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex flex-wrap items-center gap-2 mb-4 transition-colors">
+          {/* Search Input Bar (Oval/Pill) */}
+          <div className="relative flex-1 min-w-[200px]">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari Kode Tiket (REQ-...), Produk, SKU, atau Pemohon..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none transition-all"
+              className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-4 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex-1 w-full placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-900 dark:text-slate-100 hover:text-slate-600 dark:hover:text-slate-400"
               >
                 ✕
               </button>
             )}
           </div>
 
-          {/* Filter Options */}
-          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+          {/* Filter Options (Oval/Pill) */}
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
             {/* Status Filter */}
-            <div className="flex items-center gap-1.5 min-w-[150px]">
-              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Status:</label>
+            <div className="flex items-center gap-1.5">
+              <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 whitespace-nowrap">Status:</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none"
+                className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-4 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
               >
                 <option value="ALL">Semua Status</option>
                 <option value="PENDING">Menunggu (Pending)</option>
@@ -395,12 +346,12 @@ export default function RestockRequestsPage() {
             </div>
 
             {/* Urgency Filter */}
-            <div className="flex items-center gap-1.5 min-w-[140px]">
-              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Urgensi:</label>
+            <div className="flex items-center gap-1.5">
+              <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 whitespace-nowrap">Urgensi:</label>
               <select
                 value={urgencyFilter}
                 onChange={(e) => setUrgencyFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none"
+                className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-4 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
               >
                 <option value="ALL">Semua Urgensi</option>
                 <option value="URGENT">Sangat Mendesak</option>
@@ -414,160 +365,150 @@ export default function RestockRequestsPage() {
         {/* ========================================================================= */}
         {/* 4. TABEL RESTOCK REQUEST LIST                                             */}
         {/* ========================================================================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[3.5px_3.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3.5px_3.5px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors">
           {isLoading ? (
-            <div className="p-12 text-center text-slate-500 space-y-3">
-              <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-medium">Memuat data tiket pengajuan restok...</p>
+            <div className="p-12 text-center text-slate-700 dark:text-slate-300 space-y-2">
+              <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs font-black">Memuat data tiket pengajuan restok...</p>
             </div>
           ) : error ? (
-            <div className="p-12 text-center text-red-600 space-y-3">
-              <p className="text-sm font-bold">{error}</p>
+            <div className="p-12 text-center text-rose-600 dark:text-rose-400 space-y-2">
+              <p className="text-sm font-black">{error}</p>
               <button
                 type="button"
                 onClick={loadRestockRequests}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
+                className="px-4 py-2 bg-[#6366F1] text-white border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:bg-[#4F46E5] cursor-pointer"
               >
                 Coba Lagi
               </button>
             </div>
           ) : records.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 space-y-3">
-              <p className="text-sm font-bold text-slate-800">
+            <div className="p-12 text-center text-slate-900 dark:text-slate-100 space-y-2">
+              <p className="text-sm font-black text-slate-900 dark:text-slate-100">
                 Belum ada data tiket pengajuan restok barang.
               </p>
-              <p className="text-xs text-slate-400">
-                Klik tombol &quot;+ Buat Pengajuan Baru&quot; atau tambahkan sampel data awal.
+              <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
+                Klik tombol &quot;Buat Pengajuan Baru&quot; atau tambahkan sampel data awal.
               </p>
               <button
                 type="button"
                 onClick={handleTriggerSeeder}
                 disabled={seedingLoading}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-950 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
               >
                 {seedingLoading && (
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3.5 h-3.5 border-2 border-white dark:border-slate-950 border-t-transparent rounded-full animate-spin" />
                 )}
                 <span>Generate Data Dummy (Seeder)</span>
               </button>
             </div>
           ) : (
-            <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
-              <table className="w-full table-fixed text-left border-collapse text-xs text-slate-600">
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs text-slate-900 dark:text-slate-100 font-bold">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                    <th className="w-[16%] px-3 py-3">Waktu & Kode Tiket</th>
-                    <th className="w-[24%] px-3 py-3">Produk & SKU</th>
-                    <th className="w-[9%] px-2 py-3 text-center">
-                      <div className="leading-tight">
-                        <span>STOK</span>
-                        <br />
-                        <span className="text-[10px] text-slate-400 font-medium">SAAT INI</span>
-                      </div>
-                    </th>
-                    <th className="w-[9%] px-2 py-3 text-center">Qty Minta</th>
-                    <th className="w-[12%] px-2 py-3 text-center">Urgensi</th>
-                    <th className="w-[13%] px-2 py-3 text-center">Status Tiket</th>
-                    <th className="w-[17%] px-3 py-3">Pemohon & Catatan</th>
+                  <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 font-black text-[10px] uppercase tracking-wider">
+                    <th className="px-3 py-3">Waktu & Kode Tiket</th>
+                    <th className="px-3 py-3">Produk & SKU</th>
+                    <th className="px-2 py-3 text-center">Stok Saat Ini</th>
+                    <th className="px-2 py-3 text-center">Qty Minta</th>
+                    <th className="px-2 py-3 text-center">Urgensi</th>
+                    <th className="px-2 py-3 text-center">Status Tiket</th>
+                    <th className="px-3 py-3">Pemohon & Catatan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
                   {paginatedRecords.map((item) => {
                     return (
                       <tr
                         key={item.id || item.requestCode}
                         onClick={() => setSelectedDetailRequest(item)}
                         title="Klik untuk melihat detail lengkap tiket"
-                        className="hover:bg-slate-50/90 transition-colors cursor-pointer"
+                        className="hover:bg-slate-50/90 dark:hover:bg-slate-800/90 transition-colors cursor-pointer border-b border-slate-200 dark:border-slate-800"
                       >
                         {/* 1. Waktu & Kode Tiket */}
-                        <td className="px-3 py-3 align-top">
-                          <div className="font-mono font-bold text-slate-900 text-xs">
+                        <td className="px-3 py-3 align-top whitespace-nowrap">
+                          <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs">
                             {item.requestCode}
                           </div>
-                          <div className="text-[11px] text-slate-400 mt-0.5 whitespace-nowrap">
+                          <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
                             {formatDate(item.createdAt)}
                           </div>
                         </td>
 
                         {/* 2. Produk & SKU */}
                         <td className="px-3 py-3 align-top">
-                          <div className="font-semibold text-slate-900 leading-snug truncate" title={item.productName}>
+                          <div className="font-black text-slate-900 dark:text-slate-100 leading-snug" title={item.productName}>
                             {item.productName}
                           </div>
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                            <span className="font-mono font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
-                              {item.sku}
+                          <div className="flex items-center gap-1.5 text-[10px] mt-0.5">
+                            <span className="font-mono font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 shrink-0">
+                              SKU: {item.sku}
                             </span>
                             {item.categoryName && (
-                              <>
-                                <span>•</span>
-                                <span className="truncate">{item.categoryName}</span>
-                              </>
+                              <span className="text-slate-500 dark:text-slate-400 font-medium">• {item.categoryName}</span>
                             )}
                           </div>
                         </td>
 
                         {/* 3. Stok Fisik Saat Ini */}
-                        <td className="px-2 py-3 align-top text-center">
-                          <span className={`font-mono font-bold ${item.currentStock === 0 ? 'text-rose-600' : 'text-slate-700'}`}>
+                        <td className="px-2 py-3 align-top text-center whitespace-nowrap font-mono">
+                          <span className={`font-black text-xs ${item.currentStock === 0 ? 'text-red-700 dark:text-red-400' : 'text-[#B45309] dark:text-amber-400'}`}>
                             {item.currentStock} {item.unit || "Pcs"}
                           </span>
                         </td>
 
-                        {/* 4. Qty Diminta */}
-                        <td className="px-2 py-3 align-top text-center">
-                          <span className="inline-block font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200 text-[11px]">
+                        {/* 4. Qty Diminta Badge */}
+                        <td className="px-2 py-3 align-top text-center whitespace-nowrap">
+                          <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-black text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                             +{item.requestedQty} {item.unit || "Pcs"}
                           </span>
                         </td>
 
-                        {/* 5. Urgensi */}
-                        <td className="px-2 py-3 align-top text-center">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                            item.urgency === 'URGENT'
-                              ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                              : item.urgency === 'NORMAL'
-                              ? 'bg-slate-100 text-slate-700 border border-slate-200'
-                              : 'bg-blue-50 text-blue-700 border border-blue-200'
-                          }`}>
-                            {item.urgency === 'URGENT' ? 'Mendesak' : item.urgency === 'NORMAL' ? 'Normal' : 'Rendah'}
-                          </span>
+                        {/* 5. Urgensi Badges */}
+                        <td className="px-2 py-3 align-top text-center whitespace-nowrap">
+                          {item.urgency === 'URGENT' ? (
+                            <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-black text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                              MENDESAK
+                            </span>
+                          ) : (
+                            <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-400 dark:border-slate-600 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
+                              {item.urgency === 'NORMAL' ? 'NORMAL' : 'RENDAH'}
+                            </span>
+                          )}
                         </td>
 
-                        {/* 6. Status Tiket */}
-                        <td className="px-2 py-3 align-top text-center">
+                        {/* 6. Status Tiket Badges */}
+                        <td className="px-2 py-3 align-top text-center whitespace-nowrap">
                           {item.status === 'PENDING' && (
-                            <span className="inline-flex flex-col items-center justify-center px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 leading-tight">
-                              <span>MENUNGGU</span>
-                              <span>PERSETUJUAN</span>
+                            <span className="bg-[#FEF3C7] dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                              MENUNGGU PERSETUJUAN
                             </span>
                           )}
                           {item.status === 'APPROVED' && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                               DISETUJUI
                             </span>
                           )}
                           {item.status === 'REJECTED' && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
+                            <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                               DITOLAK
                             </span>
                           )}
                           {item.status === 'COMPLETED' && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                               SELESAI
                             </span>
                           )}
                         </td>
 
-                        {/* 7. Pemohon & Catatan (Dengan Tooltip) */}
+                        {/* 7. Pemohon & Catatan */}
                         <td className="px-3 py-3 align-top">
-                          <div className="font-semibold text-slate-800 text-[11px] truncate" title={item.requestedBy}>
+                          <div className="font-bold text-slate-900 dark:text-slate-100 text-xs" title={item.requestedBy}>
                             {item.requestedBy}
                           </div>
                           {item.reasonNotes && (
                             <p 
-                              className="text-[11px] text-slate-500 italic truncate mt-0.5 cursor-pointer hover:text-slate-800"
+                              className="text-[11px] text-slate-600 dark:text-slate-400 italic truncate mt-0.5 font-normal"
                               title={item.reasonNotes}
                             >
                               &quot;{item.reasonNotes}&quot;
@@ -575,7 +516,7 @@ export default function RestockRequestsPage() {
                           )}
                           {item.status === 'REJECTED' && item.rejectionReason && (
                             <p 
-                              className="text-[10px] text-rose-600 italic truncate mt-0.5 font-medium"
+                              className="text-[10px] text-rose-600 dark:text-rose-400 italic truncate mt-0.5 font-bold"
                               title={`Alasan Ditolak: ${item.rejectionReason}`}
                             >
                               Alasan: {item.rejectionReason}
@@ -604,16 +545,16 @@ export default function RestockRequestsPage() {
       {/* 5. MODAL FORMULIR PENGAJUAN RESTOK BARU                                   */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] transition-colors">
 
             {/* Modal Header */}
-            <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
+            <div className="px-5 py-4 bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between shrink-0 transition-colors">
               <div>
-                <h3 className="text-base font-extrabold text-slate-900">
+                <h3 className="text-base font-black text-slate-900 dark:text-slate-50">
                   Formulir Pengajuan Restok Barang Baru
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
                   Buat tiket permintaan pengadaan stok ke tim Purchasing/Admin.
                 </p>
               </div>
@@ -621,7 +562,7 @@ export default function RestockRequestsPage() {
                 type="button"
                 onClick={handleCloseModal}
                 disabled={isSubmitting}
-                className="text-slate-400 hover:text-slate-600 text-base font-bold p-1 cursor-pointer"
+                className="text-slate-900 dark:text-slate-100 hover:text-slate-600 dark:hover:text-slate-400 text-base font-black p-1 cursor-pointer"
               >
                 ✕
               </button>
@@ -630,15 +571,15 @@ export default function RestockRequestsPage() {
             {/* Modal Body Form */}
             <form onSubmit={handleSubmitRequest} className="p-5 overflow-y-auto space-y-4 flex-1">
               {submitError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-600">
+                <div className="p-3 bg-[#FFE4E6] dark:bg-rose-950/60 border-1.5 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black text-[#E11D48] dark:text-rose-300">
                   {submitError}
                 </div>
               )}
 
               {/* 1. Pilih Produk */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Pilih Produk Yang Membutuhkan Restok <span className="text-red-500">*</span>
+                <label className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider block">
+                  Pilih Produk Yang Membutuhkan Restok <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
 
                 <SearchableSelect
@@ -655,20 +596,20 @@ export default function RestockRequestsPage() {
 
               {/* Preview Produk Terpilih */}
               {selectedProduct && (
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-xl border-1.5 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between transition-colors">
                   <div>
-                    <h4 className="font-extrabold text-xs text-slate-900">
+                    <h4 className="font-black text-xs text-slate-900 dark:text-slate-100">
                       {selectedProduct.name}
                     </h4>
-                    <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 font-mono font-bold mt-0.5">
                       SKU: {selectedProduct.sku} • {selectedProduct.categoryName || "Umum"}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                    <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block">
                       Stok Fisik Saat Ini
                     </span>
-                    <span className="text-sm font-black font-mono text-slate-800">
+                    <span className="text-sm font-black font-mono text-[#B45309] dark:text-amber-400">
                       {selectedProduct.stock} {selectedProduct.unit}
                     </span>
                   </div>
@@ -677,8 +618,8 @@ export default function RestockRequestsPage() {
 
               {/* 2. Jumlah Qty Diminta */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Jumlah Barang Yang Diminta (Qty) <span className="text-red-500">*</span>
+                <label className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider block">
+                  Jumlah Barang Yang Diminta (Qty) <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
 
                 <input
@@ -688,58 +629,58 @@ export default function RestockRequestsPage() {
                   onChange={(e) => setRequestedQtyInput(e.target.value)}
                   placeholder="Masukkan jumlah unit..."
                   required
-                  className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-base font-black font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-base font-black font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                 />
               </div>
 
               {/* 3. Tingkat Urgensi (Pill Selectors) */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Tingkat Urgensi Restok <span className="text-red-500">*</span>
+                <label className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider block">
+                  Tingkat Urgensi Restok <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
 
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setUrgencyInput("LOW")}
-                    className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-0.5 ${urgencyInput === "LOW"
-                        ? "bg-sky-50 border-sky-500 text-sky-950 shadow-xs"
-                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                    className={`px-3 py-2.5 rounded-xl border-1.5 border-slate-900 dark:border-slate-100 text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-0.5 ${urgencyInput === "LOW"
+                        ? "bg-[#E0F2FE] dark:bg-sky-950/60 text-[#0369A1] dark:text-sky-300 font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
+                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                       }`}
                   >
                     <span>Rendah</span>
-                    <span className="text-[10px] font-normal text-slate-400">Pengadaan rutin</span>
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Pengadaan rutin</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setUrgencyInput("NORMAL")}
-                    className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-0.5 ${urgencyInput === "NORMAL"
-                        ? "bg-slate-900 border-slate-900 text-white shadow-xs"
-                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                    className={`px-3 py-2.5 rounded-xl border-1.5 border-slate-900 dark:border-slate-100 text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-0.5 ${urgencyInput === "NORMAL"
+                        ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950 font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
+                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                       }`}
                   >
                     <span>Normal</span>
-                    <span className="text-[10px] font-normal text-slate-400">Persediaan standar</span>
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Persediaan standar</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setUrgencyInput("URGENT")}
-                    className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-0.5 ${urgencyInput === "URGENT"
-                        ? "bg-rose-50 border-rose-500 text-rose-950 shadow-xs"
-                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                    className={`px-3 py-2.5 rounded-xl border-1.5 border-slate-900 dark:border-slate-100 text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-0.5 ${urgencyInput === "URGENT"
+                        ? "bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
+                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
                       }`}
                   >
-                    <span>Sangat Mendesak</span>
-                    <span className="text-[10px] font-normal text-slate-400">Stok habis/kritis</span>
+                    <span>Mendesak</span>
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Stok habis/kritis</span>
                   </button>
                 </div>
               </div>
 
               {/* 4. Catatan / Alasan Restok */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                <label className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider block">
                   Catatan / Alasan Pengajuan Restok
                 </label>
                 <textarea
@@ -747,17 +688,17 @@ export default function RestockRequestsPage() {
                   value={reasonNotesInput}
                   onChange={(e) => setReasonNotesInput(e.target.value)}
                   placeholder="Contoh: Stok toko tinggal sedikit menjelang promo akhir pekan..."
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-slate-50 dark:focus:bg-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Modal Actions */}
-              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
+              <div className="pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end gap-2 shrink-0 transition-colors">
                 <button
                   type="button"
                   onClick={handleCloseModal}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer disabled:opacity-50 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                 >
                   Batal
                 </button>
@@ -765,10 +706,10 @@ export default function RestockRequestsPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting || !selectedProductId}
-                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="px-4 py-2 rounded-xl bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs border-2 border-slate-900 dark:border-slate-100 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSubmitting && (
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
                   )}
                   <span>{isSubmitting ? "Kirim Pengajuan..." : "Kirim Tiket Pengajuan"}</span>
                 </button>
@@ -783,38 +724,37 @@ export default function RestockRequestsPage() {
       {/* 6. MODAL QUICK VIEW DETAIL PENGAJUAN (RestockDetailModal)                 */}
       {/* ========================================================================= */}
       {selectedDetailRequest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-slate-900 p-6 border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] flex flex-col max-h-[90vh] overflow-hidden transition-colors">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4 shrink-0">
+            <div className="flex items-center justify-between border-b-2 border-slate-900 dark:border-slate-100 pb-4 shrink-0 transition-colors">
               <div>
-                <span className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                <span className="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                   DETAIL PENGAJUAN RESTOK
                 </span>
-                <h3 className="text-lg font-bold font-mono text-slate-900 mt-0.5">
+                <h3 className="text-lg font-black font-mono text-slate-900 dark:text-slate-50 mt-0.5">
                   {selectedDetailRequest.requestCode}
                 </h3>
               </div>
 
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 {selectedDetailRequest.status === 'PENDING' && (
-                  <span className="inline-flex flex-col items-center justify-center px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 leading-tight">
-                    <span>MENUNGGU</span>
-                    <span>PERSETUJUAN</span>
+                  <span className="bg-[#FEF3C7] dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2.5 py-1 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
+                    MENUNGGU PERSETUJUAN
                   </span>
                 )}
                 {selectedDetailRequest.status === 'APPROVED' && (
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2.5 py-1 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                     DISETUJUI
                   </span>
                 )}
                 {selectedDetailRequest.status === 'REJECTED' && (
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">
+                  <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2.5 py-1 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                     DITOLAK
                   </span>
                 )}
                 {selectedDetailRequest.status === 'COMPLETED' && (
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2.5 py-1 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                     SELESAI
                   </span>
                 )}
@@ -822,7 +762,7 @@ export default function RestockRequestsPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedDetailRequest(null)}
-                  className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer text-base font-bold"
+                  className="rounded-xl p-1.5 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer text-base font-black"
                 >
                   ✕
                 </button>
@@ -830,39 +770,39 @@ export default function RestockRequestsPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="mt-4 space-y-4 text-xs text-slate-600 overflow-y-auto flex-1 pr-1">
+            <div className="mt-4 space-y-4 text-xs text-slate-900 dark:text-slate-100 font-bold overflow-y-auto flex-1 pr-1">
               {/* Info Produk */}
-              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-xl border-1.5 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] space-y-2 transition-colors">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Produk Yang Diajukan</p>
-                    <p className="text-sm font-bold text-slate-900 mt-0.5">{selectedDetailRequest.productName}</p>
+                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider">Produk Yang Diajukan</p>
+                    <p className="text-sm font-black text-slate-900 dark:text-slate-100 mt-0.5">{selectedDetailRequest.productName}</p>
                   </div>
                   {selectedDetailRequest.categoryName && (
-                    <span className="px-2 py-0.5 rounded bg-slate-200/60 text-slate-700 font-semibold text-[11px]">
+                    <span className="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-[10px] border border-slate-300 dark:border-slate-600">
                       {selectedDetailRequest.categoryName}
                     </span>
                   )}
                 </div>
 
-                <div className="mt-2 flex items-center justify-between text-slate-700 pt-2 border-t border-slate-200/80 font-mono text-xs">
-                  <span>SKU: <strong className="text-slate-900">{selectedDetailRequest.sku}</strong></span>
+                <div className="mt-2 flex items-center justify-between text-slate-800 dark:text-slate-200 pt-2 border-t border-slate-300 dark:border-slate-700 font-mono text-xs">
+                  <span>SKU: <strong className="text-slate-900 dark:text-slate-100">{selectedDetailRequest.sku}</strong></span>
                   <span>Stok Saat Minta: <strong>{selectedDetailRequest.currentStock} {selectedDetailRequest.unit || "Pcs"}</strong></span>
-                  <span>Qty Diminta: <strong className="text-blue-600 font-black">+{selectedDetailRequest.requestedQty} {selectedDetailRequest.unit || "Pcs"}</strong></span>
+                  <span>Qty Diminta: <strong className="text-[#4338CA] dark:text-indigo-400 font-black">+{selectedDetailRequest.requestedQty} {selectedDetailRequest.unit || "Pcs"}</strong></span>
                 </div>
               </div>
 
               {/* Pemohon & Urgensi */}
               <div className="flex justify-between items-center px-1">
                 <div>
-                  <span className="text-slate-400">Diajukan oleh:</span>
-                  <p className="font-semibold text-slate-800 text-xs mt-0.5">{selectedDetailRequest.requestedBy}</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">{formatDate(selectedDetailRequest.createdAt)}</p>
+                  <span className="text-slate-500 dark:text-slate-400 font-bold text-[11px]">Diajukan oleh:</span>
+                  <p className="font-black text-slate-900 dark:text-slate-100 text-xs mt-0.5">{selectedDetailRequest.requestedBy}</p>
+                  <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">{formatDate(selectedDetailRequest.createdAt)}</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-slate-400">Tingkat Urgensi:</span>
-                  <p className={`font-bold text-xs uppercase mt-0.5 ${
-                    selectedDetailRequest.urgency === 'URGENT' ? 'text-rose-600' : selectedDetailRequest.urgency === 'LOW' ? 'text-sky-600' : 'text-slate-800'
+                  <span className="text-slate-500 dark:text-slate-400 font-bold text-[11px]">Tingkat Urgensi:</span>
+                  <p className={`font-black text-xs uppercase mt-0.5 ${
+                    selectedDetailRequest.urgency === 'URGENT' ? 'text-[#E11D48] dark:text-rose-400' : selectedDetailRequest.urgency === 'LOW' ? 'text-sky-700 dark:text-sky-400' : 'text-slate-900 dark:text-slate-100'
                   }`}>
                     {selectedDetailRequest.urgency === 'URGENT' ? 'Sangat Mendesak' : selectedDetailRequest.urgency === 'LOW' ? 'Rendah' : 'Normal'}
                   </p>
@@ -871,10 +811,10 @@ export default function RestockRequestsPage() {
 
               {/* Catatan Lengkap Pemohon */}
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
                   Catatan / Alasan Pemohon:
                 </label>
-                <div className="rounded-xl border border-slate-200 bg-slate-50/75 p-3.5 text-slate-800 leading-relaxed italic text-xs">
+                <div className="rounded-xl border-1.5 border-slate-900 dark:border-slate-100 bg-slate-50 dark:bg-slate-800 p-3.5 text-slate-900 dark:text-slate-100 font-medium italic text-xs shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]">
                   &quot;{selectedDetailRequest.reasonNotes || 'Tidak ada catatan tambahan.'}&quot;
                 </div>
               </div>
@@ -882,10 +822,10 @@ export default function RestockRequestsPage() {
               {/* Alasan Ditolak (Jika Ada) */}
               {selectedDetailRequest.status === 'REJECTED' && selectedDetailRequest.rejectionReason && (
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-rose-600 mb-1">
+                  <label className="block text-[10px] font-black uppercase tracking-wider text-[#E11D48] dark:text-rose-400 mb-1">
                     Alasan Penolakan dari Admin:
                   </label>
-                  <div className="rounded-xl border border-rose-200 bg-rose-50/75 p-3.5 text-rose-800 leading-relaxed font-medium text-xs">
+                  <div className="rounded-xl border-1.5 border-slate-900 dark:border-slate-100 bg-[#FFE4E6] dark:bg-rose-950/60 p-3.5 text-[#E11D48] dark:text-rose-300 font-bold text-xs shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]">
                     {selectedDetailRequest.rejectionReason}
                   </div>
                 </div>
@@ -893,11 +833,11 @@ export default function RestockRequestsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="mt-6 pt-3 border-t border-slate-100 flex justify-end shrink-0">
+            <div className="mt-6 pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex justify-end shrink-0 transition-colors">
               <button
                 type="button"
                 onClick={() => setSelectedDetailRequest(null)}
-                className="rounded-xl bg-slate-900 hover:bg-slate-800 px-5 py-2.5 text-xs font-bold text-white transition-colors cursor-pointer shadow-xs"
+                className="rounded-xl bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 border-2 border-slate-900 dark:border-slate-100 px-5 py-2 text-xs font-black text-white dark:text-slate-950 transition-all cursor-pointer shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
               >
                 Tutup
               </button>

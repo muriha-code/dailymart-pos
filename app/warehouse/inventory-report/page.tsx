@@ -208,74 +208,184 @@ export default function InventoryReportPage() {
           ? "Bulan Ini"
           : "Semua Waktu";
 
+  const periodDateRangeText = useMemo(() => {
+    const now = new Date();
+    const formatDate = (d: Date) =>
+      d.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+
+    if (periodFilter === "today") {
+      return `${formatDate(now)} - ${formatDate(now)}`;
+    } else if (periodFilter === "7days") {
+      const start = new Date();
+      start.setDate(now.getDate() - 7);
+      return `${formatDate(start)} - ${formatDate(now)}`;
+    } else if (periodFilter === "thisMonth") {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      return `${formatDate(start)} - ${formatDate(end)}`;
+    } else {
+      const start = new Date(now.getFullYear(), 0, 1);
+      return `${formatDate(start)} - ${formatDate(now)}`;
+    }
+  }, [periodFilter]);
+
+  const printedDateTimeText = useMemo(() => {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const timeStr = now.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).replace(".", ":");
+    return `${dateStr}, ${timeStr}`;
+  }, []);
+
+  const formattedTodayDate = useMemo(() => {
+    return new Date().toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  }, []);
+
+  const totalFinalStock = useMemo(() => {
+    return records.reduce((acc, item) => acc + (Number(item.finalStock) || 0), 0);
+  }, [records]);
+
   return (
-    <div className="w-full min-h-screen bg-slate-50 p-4 lg:p-6 print:p-0 print:bg-white print:m-0 font-sans">
+    <div className="w-full min-h-screen bg-slate-100 dark:bg-[#0F172A] p-4 lg:p-6 print:p-0 print:bg-white print:m-0 font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <div className="max-w-7xl mx-auto space-y-6 print:max-w-none print:w-full print:m-0 print:space-y-4">
         {/* ========================================================================= */}
-        {/* 1. KOP SURAT FORMAL & RINGKASAN TEKS (HANYA MUNCUL SAAT CETAK)             */}
+        {/* PRINT ONLY: TEMPLATE CETAK PDF RESMI INVENTARIS GUDANG                    */}
         {/* ========================================================================= */}
-        <div className="hidden print:block mb-4 border-b-2 border-slate-900 pb-3">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-xl font-black tracking-wider text-slate-900 uppercase">
-                DAILYMART POS
-              </h1>
-              <p className="text-[11px] text-slate-700 font-medium">
-                Sistem Manajemen Kasir & Logistik Gudang
-              </p>
-              <p className="text-[10px] text-slate-500">
-                Jl. Retail Utama No. 88, Jakarta Selatan
-              </p>
+        <div className="hidden print:block w-full text-slate-900 font-sans text-xs print:p-0">
+          {/* 1. Header Kop Dokumen */}
+          <div className="border-y-4 border-double border-slate-900 py-3 mb-4 text-center space-y-0.5">
+            <h1 className="text-center font-black text-xl tracking-wider uppercase text-slate-900">
+              DAILYMART POS
+            </h1>
+            <h2 className="text-center font-bold text-sm text-slate-800">
+              Ringkasan Eksekutif Inventaris & Rekap Mutasi Stok
+            </h2>
+            <p className="text-center text-xs text-slate-600 mb-2">
+              Jl. Raya Utama No. 88, Jakarta Selatan • Telp: (021) 555-0199
+            </p>
+          </div>
+
+          {/* 2. Metadata Informasi Laporan Bar */}
+          <div className="border-y-2 border-slate-900 py-1.5 mb-6 flex justify-between items-center text-xs">
+            <div className="space-y-0.5">
+              <div className="font-black uppercase text-xs text-slate-900">
+                DOKUMEN INVENTARIS RESMI
+              </div>
+              <div className="text-xs font-semibold text-slate-800">
+                Periode Laporan : {periodDateRangeText}
+              </div>
             </div>
-            <div className="text-right">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                LAPORAN MUTASI STOK INVENTARIS
-              </h2>
-              <p className="text-[10px] text-slate-600 mt-0.5">
-                Tanggal Cetak:{" "}
-                {new Date().toLocaleDateString("id-ID", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}{" "}
-                pukul{" "}
-                {new Date().toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              <p className="text-[10px] text-slate-600">
-                Periode: <strong>{periodText}</strong>
-              </p>
-              <p className="text-[10px] font-semibold text-slate-800 mt-0.5">
-                Dicetak Oleh: <span className="underline">{staffName}</span>
-              </p>
+            <div className="text-right space-y-0.5">
+              <div className="text-xs text-slate-800">
+                Dicetak : {printedDateTimeText}
+              </div>
+              <div className="font-bold text-xs text-slate-900">
+                Oleh : {staffName || "Pegawai Gudang"}
+              </div>
             </div>
           </div>
 
-          {/* Ringkasan Periode Format Teks (Tanpa Card) */}
-          <div className="mt-3 py-1.5 px-3 border border-slate-300 rounded bg-slate-50/50 text-[10px] flex items-center justify-between text-slate-700">
-            <span>
-              • Total Barang Masuk:{" "}
-              <strong className="text-slate-900">+{summary.totalStockIn} Unit</strong>
-            </span>
-            <span>
-              • Total Barang Keluar:{" "}
-              <strong className="text-slate-900">-{summary.totalStockOut} Unit</strong>
-            </span>
-            <span>
-              • Net Selisih Opname:{" "}
-              <strong className="text-slate-900">
-                {summary.netOpnameDiff >= 0
-                  ? `+${summary.netOpnameDiff}`
-                  : summary.netOpnameDiff}{" "}
-                Unit
-              </strong>
-            </span>
-            <span>
-              • Barang Rusak / Retur:{" "}
-              <strong className="text-slate-900">-{summary.totalStockReturn} Unit</strong>
-            </span>
+          {/* 3. Tabel Ringkasan Mutasi Stok Barang Gudang (Continuous Vertical Line 2-Column Table) */}
+          <table className="w-full border-2 border-slate-900 border-collapse mb-12">
+            <thead>
+              <tr className="border-b-2 border-slate-900 bg-slate-100">
+                <th className="w-2/3 text-left font-black text-xs uppercase px-4 py-2.5 border-r-2 border-slate-900 text-slate-900 tracking-wider">
+                  KETERANGAN
+                </th>
+                <th className="w-1/3 text-center font-black text-xs uppercase px-4 py-2.5 text-slate-900 tracking-wider">
+                  JUMLAH / TOTAL
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y border-slate-900 text-xs font-medium">
+              <tr className="border-b border-slate-900">
+                <td className="px-4 py-2.5 border-r-2 border-slate-900 font-medium text-slate-800">
+                  Total Unit Masuk (Restok / Supplier)
+                </td>
+                <td className="px-4 py-2.5 text-center font-mono font-bold text-slate-900">
+                  +{summary.totalStockIn} Unit
+                </td>
+              </tr>
+              <tr className="border-b border-slate-900">
+                <td className="px-4 py-2.5 border-r-2 border-slate-900 font-medium text-slate-800">
+                  Total Unit Keluar (Penjualan Kasir)
+                </td>
+                <td className="px-4 py-2.5 text-center font-mono font-bold text-slate-900">
+                  -{summary.totalStockOut} Unit
+                </td>
+              </tr>
+              <tr className="border-b border-slate-900">
+                <td className="px-4 py-2.5 border-r-2 border-slate-900 font-medium text-slate-800">
+                  Net Selisih Audit Opname
+                </td>
+                <td className="px-4 py-2.5 text-center font-mono font-bold text-slate-900">
+                  {summary.netOpnameDiff >= 0 ? `+${summary.netOpnameDiff}` : summary.netOpnameDiff} Unit
+                </td>
+              </tr>
+              <tr className="border-b border-slate-900">
+                <td className="px-4 py-2.5 border-r-2 border-slate-900 font-medium text-slate-800">
+                  Barang Rusak / Retur Vendor
+                </td>
+                <td className="px-4 py-2.5 text-center font-mono font-bold text-slate-900">
+                  -{summary.totalStockReturn} Unit
+                </td>
+              </tr>
+              <tr className="bg-slate-50 border-t-2 border-slate-900 font-black">
+                <td className="px-4 py-2.5 border-r-2 border-slate-900 uppercase text-slate-900">
+                  TOTAL AKHIR STOK INVENTARIS
+                </td>
+                <td className="px-4 py-2.5 text-center font-mono font-black text-sm text-slate-900">
+                  {totalFinalStock} Unit
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          {/* 4. Blok Tanda Tangan & Otorisasi Resmi Footer (Sesuai Referensi Laporan Arus Kas) */}
+          <div className="flex justify-between items-end mt-16 pt-4 border-t-2 border-slate-900">
+            {/* Kolom Kiri (Penyusun) */}
+            <div className="flex flex-col items-start text-left">
+              <span className="text-xs text-slate-700 block">Dibuat & Diverifikasi Oleh,</span>
+              <div className="h-[60px]" />
+              <span className="font-black text-xs text-slate-900 block">
+                ( {staffName || "Pegawai Gudang"} )
+              </span>
+              <span className="text-[10px] text-slate-500 block">
+                Bagian Logistik & Inventaris DailyMart POS
+              </span>
+            </div>
+
+            {/* Kolom Kanan (Persetujuan) */}
+            <div className="flex flex-col items-end text-right">
+              <span className="text-xs text-slate-700 text-right block mb-0.5">
+                Jakarta, {formattedTodayDate}
+              </span>
+              <span className="text-xs text-slate-700 text-right block">
+                Disetujui Oleh,
+              </span>
+              <div className="h-[60px]" />
+              <span className="font-black text-xs text-slate-900 text-right block">
+                ( ........................................................... )
+              </span>
+              <span className="text-[10px] text-slate-500 text-right block">
+                Store Manager / Owner
+              </span>
+            </div>
           </div>
         </div>
 
@@ -283,72 +393,70 @@ export default function InventoryReportPage() {
         {/* 2. HEADER INTERAKTIF & 4 CARD KPI (SEMBUNYI SAAT CETAK)                   */}
         {/* ========================================================================= */}
         <div className="print:hidden">
-          <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+          {/* Header Bar Compact & Clean (Hapus Badge) */}
+          <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
             <div>
-              <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 uppercase tracking-wider">
-                GUDANG & LOGISTIK • Laporan Mutasi Stok
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
+              <h1 className="text-lg font-black text-slate-900 dark:text-slate-50 tracking-tight">
                 Laporan Inventaris & Rekap Mutasi
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              <p className="hidden sm:block text-[11px] text-slate-600 dark:text-slate-400 font-medium mt-0.5">
                 Rekapitulasi pergerakan stok barang masuk, keluar, selisih opname, dan retur/rusak per periode.
               </p>
             </div>
 
-            <div className="flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
               {/* Unified Export Dropdown */}
               <div className="relative" ref={dropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsExportOpen(!isExportOpen)}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                  className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-3.5 py-2 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all flex items-center gap-1.5 cursor-pointer"
                 >
-                  <svg className="w-4 h-4 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                   </svg>
-                  <span>Cetak</span>
-                  <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isExportOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  <span>Cetak / Ekspor PDF</span>
+                  <svg className={`w-3.5 h-3.5 text-white transition-transform duration-200 ${isExportOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
                 {/* Dropdown Menu Modal */}
                 {isExportOpen && (
-                  <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white p-1.5 shadow-xl border border-slate-200 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    {/* Opsi 1: Cetak / Simpan PDF (Nuansa Merah) */}
+                  <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-slate-900 p-2 border-2 border-slate-900 dark:border-slate-100 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] z-50 animate-in fade-in zoom-in-95 duration-100 transition-colors">
+                    {/* Opsi 1: Cetak / Simpan PDF */}
                     <button
                       type="button"
                       onClick={handlePrintPDF}
-                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-rose-50 text-left transition-colors cursor-pointer group"
+                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors cursor-pointer group"
                     >
-                      <div className="p-2 rounded-md bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-md bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-slate-800 group-hover:text-rose-900">Cetak Dokumen (PDF)</div>
-                        <div className="text-[10px] text-slate-500">Format formal A4 Landscape</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Cetak Dokumen (PDF)</div>
+                        <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Format formal A4 Landscape</div>
                       </div>
                     </button>
 
-                    <div className="my-1 border-t border-slate-100" />
+                    <div className="my-1 border-t border-slate-200 dark:border-slate-800" />
 
                     {/* Opsi 2: Ekspor CSV Excel */}
                     <button
                       type="button"
                       onClick={handleDownloadCSV}
-                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-emerald-50 text-left transition-colors cursor-pointer group"
+                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors cursor-pointer group"
                     >
-                      <div className="p-2 rounded-md bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                      <div className="p-2 rounded-md bg-[#E8F5E9] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-900">Ekspor CSV (Excel)</div>
-                        <div className="text-[10px] text-slate-500">Unduh lembar kerja mentah (.csv)</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Ekspor CSV (Excel)</div>
+                        <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Unduh lembar kerja mentah (.csv)</div>
                       </div>
                     </button>
                   </div>
@@ -359,7 +467,7 @@ export default function InventoryReportPage() {
                 type="button"
                 onClick={loadInventoryReport}
                 title="Refresh Data"
-                className="p-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer"
+                className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-slate-900 dark:border-slate-100 p-2 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] text-slate-900 dark:text-slate-100 transition-all cursor-pointer flex items-center justify-center"
               >
                 <svg
                   className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
@@ -370,7 +478,7 @@ export default function InventoryReportPage() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth="2"
+                    strokeWidth="2.5"
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
@@ -378,123 +486,83 @@ export default function InventoryReportPage() {
             </div>
           </div>
 
-          {/* 4 Card KPI Layar Web */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Total Unit Masuk
-                </span>
-                <span className="text-2xl font-black text-emerald-600 mt-1 block font-mono">
-                  +{summary.totalStockIn}{" "}
-                  <span className="text-xs font-normal text-slate-400">unit</span>
-                </span>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
-                </svg>
-              </div>
+          {/* 4 Card KPI Layar Web (Compact 4 Grid) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+            {/* Card 1: Total Unit Masuk */}
+            <div className="bg-[#E8F5E9] dark:bg-emerald-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-center min-h-[72px] transition-all">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#065F46] dark:text-emerald-300 block mb-1">
+                Total Unit Masuk
+              </span>
+              <span className="text-[#065F46] dark:text-emerald-300 font-mono font-black text-lg block">
+                +{summary.totalStockIn}{" "}
+                <span className="text-xs font-bold text-[#065F46]/80 dark:text-emerald-300/80">unit</span>
+              </span>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Total Unit Keluar
-                </span>
-                <span className="text-2xl font-black text-blue-600 mt-1 block font-mono">
-                  -{summary.totalStockOut}{" "}
-                  <span className="text-xs font-normal text-slate-400">unit</span>
-                </span>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-                </svg>
-              </div>
+            {/* Card 2: Total Unit Keluar */}
+            <div className="bg-[#EEF2FF] dark:bg-indigo-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-center min-h-[72px] transition-all">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#4338CA] dark:text-indigo-300 block mb-1">
+                Total Unit Keluar
+              </span>
+              <span className="text-[#4338CA] dark:text-indigo-300 font-mono font-black text-lg block">
+                -{summary.totalStockOut}{" "}
+                <span className="text-xs font-bold text-[#4338CA]/80 dark:text-indigo-300/80">unit</span>
+              </span>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Net Selisih Opname
-                </span>
-                <span className={`text-2xl font-black mt-1 block font-mono ${summary.netOpnameDiff < 0
-                  ? "text-rose-600"
-                  : summary.netOpnameDiff > 0
-                    ? "text-emerald-600"
-                    : "text-slate-800"
-                  }`}>
-                  {summary.netOpnameDiff > 0 ? `+${summary.netOpnameDiff}` : summary.netOpnameDiff}{" "}
-                  <span className="text-xs font-normal text-slate-400">unit</span>
-                </span>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
+            {/* Card 3: Net Selisih Opname */}
+            <div className="bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-center min-h-[72px] transition-all">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#B45309] dark:text-amber-300 block mb-1">
+                Net Selisih Opname
+              </span>
+              <span className="text-[#B45309] dark:text-amber-300 font-mono font-black text-lg block">
+                {summary.netOpnameDiff > 0 ? `+${summary.netOpnameDiff}` : summary.netOpnameDiff}{" "}
+                <span className="text-xs font-bold text-[#B45309]/80 dark:text-amber-300/80">unit</span>
+              </span>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                  Barang Rusak / Retur
-                </span>
-                <span className="text-2xl font-black text-rose-600 mt-1 block font-mono">
-                  -{summary.totalStockReturn}{" "}
-                  <span className="text-xs font-normal text-slate-400">unit</span>
-                </span>
-              </div>
-              <div className="w-11 h-11 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 shrink-0">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </div>
+            {/* Card 4: Barang Rusak / Retur */}
+            <div className="bg-[#FFE4E6] dark:bg-rose-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-center min-h-[72px] transition-all">
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#E11D48] dark:text-rose-400 block mb-1">
+                Barang Rusak / Retur
+              </span>
+              <span className="text-[#E11D48] dark:text-rose-400 font-mono font-black text-lg block">
+                -{summary.totalStockReturn}{" "}
+                <span className="text-xs font-bold text-[#E11D48]/80 dark:text-rose-400/80">unit</span>
+              </span>
             </div>
           </div>
 
-          {/* TOOLBAR SEARCH & FILTERS LAYAR WEB */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 mb-6">
-            <div className="relative flex-1">
-              <svg
-                className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+          {/* TOOLBAR SEARCH & FILTERS DENGAN OVAL/PILL INPUTS */}
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex flex-wrap items-center gap-2 mb-4 transition-colors">
+            {/* Search Bar (Oval/Pill) */}
+            <div className="relative flex-1 min-w-[200px]">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari Nama Produk, SKU, atau Kategori..."
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none transition-all"
+                className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-4 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex-1 w-full placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-900 dark:text-slate-100 hover:text-slate-600 dark:hover:text-slate-400"
                 >
                   ✕
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
-              <div className="flex items-center gap-1.5 min-w-[150px]">
-                <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Periode:</label>
+            {/* Select Options (Oval/Pill) */}
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
+              <div className="flex items-center gap-1.5">
+                <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 whitespace-nowrap">Periode:</label>
                 <select
                   value={periodFilter}
                   onChange={(e) => setPeriodFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none"
+                  className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-4 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
                 >
                   <option value="all">Semua Waktu</option>
                   <option value="today">Hari Ini</option>
@@ -503,12 +571,12 @@ export default function InventoryReportPage() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-1.5 min-w-[150px]">
-                <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Kategori:</label>
+              <div className="flex items-center gap-1.5">
+                <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 whitespace-nowrap">Kategori:</label>
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:outline-none"
+                  className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-4 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
                 >
                   <option value="ALL">Semua Kategori</option>
                   {categoriesList.map((cat) => (
@@ -523,224 +591,130 @@ export default function InventoryReportPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. TABEL DATA MUTASI STOK INVENTARIS                                      */}
+        {/* 3. TABEL DATA MUTASI STOK INVENTARIS (SCREEN ONLY)                         */}
         {/* ========================================================================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden print:border-slate-400 print:rounded-none print:shadow-none">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[3.5px_3.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3.5px_3.5px_0px_0px_rgba(255,255,255,1)] overflow-hidden print:hidden transition-colors">
           {isLoading ? (
-            <div className="p-12 text-center text-slate-500 space-y-3">
-              <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-medium">Memuat laporan inventaris & mutasi stok...</p>
+            <div className="p-12 text-center text-slate-700 dark:text-slate-300 space-y-2">
+              <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs font-black">Memuat laporan inventaris & mutasi stok...</p>
             </div>
           ) : error ? (
-            <div className="p-12 text-center text-red-600 space-y-3">
-              <p className="text-sm font-bold">{error}</p>
+            <div className="p-12 text-center text-rose-600 dark:text-rose-400 space-y-2">
+              <p className="text-sm font-black">{error}</p>
               <button
                 type="button"
                 onClick={loadInventoryReport}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
+                className="px-4 py-2 bg-[#6366F1] text-white border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:bg-[#4F46E5] cursor-pointer"
               >
                 Coba Lagi
               </button>
             </div>
           ) : records.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 space-y-3">
-              <p className="text-sm font-bold text-slate-800">
+            <div className="p-12 text-center text-slate-900 dark:text-slate-100 space-y-2">
+              <p className="text-sm font-black text-slate-900 dark:text-slate-100">
                 Belum ada data rekapitulasi mutasi stok inventaris.
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
                 Klik tombol seeder di bawah untuk mengisi data sampel rekap mutasi.
               </p>
               <button
                 type="button"
                 onClick={handleTriggerSeeder}
                 disabled={seedingLoading}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-950 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
               >
                 {seedingLoading && (
-                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3.5 h-3.5 border-2 border-white dark:border-slate-950 border-t-transparent rounded-full animate-spin" />
                 )}
                 <span>Generate Data Dummy (Seeder)</span>
               </button>
             </div>
           ) : (
-            <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs print:border-slate-400 print:rounded-none print:shadow-none">
-              {/* Screen Table (Paginated) */}
-              <div className="print:hidden">
-                <table className="w-full table-fixed text-left border-collapse text-xs text-slate-600">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                      <th className="w-[26%] px-3 py-3">Produk & SKU</th>
-                      <th className="w-[10%] px-2 py-3 text-center">Stok Awal</th>
-                      <th className="w-[11%] px-2 py-3 text-center text-emerald-700">Masuk (+)</th>
-                      <th className="w-[11%] px-2 py-3 text-center text-blue-700">Keluar (-)</th>
-                      <th className="w-[12%] px-2 py-3 text-center">Opname (+/-)</th>
-                      <th className="w-[12%] px-2 py-3 text-center text-rose-700">Retur/Rusak (-)</th>
-                      <th className="w-[18%] px-3 py-3 text-right">Stok Akhir</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-xs">
-                    {paginatedRecords.map((item) => {
-                      const isOut = item.finalStock === 0;
-
-                      return (
-                        <tr
-                          key={item.id || item.productId}
-                          className="hover:bg-slate-50/75 transition-colors"
-                        >
-                          <td className="px-3 py-3 align-top">
-                            <div
-                              className="font-semibold text-slate-900 leading-snug truncate"
-                              title={item.productName}
-                            >
-                              {item.productName}
-                            </div>
-                            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                              <span className="font-mono font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
-                                {item.sku}
-                              </span>
-                              {item.categoryName && (
-                                <>
-                                  <span>•</span>
-                                  <span className="truncate">{item.categoryName}</span>
-                                </>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="px-2 py-3 align-top text-center font-mono font-semibold text-slate-700">
-                            {item.initialStock} {item.unit}
-                          </td>
-
-                          <td className="px-2 py-3 align-top text-center font-mono font-bold text-emerald-600">
-                            +{item.stockIn} {item.unit}
-                          </td>
-
-                          <td className="px-2 py-3 align-top text-center font-mono font-bold text-blue-600">
-                            -{item.stockOut} {item.unit}
-                          </td>
-
-                          <td className="px-2 py-3 align-top text-center font-mono font-bold">
-                            {item.opnameDiff > 0 ? (
-                              <span className="text-emerald-600">+{item.opnameDiff}</span>
-                            ) : item.opnameDiff < 0 ? (
-                              <span className="text-rose-600">{item.opnameDiff}</span>
-                            ) : (
-                              <span className="text-slate-400">0</span>
-                            )}
-                          </td>
-
-                          <td className="px-2 py-3 align-top text-center font-mono font-bold text-rose-600">
-                            -{item.stockReturn} {item.unit}
-                          </td>
-
-                          <td className="px-3 py-3 align-top text-right font-mono">
-                            <span
-                              className={`inline-block px-2.5 py-1 rounded-lg font-black text-xs ${isOut
-                                ? "bg-rose-50 text-rose-700 border border-rose-200"
-                                : "bg-slate-100 text-slate-900 border border-slate-200"
-                                }`}
-                            >
-                              {item.finalStock} {item.unit}
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs text-slate-900 dark:text-slate-100 font-bold">
+                <thead>
+                  <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 font-black text-[10px] uppercase tracking-wider">
+                    <th className="px-3 py-3">Produk & SKU</th>
+                    <th className="px-2 py-3 text-center">Stok Awal</th>
+                    <th className="px-2 py-3 text-center">Masuk (+)</th>
+                    <th className="px-2 py-3 text-center">Keluar (-)</th>
+                    <th className="px-2 py-3 text-center">Opname (+/-)</th>
+                    <th className="px-2 py-3 text-center">Retur/Rusak (-)</th>
+                    <th className="px-3 py-3 text-center">Stok Akhir</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
+                  {paginatedRecords.map((item) => {
+                    return (
+                      <tr
+                        key={item.id || item.productId}
+                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors border-b border-slate-200 dark:border-slate-800"
+                      >
+                        <td className="px-3 py-3 align-top">
+                          <div
+                            className="font-black text-slate-900 dark:text-slate-100 leading-snug"
+                            title={item.productName}
+                          >
+                            {item.productName}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[10px] mt-0.5">
+                            <span className="font-mono font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 shrink-0">
+                              SKU: {item.sku}
                             </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            {item.categoryName && (
+                              <span className="text-slate-500 dark:text-slate-400 font-medium">• {item.categoryName}</span>
+                            )}
+                          </div>
+                        </td>
 
-              {/* Print Table (Full Records without Pagination) */}
-              <div className="hidden print:block">
-                <table className="w-full table-fixed text-left border-collapse text-xs print:text-[9.5px]">
-                  <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50 print:bg-slate-100 font-bold uppercase text-slate-700">
-                      <th className="w-[5%] px-2 py-2 text-center">No</th>
-                      <th className="w-[27%] px-2.5 py-2">Produk & SKU</th>
-                      <th className="w-[10%] px-2 py-2 text-center">Stok Awal</th>
-                      <th className="w-[11%] px-2 py-2 text-center">Masuk (+)</th>
-                      <th className="w-[11%] px-2 py-2 text-center">Keluar (-)</th>
-                      <th className="w-[11%] px-2 py-2 text-center">Opname</th>
-                      <th className="w-[11%] px-2 py-2 text-center">Retur (-)</th>
-                      <th className="w-[14%] px-2.5 py-2 text-right">Stok Akhir</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 print:divide-slate-300">
-                    {records.map((item, idx) => (
-                      <tr key={item.id || item.productId}>
-                        <td className="px-2 py-2 text-center text-slate-500">{idx + 1}</td>
-                        <td className="px-2.5 py-2">
-                          <div className="font-semibold text-slate-900 truncate">{item.productName}</div>
-                          <div className="text-[10px] print:text-[8.5px] text-slate-500 font-mono">{item.sku}</div>
+                        <td className="px-2 py-3 align-top text-center font-mono font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          {item.initialStock} {item.unit}
                         </td>
-                        <td className="px-2 py-2 text-center font-mono">{item.initialStock}</td>
-                        <td className="px-2 py-2 text-center font-mono font-semibold text-emerald-600">+{item.stockIn}</td>
-                        <td className="px-2 py-2 text-center font-mono font-semibold text-blue-600">-{item.stockOut}</td>
-                        <td className="px-2 py-2 text-center font-mono font-medium">
-                          {item.opnameDiff > 0 ? `+${item.opnameDiff}` : item.opnameDiff}
+
+                        <td className="px-2 py-3 align-top text-center font-mono font-black text-xs text-[#065F46] dark:text-emerald-400 whitespace-nowrap">
+                          +{item.stockIn} {item.unit}
                         </td>
-                        <td className="px-2 py-2 text-center font-mono font-semibold text-rose-600">
-                          {item.stockReturn > 0 ? `-${item.stockReturn}` : 0}
+
+                        <td className="px-2 py-3 align-top text-center font-mono font-black text-xs text-[#4338CA] dark:text-indigo-400 whitespace-nowrap">
+                          -{item.stockOut} {item.unit}
                         </td>
-                        <td className="px-2.5 py-2 text-right font-mono font-bold text-slate-900">
-                          {item.finalStock} {item.unit || "Pcs"}
+
+                        <td className="px-2 py-3 align-top text-center font-mono font-black text-xs text-[#B45309] dark:text-amber-400 whitespace-nowrap">
+                          {item.opnameDiff > 0 ? (
+                            <span>+{item.opnameDiff} {item.unit}</span>
+                          ) : item.opnameDiff < 0 ? (
+                            <span>{item.opnameDiff} {item.unit}</span>
+                          ) : (
+                            <span className="text-slate-400 dark:text-slate-500">0 {item.unit}</span>
+                          )}
+                        </td>
+
+                        <td className="px-2 py-3 align-top text-center font-mono font-black text-xs text-[#E11D48] dark:text-rose-400 whitespace-nowrap">
+                          -{item.stockReturn} {item.unit}
+                        </td>
+
+                        <td className="px-3 py-3 align-top text-center whitespace-nowrap">
+                          <span className="bg-slate-100 dark:bg-slate-800 text-slate-950 dark:text-slate-50 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-black text-xs px-2.5 py-1 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                            {item.finalStock} {item.unit}
+                          </span>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
 
           {/* Integrated Reusable Pagination */}
-          <div className="print:hidden">
+          <div>
             <Pagination
               currentPage={currentPage}
               totalItems={records.length}
               itemsPerPage={ITEMS_PER_PAGE}
               onPageChange={setCurrentPage}
             />
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* 4. LEMBAR TANDA TANGAN FORMAL (SEJAJAR PRESISI)                           */}
-        {/* ========================================================================= */}
-        <div className="hidden print:grid grid-cols-2 mt-10 pt-2 text-xs text-slate-800">
-          {/* Kolom Kiri: Staff Gudang */}
-          <div className="flex flex-col items-center text-center">
-            {/* Placeholder agar sejajar dengan tanggal di kanan */}
-            <p className="invisible select-none text-[11px] leading-tight">
-              Surakarta, 00 Bulan 0000
-            </p>
-            <p className="font-medium text-slate-700 mt-1 leading-tight">Dibuat Oleh,</p>
-
-            {/* Ruang Tanda Tangan */}
-            <div className="h-20 w-full" />
-
-            {/* Nama & Garis Bawah */}
-            <p className="font-bold text-slate-900 underline uppercase tracking-wide leading-none">
-              ( {staffName} )
-            </p>
-            <p className="text-[10px] text-slate-500 mt-1.5 leading-none">Staff Gudang & Logistik</p>
-          </div>
-
-          {/* Kolom Kanan: Store Manager */}
-          <div className="flex flex-col items-center text-center">
-            <p className="text-slate-700 text-[11px] leading-tight">
-              Surakarta, {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-            </p>
-            <p className="font-medium text-slate-700 mt-1 leading-tight">Disetujui Oleh,</p>
-
-            {/* Ruang Tanda Tangan */}
-            <div className="h-20 w-full" />
-
-            {/* Nama & Garis Bawah */}
-            <p className="font-bold text-slate-900 underline tracking-wide leading-none">
-              ( .................................................... )
-            </p>
-            <p className="text-[10px] text-slate-500 mt-1.5 leading-none">Store Manager / Admin Retail</p>
           </div>
         </div>
       </div>

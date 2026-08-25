@@ -260,7 +260,7 @@ export default function AdminStockOpnameReportPage() {
   }, [reportData]);
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 p-4 lg:p-6 print:p-0 print:bg-white print:m-0 font-sans text-slate-800">
+    <div className="w-full min-h-screen bg-slate-100 dark:bg-[#0F172A] p-4 lg:p-6 print:p-0 print:bg-white print:m-0 font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <div className="max-w-7xl mx-auto space-y-6 print:max-w-none print:w-full print:m-0 print:space-y-0">
         {/* ========================================================================= */}
         {/* PRINT ONLY: RINGKASAN EKSEKUTIF AUDIT STOCK OPNAME (1 HALAMAN A4)        */}
@@ -441,10 +441,10 @@ export default function AdminStockOpnameReportPage() {
           {/* 1. Header Bar Compact */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3 p-0">
             <div>
-              <h1 className="text-lg font-black text-slate-900 tracking-tight">
+              <h1 className="text-lg font-black text-slate-900 dark:text-slate-50 tracking-tight">
                 Laporan Audit Stock Opname
               </h1>
-              <p className="hidden sm:block text-[11px] text-slate-500 font-bold mt-0.5">
+              <p className="hidden sm:block text-[11px] text-slate-600 dark:text-slate-400 font-bold mt-0.5">
                 Analisis verifikasi stok fisik vs sistem, persentase akurasi, nilai kerugian/surplus, dan temuan selisih.
               </p>
             </div>
@@ -455,7 +455,7 @@ export default function AdminStockOpnameReportPage() {
                 <button
                   type="button"
                   onClick={() => setIsExportOpen(!isExportOpen)}
-                  className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs py-1.5 px-3.5 rounded-xl border-2 border-slate-900 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs py-1.5 px-3.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -468,40 +468,40 @@ export default function AdminStockOpnameReportPage() {
 
                 {/* Dropdown Menu Modal */}
                 {isExportOpen && (
-                  <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white p-2 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 z-50 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-slate-900 p-2 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] border-2 border-slate-900 dark:border-slate-100 z-50 animate-in fade-in zoom-in-95 duration-100 transition-colors">
                     {/* Opsi 1: Cetak / Simpan PDF */}
                     <button
                       type="button"
                       onClick={handlePrintPDF}
-                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 text-left transition-colors cursor-pointer border border-transparent hover:border-slate-900"
+                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors cursor-pointer border border-transparent hover:border-slate-900 dark:hover:border-slate-100"
                     >
-                      <div className="p-2 rounded-lg bg-rose-100 border border-slate-900 text-rose-700">
+                      <div className="p-2 rounded-lg bg-rose-100 dark:bg-rose-950/60 border border-slate-900 dark:border-slate-100 text-rose-700 dark:text-rose-300">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-black text-slate-900">Cetak Dokumen (PDF)</div>
-                        <div className="text-[10px] font-semibold text-slate-500">Format resmi A4 Landscape</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Cetak Dokumen (PDF)</div>
+                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Format resmi A4 Landscape</div>
                       </div>
                     </button>
 
-                    <div className="my-1 border-t-2 border-slate-200" />
+                    <div className="my-1 border-t-2 border-slate-200 dark:border-slate-800" />
 
                     {/* Opsi 2: Ekspor CSV Excel */}
                     <button
                       type="button"
                       onClick={handleExportCSV}
-                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 text-left transition-colors cursor-pointer border border-transparent hover:border-slate-900"
+                      className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors cursor-pointer border border-transparent hover:border-slate-900 dark:hover:border-slate-100"
                     >
-                      <div className="p-2 rounded-lg bg-emerald-100 border border-slate-900 text-emerald-700">
+                      <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 border border-slate-900 dark:border-slate-100 text-emerald-700 dark:text-emerald-300">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-black text-slate-900">Ekspor CSV (Excel)</div>
-                        <div className="text-[10px] font-semibold text-slate-500">Unduh lembar kerja mentah (.csv)</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Ekspor CSV (Excel)</div>
+                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Unduh lembar kerja mentah (.csv)</div>
                       </div>
                     </button>
                   </div>
@@ -513,7 +513,7 @@ export default function AdminStockOpnameReportPage() {
                 type="button"
                 onClick={loadStockOpnameReport}
                 title="Refresh Data"
-                className="bg-white hover:bg-slate-100 border-2 border-slate-900 p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900 transition-all cursor-pointer"
+                className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] text-slate-900 dark:text-slate-100 transition-all cursor-pointer hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
               >
                 <svg
                   className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
@@ -535,55 +535,55 @@ export default function AdminStockOpnameReportPage() {
           {/* 2. KPI Stat Cards (4 Grid Opname Metrics - Compact) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
             {/* Card 1 (Total Item Diverifikasi) */}
-            <div className="bg-white border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
+            <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 mb-0.5 block">
                 Total Item Diverifikasi
               </span>
-              <span className="text-lg font-black font-mono text-slate-900 tracking-tight block">
+              <span className="text-lg font-black font-mono text-slate-900 dark:text-slate-50 tracking-tight block">
                 {reportData?.summary.totalAudited || 0}{" "}
-                <span className="text-[10px] font-bold text-slate-500">item</span>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">item</span>
               </span>
             </div>
 
             {/* Card 2 (Tingkat Akurasi Stok) */}
-            <div className="bg-[#E8F5E9] border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
+            <div className="bg-[#E8F5E9] dark:bg-emerald-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 mb-0.5 block">
                 Tingkat Akurasi Stok
               </span>
-              <span className="text-[#065F46] font-mono font-black text-lg tracking-tight block">
+              <span className="text-[#065F46] dark:text-emerald-300 font-mono font-black text-lg tracking-tight block">
                 {reportData?.summary.accuracyRate || 0}%
               </span>
             </div>
 
             {/* Card 3 (Total Nilai Kerugian / Loss) */}
-            <div className="bg-[#FFE4E6] border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
+            <div className="bg-[#FFE4E6] dark:bg-rose-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 mb-0.5 block">
                 Total Kerugian (Loss)
               </span>
-              <span className="text-[#E11D48] font-mono font-black text-lg tracking-tight block">
+              <span className="text-[#E11D48] dark:text-rose-400 font-mono font-black text-lg tracking-tight block">
                 {formatRupiah(reportData?.summary.totalLossRp || 0)}
               </span>
             </div>
 
             {/* Card 4 (Total Nilai Surplus) */}
-            <div className="bg-[#EEF2FF] border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-              <span className="text-[9px] font-black uppercase text-slate-500 mb-0.5 block">
+            <div className="bg-[#EEF2FF] dark:bg-indigo-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+              <span className="text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 mb-0.5 block">
                 Total Surplus
               </span>
-              <span className="text-[#4338CA] font-mono font-black text-lg tracking-tight block">
+              <span className="text-[#4338CA] dark:text-indigo-300 font-mono font-black text-lg tracking-tight block">
                 {formatRupiah(reportData?.summary.totalSurplusRp || 0)}
               </span>
             </div>
           </div>
 
           {/* 3. Inline Filter Bar */}
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-2 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] flex flex-wrap items-center gap-2.5 mb-3">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex flex-wrap items-center gap-2.5 mb-3 transition-colors">
             <div className="flex items-center gap-1.5">
-              <label className="text-[10px] font-black text-slate-800 uppercase tracking-wider whitespace-nowrap">PERIODE:</label>
+              <label className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">PERIODE:</label>
               <select
                 value={periodFilter}
                 onChange={(e) => setPeriodFilter(e.target.value)}
-                className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-3 py-1 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]"
               >
                 <option value="all">Semua Waktu</option>
                 <option value="today">Hari Ini</option>
@@ -599,24 +599,24 @@ export default function AdminStockOpnameReportPage() {
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-3 py-1 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]"
                 />
-                <span className="text-[10px] font-black text-slate-600">s/d</span>
+                <span className="text-[10px] font-black text-slate-600 dark:text-slate-400">s/d</span>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-3 py-1 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]"
                 />
               </div>
             )}
 
             <div className="flex items-center gap-1.5">
-              <label className="text-[10px] font-black text-slate-800 uppercase tracking-wider whitespace-nowrap">STATUS SELISIH:</label>
+              <label className="text-[10px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider whitespace-nowrap">STATUS SELISIH:</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-slate-50 border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full px-3 py-1 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]"
               >
                 <option value="ALL">Semua Status</option>
                 <option value="MATCHED">Sesuai (Match)</option>
@@ -627,7 +627,7 @@ export default function AdminStockOpnameReportPage() {
 
             <div className="relative flex-1 min-w-[180px]">
               <svg
-                className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+                className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -644,7 +644,7 @@ export default function AdminStockOpnameReportPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari Produk, SKU, Auditor..."
-                className="w-full bg-slate-50 border-2 border-slate-900 rounded-full pl-8 pr-3 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:bg-white placeholder:text-slate-400 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-full pl-8 pr-3 py-1 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]"
               />
             </div>
           </div>
@@ -652,9 +652,9 @@ export default function AdminStockOpnameReportPage() {
           {/* 4. Chart Section (Komposisi Hasil Audit & Top 5 Dampak Selisih) */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-3">
             {/* Komposisi Hasil Audit (lg:col-span-1) */}
-            <div className="lg:col-span-1 bg-white border-2 border-slate-900 rounded-xl p-3.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+            <div className="lg:col-span-1 bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-colors">
               <div className="mb-1">
-                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100">
                   Komposisi Hasil Audit
                 </h2>
               </div>
@@ -680,7 +680,7 @@ export default function AdminStockOpnameReportPage() {
                         formatter={(val: any) => [`${val} Item`, "Jumlah Item"]}
                         contentStyle={{
                           backgroundColor: "#0F172A",
-                          border: "2px solid #0F172A",
+                          border: "2px solid #334155",
                           borderRadius: "10px",
                           color: "#FFF",
                           fontSize: "11px",
@@ -691,7 +691,7 @@ export default function AdminStockOpnameReportPage() {
                         verticalAlign="bottom"
                         height={32}
                         formatter={(value, entry: any) => (
-                          <span className="font-mono text-[10px] font-bold text-slate-700">
+                          <span className="font-mono text-[10px] font-bold text-slate-700 dark:text-slate-300">
                             {value} ({entry.payload.value})
                           </span>
                         )}
@@ -699,7 +699,7 @@ export default function AdminStockOpnameReportPage() {
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400">
+                  <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400 dark:text-slate-500">
                     Belum ada data audit untuk grafik.
                   </div>
                 )}
@@ -707,9 +707,9 @@ export default function AdminStockOpnameReportPage() {
             </div>
 
             {/* Top 5 Produk Dampak Selisih (lg:col-span-2) */}
-            <div className="lg:col-span-2 bg-white border-2 border-slate-900 rounded-xl p-3.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between">
+            <div className="lg:col-span-2 bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3.5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-colors">
               <div className="mb-1">
-                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-slate-100">
                   Top 5 Produk Dampak Selisih (Rp)
                 </h2>
               </div>
@@ -718,14 +718,14 @@ export default function AdminStockOpnameReportPage() {
                 {reportData?.topDiscrepancies && reportData.topDiscrepancies.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={reportData.topDiscrepancies} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: -5 }}>
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
-                      <XAxis type="number" tick={{ fontSize: 10, fontWeight: 'bold', fill: '#0F172A' }} tickFormatter={(v) => `Rp${(v / 1000).toFixed(0)}k`} />
-                      <YAxis dataKey="productName" type="category" width={130} tick={{ fontSize: 10, fontWeight: '700', fill: '#0F172A' }} />
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#94A3B8" opacity={0.3} />
+                      <XAxis type="number" tick={{ fontSize: 10, fontWeight: 'bold', fill: 'currentColor' }} className="text-slate-700 dark:text-slate-300" tickFormatter={(v) => `Rp${(v / 1000).toFixed(0)}k`} />
+                      <YAxis dataKey="productName" type="category" width={130} tick={{ fontSize: 10, fontWeight: '700', fill: 'currentColor' }} className="text-slate-700 dark:text-slate-300" />
                       <RechartsTooltip
                         formatter={(val: any) => [formatRupiah(Number(val)), "Dampak Selisih"]}
                         contentStyle={{
                           backgroundColor: "#0F172A",
-                          border: "2px solid #0F172A",
+                          border: "2px solid #334155",
                           borderRadius: "10px",
                           color: "#FFF",
                           fontSize: "11px",
@@ -736,7 +736,7 @@ export default function AdminStockOpnameReportPage() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400">
+                  <div className="h-full flex items-center justify-center text-xs font-bold text-slate-400 dark:text-slate-500">
                     Tidak ada temuan selisih produk.
                   </div>
                 )}
@@ -745,48 +745,48 @@ export default function AdminStockOpnameReportPage() {
           </div>
 
           {/* 5. Table Data Audit Stock Opname */}
-          <div className="bg-white border-2 border-slate-900 rounded-xl shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors">
             {isLoading ? (
-              <div className="p-12 text-center text-slate-500 space-y-3">
+              <div className="p-12 text-center text-slate-500 dark:text-slate-400 space-y-3">
                 <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto" />
-                <p className="text-xs font-bold text-slate-700">Memuat data audit stock opname...</p>
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Memuat data audit stock opname...</p>
               </div>
             ) : error ? (
-              <div className="p-12 text-center text-red-600 space-y-3">
+              <div className="p-12 text-center text-rose-600 dark:text-rose-400 space-y-3">
                 <p className="text-sm font-bold">{error}</p>
                 <button
                   type="button"
                   onClick={loadStockOpnameReport}
-                  className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+                  className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-xs font-bold border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
                 >
                   Coba Lagi
                 </button>
               </div>
             ) : !reportData?.audits || reportData.audits.length === 0 ? (
-              <div className="p-12 text-center text-slate-500 space-y-3">
-                <p className="text-sm font-black text-slate-900">
+              <div className="p-12 text-center text-slate-500 dark:text-slate-400 space-y-3">
+                <p className="text-sm font-black text-slate-900 dark:text-slate-100">
                   Belum ada data audit stock opname yang tercatat pada periode ini.
                 </p>
-                <p className="text-xs font-medium text-slate-500">
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   Klik tombol seeder di bawah untuk mengisi data sampel audit stok.
                 </p>
                 <button
                   type="button"
                   onClick={handleTriggerSeeder}
                   disabled={seedingLoading}
-                  className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
+                  className="px-4 py-2.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-xl text-xs font-bold border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
                 >
                   {seedingLoading && (
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-3.5 h-3.5 border-2 border-white dark:border-slate-900 border-t-transparent rounded-full animate-spin" />
                   )}
                   <span>Generate Data Dummy Audit (Seeder)</span>
                 </button>
               </div>
             ) : (
               <div className="w-full overflow-x-auto">
-                <table className="w-full table-auto text-left border-collapse text-xs text-slate-700">
+                <table className="w-full table-auto text-left border-collapse text-xs text-slate-700 dark:text-slate-300">
                   <thead>
-                    <tr className="bg-slate-100 border-b-2 border-slate-900 text-slate-900 font-black text-[10px] uppercase tracking-wider">
+                    <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 font-black text-[10px] uppercase tracking-wider">
                       <th className="px-3 py-3">Waktu & Kode Audit</th>
                       <th className="px-3 py-3">Produk & SKU</th>
                       <th className="px-3 py-3">Auditor</th>
@@ -796,7 +796,7 @@ export default function AdminStockOpnameReportPage() {
                       <th className="px-3 py-3 text-right">Dampak Nilai (Rp)</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 text-xs">
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
                     {paginatedAudits.map((item) => {
                       const isLoss = item.diff < 0;
                       const isSurplus = item.diff > 0;
@@ -805,15 +805,15 @@ export default function AdminStockOpnameReportPage() {
                         <tr
                           key={item.id}
                           onClick={() => setSelectedAudit(item)}
-                          className="hover:bg-slate-50/80 transition-colors cursor-pointer border-b border-slate-200"
+                          className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors cursor-pointer border-b border-slate-200 dark:border-slate-800"
                           title="Klik untuk melihat catatan alasan audit"
                         >
                           {/* Waktu & Kode Audit */}
                           <td className="px-3 py-3 align-middle">
-                            <div className="font-mono font-bold text-slate-900">
+                            <div className="font-mono font-bold text-slate-900 dark:text-slate-100">
                               {item.auditCode}
                             </div>
-                            <div className="text-[10px] text-slate-500 font-medium mt-0.5">
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                               {item.date}
                             </div>
                           </td>
@@ -821,45 +821,45 @@ export default function AdminStockOpnameReportPage() {
                           {/* Produk & SKU */}
                           <td className="px-3 py-3 align-middle">
                             <div
-                              className="font-bold text-slate-900 leading-snug truncate"
+                              className="font-bold text-slate-900 dark:text-slate-100 leading-snug truncate"
                               title={item.productName}
                             >
                               {item.productName}
                             </div>
-                            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                              <span className="font-mono text-[10px] font-bold text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300">
+                            <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                              <span className="font-mono text-[10px] font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700">
                                 {item.sku}
                               </span>
                             </div>
                           </td>
 
                           {/* Auditor */}
-                          <td className="px-3 py-3 align-middle font-bold text-slate-900 truncate">
+                          <td className="px-3 py-3 align-middle font-bold text-slate-900 dark:text-slate-100 truncate">
                             {item.auditorName}
                           </td>
 
                           {/* Sistem */}
-                          <td className="px-2 py-3 align-middle text-center font-mono font-semibold text-slate-700">
+                          <td className="px-2 py-3 align-middle text-center font-mono font-semibold text-slate-700 dark:text-slate-300">
                             {item.systemStock}
                           </td>
 
                           {/* Fisik */}
-                          <td className="px-2 py-3 align-middle text-center font-mono font-black text-slate-900">
+                          <td className="px-2 py-3 align-middle text-center font-mono font-black text-slate-900 dark:text-slate-100">
                             {item.physicalStock}
                           </td>
 
                           {/* Selisih */}
                           <td className="px-2 py-3 align-middle text-center font-mono font-black text-[10px]">
                             {isLoss ? (
-                              <span className="bg-[#FFE4E6] text-[#E11D48] border-1.5 border-slate-900 font-mono font-black text-[10px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                              <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-black text-[10px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                                 {item.diff}
                               </span>
                             ) : isSurplus ? (
-                              <span className="bg-[#EEF2FF] text-[#4338CA] border-1.5 border-slate-900 font-mono font-black text-[10px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                              <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-black text-[10px] px-1.5 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                                 +{item.diff}
                               </span>
                             ) : (
-                              <span className="bg-slate-100 text-slate-600 border border-slate-400 font-mono font-bold text-[10px] px-1.5 py-0.5 rounded-md inline-block">
+                              <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-400 dark:border-slate-600 font-mono font-bold text-[10px] px-1.5 py-0.5 rounded-md inline-block">
                                 0
                               </span>
                             )}
@@ -870,10 +870,10 @@ export default function AdminStockOpnameReportPage() {
                             <span
                               className={
                                 isLoss
-                                  ? "text-[#E11D48]"
+                                  ? "text-[#E11D48] dark:text-rose-400"
                                   : isSurplus
-                                  ? "text-[#4338CA]"
-                                  : "text-slate-500 font-normal"
+                                  ? "text-[#4338CA] dark:text-indigo-400"
+                                  : "text-slate-500 dark:text-slate-400 font-normal"
                               }
                             >
                               {isLoss ? `- ${formatRupiah(item.impactValueRp)}` : isSurplus ? `+ ${formatRupiah(item.impactValueRp)}` : "Rp 0"}
@@ -888,7 +888,7 @@ export default function AdminStockOpnameReportPage() {
             )}
 
             {/* Integrated Reusable Pagination */}
-            <div className="border-t-2 border-slate-900">
+            <div className="border-t-2 border-slate-900 dark:border-slate-100">
               <Pagination
                 currentPage={currentPage}
                 totalItems={reportData?.audits.length || 0}
@@ -903,78 +903,78 @@ export default function AdminStockOpnameReportPage() {
         {/* 6. MODAL QUICK VIEW DETAIL TEMUAN AUDIT                                   */}
         {/* ========================================================================= */}
         {selectedAudit && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 print:hidden">
-            <div className="bg-white border-3 border-slate-900 rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] max-w-md w-full animate-in fade-in zoom-in-95 duration-150">
-              <div className="pb-3 border-b-2 border-slate-900 flex items-center justify-between">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 print:hidden">
+            <div className="bg-white dark:bg-slate-900 border-3 border-slate-900 dark:border-slate-100 rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] max-w-md w-full animate-in fade-in zoom-in-95 duration-150 transition-colors">
+              <div className="pb-3 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-mono font-black bg-slate-100 text-slate-900 px-2 py-0.5 rounded border border-slate-900">
+                  <span className="text-[10px] font-mono font-black bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-2 py-0.5 rounded border border-slate-900 dark:border-slate-100">
                     {selectedAudit.auditCode}
                   </span>
-                  <h3 className="font-black text-base text-slate-900 mt-1">
+                  <h3 className="font-black text-base text-slate-900 dark:text-slate-50 mt-1">
                     Detail Temuan Audit
                   </h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedAudit(null)}
-                  className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 border-2 border-slate-900 text-slate-900 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                  className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="py-4 space-y-3 text-xs text-slate-700">
+              <div className="py-4 space-y-3 text-xs text-slate-700 dark:text-slate-300">
                 <div>
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Produk</span>
-                  <span className="font-black text-slate-900 text-sm">{selectedAudit.productName}</span>
-                  <span className="text-slate-500 font-mono text-[11px] block">SKU: {selectedAudit.sku}</span>
+                  <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Produk</span>
+                  <span className="font-black text-slate-900 dark:text-slate-100 text-sm">{selectedAudit.productName}</span>
+                  <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px] block">SKU: {selectedAudit.sku}</span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border-2 border-slate-900 text-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
+                <div className="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
                   <div>
-                    <span className="text-[9px] font-black text-slate-500 block uppercase">SISTEM</span>
-                    <span className="font-mono font-black text-sm text-slate-800">{selectedAudit.systemStock}</span>
+                    <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 block uppercase">SISTEM</span>
+                    <span className="font-mono font-black text-sm text-slate-800 dark:text-slate-200">{selectedAudit.systemStock}</span>
                   </div>
                   <div>
-                    <span className="text-[9px] font-black text-slate-500 block uppercase">FISIK</span>
-                    <span className="font-mono font-black text-sm text-slate-900">{selectedAudit.physicalStock}</span>
+                    <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 block uppercase">FISIK</span>
+                    <span className="font-mono font-black text-sm text-slate-900 dark:text-slate-100">{selectedAudit.physicalStock}</span>
                   </div>
                   <div>
-                    <span className="text-[9px] font-black text-slate-500 block uppercase">SELISIH</span>
-                    <span className={`font-mono font-black text-sm ${selectedAudit.diff < 0 ? "text-[#E11D48]" : selectedAudit.diff > 0 ? "text-[#4338CA]" : "text-emerald-700"}`}>
+                    <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 block uppercase">SELISIH</span>
+                    <span className={`font-mono font-black text-sm ${selectedAudit.diff < 0 ? "text-[#E11D48] dark:text-rose-400" : selectedAudit.diff > 0 ? "text-[#4338CA] dark:text-indigo-400" : "text-emerald-700 dark:text-emerald-400"}`}>
                       {selectedAudit.diff > 0 ? `+${selectedAudit.diff}` : selectedAudit.diff}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Dampak Nilai (Rp)</span>
-                  <span className="font-mono font-black text-base text-slate-900">{formatRupiah(selectedAudit.impactValueRp)}</span>
+                  <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Dampak Nilai (Rp)</span>
+                  <span className="font-mono font-black text-base text-slate-900 dark:text-slate-100">{formatRupiah(selectedAudit.impactValueRp)}</span>
                 </div>
 
                 <div>
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Kategori Alasan</span>
-                  <span className="font-bold text-slate-900">{selectedAudit.reason}</span>
+                  <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Kategori Alasan</span>
+                  <span className="font-bold text-slate-900 dark:text-slate-100">{selectedAudit.reason}</span>
                 </div>
 
                 <div>
-                  <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider block">Catatan Auditor</span>
-                  <p className="p-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl font-bold text-slate-800 leading-relaxed mt-1 text-xs">
+                  <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Catatan Auditor</span>
+                  <p className="p-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl font-bold text-slate-800 dark:text-slate-200 leading-relaxed mt-1 text-xs">
                     {selectedAudit.notes}
                   </p>
                 </div>
 
-                <div className="pt-1 text-[10px] text-slate-500 font-bold flex items-center justify-between">
-                  <span>Auditor: <strong className="text-slate-900">{selectedAudit.auditorName}</strong></span>
+                <div className="pt-1 text-[10px] text-slate-500 dark:text-slate-400 font-bold flex items-center justify-between">
+                  <span>Auditor: <strong className="text-slate-900 dark:text-slate-100">{selectedAudit.auditorName}</strong></span>
                   <span>{selectedAudit.date}</span>
                 </div>
               </div>
 
-              <div className="pt-3 border-t-2 border-slate-900 flex justify-end">
+              <div className="pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex justify-end">
                 <button
                   type="button"
                   onClick={() => setSelectedAudit(null)}
-                  className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+                  className="px-4 py-1.5 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 rounded-xl text-xs font-black border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
                 >
                   Tutup
                 </button>

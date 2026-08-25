@@ -248,17 +248,17 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#F1F5F9] p-4 lg:p-6 font-sans text-[#0F172A]">
+    <div className="w-full min-h-screen bg-slate-100 dark:bg-[#0F172A] p-4 lg:p-6 font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* ========================================================================= */}
         {/* 1. HEADER SECTION                                                         */}
         {/* ========================================================================= */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">
               Manajemen Pengguna & Hak Akses
             </h1>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
               Kelola akun pengguna, peranan hak akses (RBAC), reset kata sandi, dan status aktif staf.
             </p>
           </div>
@@ -267,7 +267,7 @@ export default function UserManagementPage() {
             <button
               type="button"
               onClick={handleOpenAddModal}
-              className="bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-xs px-4 py-2.5 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer inline-flex items-center gap-2"
+              className="bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white font-black text-xs px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer inline-flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -279,7 +279,7 @@ export default function UserManagementPage() {
               type="button"
               onClick={loadUsers}
               title="Refresh Data"
-              className="bg-white hover:bg-slate-100 border-2 border-slate-900 p-2.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-slate-900 transition-all cursor-pointer"
+              className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-slate-900 dark:border-slate-100 p-2.5 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] text-slate-900 dark:text-slate-100 transition-all cursor-pointer"
             >
               <svg
                 className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
@@ -302,43 +302,43 @@ export default function UserManagementPage() {
         {/* 2. 4 CARD KPI RINGKASAN                                                   */}
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-slate-500 font-black text-[10px] uppercase tracking-wider block">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-wider block">
               Total Pengguna
             </span>
-            <span className="text-xl font-black font-mono text-slate-900 mt-2 block">
+            <span className="text-xl font-black font-mono text-slate-900 dark:text-slate-50 mt-2 block">
               {kpiData.total}{" "}
-              <span className="text-xs font-bold text-slate-500 font-sans">akun</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 font-sans">akun</span>
             </span>
           </div>
 
-          <div className="bg-[#EEF2FF] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-[#4338CA] font-black text-[10px] uppercase tracking-wider block">
+          <div className="bg-[#EEF2FF] dark:bg-indigo-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[#4338CA] dark:text-indigo-300 font-black text-[10px] uppercase tracking-wider block">
               Administrator
             </span>
-            <span className="text-xl font-black font-mono text-[#4338CA] mt-2 block">
+            <span className="text-xl font-black font-mono text-[#4338CA] dark:text-indigo-300 mt-2 block">
               {kpiData.admin}{" "}
-              <span className="text-xs font-bold text-[#4338CA]/70 font-sans">orang</span>
+              <span className="text-xs font-bold text-[#4338CA]/70 dark:text-indigo-300/70 font-sans">orang</span>
             </span>
           </div>
 
-          <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-[#B45309] font-black text-[10px] uppercase tracking-wider block">
+          <div className="bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[#B45309] dark:text-amber-300 font-black text-[10px] uppercase tracking-wider block">
               Kasir (Cashier)
             </span>
-            <span className="text-xl font-black font-mono text-[#B45309] mt-2 block">
+            <span className="text-xl font-black font-mono text-[#B45309] dark:text-amber-300 mt-2 block">
               {kpiData.cashier}{" "}
-              <span className="text-xs font-bold text-[#B45309]/70 font-sans">orang</span>
+              <span className="text-xs font-bold text-[#B45309]/70 dark:text-amber-300/70 font-sans">orang</span>
             </span>
           </div>
 
-          <div className="bg-[#E0F2FE] border-2 border-slate-900 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col justify-between transition-all">
-            <span className="text-[#0369A1] font-black text-[10px] uppercase tracking-wider block">
+          <div className="bg-[#E0F2FE] dark:bg-sky-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[#0369A1] dark:text-sky-300 font-black text-[10px] uppercase tracking-wider block">
               Staf Gudang
             </span>
-            <span className="text-xl font-black font-mono text-[#0369A1] mt-2 block">
+            <span className="text-xl font-black font-mono text-[#0369A1] dark:text-sky-300 mt-2 block">
               {kpiData.warehouse}{" "}
-              <span className="text-xs font-bold text-[#0369A1]/70 font-sans">orang</span>
+              <span className="text-xs font-bold text-[#0369A1]/70 dark:text-sky-300/70 font-sans">orang</span>
             </span>
           </div>
         </div>
@@ -346,10 +346,10 @@ export default function UserManagementPage() {
         {/* ========================================================================= */}
         {/* 3. TOOLBAR SEARCH & FILTERS                                               */}
         {/* ========================================================================= */}
-        <div className="bg-white border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex flex-wrap items-center gap-3 mb-6">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-wrap items-center gap-3 mb-6 transition-colors">
           <div className="relative flex-1 min-w-[240px]">
             <svg
-              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -366,13 +366,13 @@ export default function UserManagementPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari Nama Pengguna, Email, atau No. Telepon..."
-              className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border-2 border-slate-900 rounded-lg text-xs font-bold text-slate-900 focus:outline-none focus:bg-white transition-all"
+              className="w-full pl-9 pr-4 py-1.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 transition-all"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
               >
                 ✕
               </button>
@@ -381,11 +381,11 @@ export default function UserManagementPage() {
 
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
             <div className="flex items-center gap-1.5">
-              <label className="text-xs font-bold text-slate-700 whitespace-nowrap">Role:</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">Role:</label>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="bg-white border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
               >
                 <option value="ALL">Semua Role</option>
                 <option value="ADMIN">ADMIN</option>
@@ -395,11 +395,11 @@ export default function UserManagementPage() {
             </div>
 
             <div className="flex items-center gap-1.5">
-              <label className="text-xs font-bold text-slate-700 whitespace-nowrap">Status:</label>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">Status:</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white border-2 border-slate-900 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
               >
                 <option value="ALL">Semua Status</option>
                 <option value="ACTIVE">Aktif</option>
@@ -412,37 +412,37 @@ export default function UserManagementPage() {
         {/* ========================================================================= */}
         {/* 4. TABEL PENGGUNA FIT-WIDTH 100%                                          */}
         {/* ========================================================================= */}
-        <div className="bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors">
           {isLoading ? (
-            <div className="p-12 text-center text-slate-500 space-y-3">
+            <div className="p-12 text-center text-slate-500 dark:text-slate-400 space-y-3">
               <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-bold text-slate-700">Memuat data pengguna...</p>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Memuat data pengguna...</p>
             </div>
           ) : error ? (
-            <div className="p-12 text-center text-red-600 space-y-3">
+            <div className="p-12 text-center text-rose-600 dark:text-rose-400 space-y-3">
               <p className="text-sm font-black">{error}</p>
               <button
                 type="button"
                 onClick={loadUsers}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+                className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-xs font-black border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
               >
                 Coba Lagi
               </button>
             </div>
           ) : filteredUsers.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 space-y-2">
-              <p className="text-sm font-black text-slate-800">
+            <div className="p-12 text-center text-slate-500 dark:text-slate-400 space-y-2">
+              <p className="text-sm font-black text-slate-800 dark:text-slate-200">
                 Tidak ada pengguna yang sesuai dengan kriteria filter.
               </p>
-              <p className="text-xs font-medium text-slate-500">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 Coba ubah kata kunci pencarian atau filter status/role.
               </p>
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
-              <table className="w-full table-fixed text-left border-collapse text-xs text-slate-600">
+              <table className="w-full table-fixed text-left border-collapse text-xs text-slate-600 dark:text-slate-300">
                 <thead>
-                  <tr className="bg-slate-100 border-b-2 border-slate-900 text-slate-900 font-black text-[11px] uppercase tracking-wider">
+                  <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 font-black text-[11px] uppercase tracking-wider">
                     <th className="w-[32%] px-4 py-3.5">Pengguna & Email</th>
                     <th className="w-[18%] px-3 py-3.5 text-center">Role / Hak Akses</th>
                     <th className="w-[15%] px-3 py-3.5 text-center">Status</th>
@@ -450,30 +450,30 @@ export default function UserManagementPage() {
                     <th className="w-[17%] px-4 py-3.5 text-center">Aksi</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 text-xs">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
                   {filteredUsers.map((user) => {
                     const initials = getInitials(user.displayName);
 
                     return (
                       <tr
                         key={user.uid}
-                        className="hover:bg-slate-50/80 transition-colors"
+                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors"
                       >
                         {/* Pengguna & Email */}
                         <td className="px-4 py-3.5 align-middle">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-[#FFB800] text-slate-950 font-black text-xs border-1.5 border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-[#FFB800] text-slate-950 font-black text-xs border-1.5 border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center shrink-0">
                               {initials}
                             </div>
                             <div className="min-w-0 flex-1">
                               <div
-                                className="font-bold text-slate-900 truncate"
+                                className="font-bold text-slate-900 dark:text-slate-100 truncate"
                                 title={user.displayName}
                               >
                                 {user.displayName}
                               </div>
                               <div
-                                className="text-[10px] text-slate-500 font-mono truncate"
+                                className="text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate"
                                 title={user.email}
                               >
                                 {user.email}
@@ -485,15 +485,15 @@ export default function UserManagementPage() {
                         {/* Role / Hak Akses */}
                         <td className="px-3 py-3.5 align-middle text-center">
                           {user.role === "ADMIN" ? (
-                            <span className="bg-[#EEF2FF] text-[#4338CA] border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                            <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                               ADMIN
                             </span>
                           ) : user.role === "CASHIER" ? (
-                            <span className="bg-[#FEF3C7] text-[#B45309] border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                            <span className="bg-[#FEF3C7] dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                               CASHIER
                             </span>
                           ) : (
-                            <span className="bg-[#E0F2FE] text-[#0369A1] border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] inline-block">
+                            <span className="bg-[#E0F2FE] dark:bg-sky-950/60 text-[#0369A1] dark:text-sky-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                               WAREHOUSE
                             </span>
                           )}
@@ -502,18 +502,18 @@ export default function UserManagementPage() {
                         {/* Status */}
                         <td className="px-3 py-3.5 align-middle text-center">
                           {user.isActive ? (
-                            <span className="bg-[#D1FAE5] text-[#065F46] border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
+                            <span className="bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
                               Aktif
                             </span>
                           ) : (
-                            <span className="bg-slate-100 text-slate-600 border-1.5 border-slate-900 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
+                            <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
                               Nonaktif
                             </span>
                           )}
                         </td>
 
                         {/* No. Telepon */}
-                        <td className="px-3 py-3.5 align-middle font-mono font-bold text-slate-800">
+                        <td className="px-3 py-3.5 align-middle font-mono font-bold text-slate-800 dark:text-slate-200">
                           {user.phone || "-"}
                         </td>
 
@@ -525,7 +525,7 @@ export default function UserManagementPage() {
                               type="button"
                               onClick={() => handleOpenEdit(user)}
                               title="Edit Pengguna"
-                              className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-slate-900"
+                              className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-slate-900 dark:text-slate-100"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -537,7 +537,7 @@ export default function UserManagementPage() {
                               type="button"
                               onClick={() => handleOpenResetPassword(user)}
                               title="Reset Password"
-                              className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-amber-700"
+                              className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-amber-700 dark:text-amber-400"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -549,7 +549,7 @@ export default function UserManagementPage() {
                               type="button"
                               onClick={() => handleDeleteUser(user)}
                               title="Hapus Pengguna"
-                              className="bg-white border-1.5 border-slate-900 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-rose-600"
+                              className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-rose-600 dark:text-rose-400"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -571,16 +571,16 @@ export default function UserManagementPage() {
       {/* 5. MODAL 1: TAMBAH PENGGUNA BARU                                         */}
       {/* ========================================================================= */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b-2 border-slate-900 flex items-center justify-between bg-slate-100">
-              <h3 className="font-black text-base text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transition-colors">
+            <div className="px-6 py-4 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between bg-slate-100 dark:bg-slate-800">
+              <h3 className="font-black text-base text-slate-900 dark:text-slate-50">
                 Tambah Pengguna Baru
               </h3>
               <button
                 type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="text-slate-900 hover:text-rose-600 text-lg font-black p-1 cursor-pointer"
+                className="text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 text-lg font-black p-1 cursor-pointer"
               >
                 ✕
               </button>
@@ -588,7 +588,7 @@ export default function UserManagementPage() {
 
             <form onSubmit={handleCreateUser} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                   Nama Lengkap <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -599,12 +599,12 @@ export default function UserManagementPage() {
                     setAddForm({ ...addForm, displayName: e.target.value })
                   }
                   placeholder="Contoh: Budi Santoso"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                   Alamat Email <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -615,12 +615,12 @@ export default function UserManagementPage() {
                     setAddForm({ ...addForm, email: e.target.value })
                   }
                   placeholder="Contoh: nama@dailymart.com"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                   Kata Sandi Awal <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -633,12 +633,12 @@ export default function UserManagementPage() {
                       setAddForm({ ...addForm, password: e.target.value })
                     }
                     placeholder="Minimal 6 karakter"
-                    className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                    className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowAddPassword(!showAddPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900 transition-colors p-1 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors p-1 cursor-pointer"
                     title={showAddPassword ? "Sembunyikan password" : "Tampilkan password"}
                   >
                     {showAddPassword ? (
@@ -657,7 +657,7 @@ export default function UserManagementPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                  <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                     Role / Akses <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -666,7 +666,7 @@ export default function UserManagementPage() {
                     onChange={(e) =>
                       setAddForm({ ...addForm, role: e.target.value as UserRole })
                     }
-                    className="w-full px-3.5 py-2.5 bg-white border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none"
                   >
                     <option value="" disabled>
                       -- Pilih Role --
@@ -678,7 +678,7 @@ export default function UserManagementPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                  <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                     No. Telepon / HP
                   </label>
                   <input
@@ -688,23 +688,23 @@ export default function UserManagementPage() {
                       setAddForm({ ...addForm, phone: e.target.value })
                     }
                     placeholder="Contoh: 081234567890"
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t-2 border-slate-900 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 text-xs font-bold text-slate-900 hover:bg-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-xs font-bold text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white text-xs font-black border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
                 >
                   {isSubmitting && (
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -721,21 +721,21 @@ export default function UserManagementPage() {
       {/* 6. MODAL 2: EDIT PENGGUNA                                                */}
       {/* ========================================================================= */}
       {isEditModalOpen && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b-2 border-slate-900 flex items-center justify-between bg-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transition-colors">
+            <div className="px-6 py-4 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between bg-slate-100 dark:bg-slate-800">
               <div>
-                <h3 className="font-black text-base text-slate-900">
+                <h3 className="font-black text-base text-slate-900 dark:text-slate-50">
                   Edit Pengguna
                 </h3>
-                <p className="text-xs text-slate-600 font-mono font-bold mt-0.5">
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-mono font-bold mt-0.5">
                   {selectedUser.email}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
-                className="text-slate-900 hover:text-rose-600 text-lg font-black p-1 cursor-pointer"
+                className="text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 text-lg font-black p-1 cursor-pointer"
               >
                 ✕
               </button>
@@ -743,7 +743,7 @@ export default function UserManagementPage() {
 
             <form onSubmit={handleEditUser} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                   Nama Lengkap <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -753,13 +753,13 @@ export default function UserManagementPage() {
                   onChange={(e) =>
                     setEditForm({ ...editForm, displayName: e.target.value })
                   }
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                  <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                     Role / Akses <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -767,7 +767,7 @@ export default function UserManagementPage() {
                     onChange={(e) =>
                       setEditForm({ ...editForm, role: e.target.value as UserRole })
                     }
-                    className="w-full px-3.5 py-2.5 bg-white border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none"
                   >
                     <option value="CASHIER">CASHIER (Kasir)</option>
                     <option value="WAREHOUSE">WAREHOUSE (Gudang)</option>
@@ -776,7 +776,7 @@ export default function UserManagementPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                  <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                     Status Akun <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -787,7 +787,7 @@ export default function UserManagementPage() {
                         isActive: e.target.value === "ACTIVE",
                       })
                     }
-                    className="w-full px-3.5 py-2.5 bg-white border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none"
                   >
                     <option value="ACTIVE">Aktif (Bisa Login)</option>
                     <option value="INACTIVE">Nonaktif (Blokir)</option>
@@ -796,7 +796,7 @@ export default function UserManagementPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                   No. Telepon / HP
                 </label>
                 <input
@@ -805,22 +805,22 @@ export default function UserManagementPage() {
                   onChange={(e) =>
                     setEditForm({ ...editForm, phone: e.target.value })
                   }
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none"
                 />
               </div>
 
-              <div className="pt-3 border-t-2 border-slate-900 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 text-xs font-bold text-slate-900 hover:bg-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-xs font-bold text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white text-xs font-black border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
                 >
                   {isSubmitting && (
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -837,21 +837,21 @@ export default function UserManagementPage() {
       {/* 7. MODAL 3: RESET PASSWORD                                                */}
       {/* ========================================================================= */}
       {isResetModalOpen && selectedUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b-2 border-slate-900 flex items-center justify-between bg-[#FEF3C7]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transition-colors">
+            <div className="px-6 py-4 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between bg-[#FEF3C7] dark:bg-amber-950/60">
               <div>
-                <h3 className="font-black text-base text-[#B45309]">
+                <h3 className="font-black text-base text-[#B45309] dark:text-amber-200">
                   Reset Kata Sandi
                 </h3>
-                <p className="text-xs text-[#B45309] font-mono font-bold mt-0.5">
+                <p className="text-xs text-[#B45309] dark:text-amber-300 font-mono font-bold mt-0.5">
                   {selectedUser.displayName} ({selectedUser.email})
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsResetModalOpen(false)}
-                className="text-slate-900 hover:text-rose-600 text-lg font-black p-1 cursor-pointer"
+                className="text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 text-lg font-black p-1 cursor-pointer"
               >
                 ✕
               </button>
@@ -859,7 +859,7 @@ export default function UserManagementPage() {
 
             <form onSubmit={handleResetPassword} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-black uppercase text-slate-800 mb-1">
+                <label className="block text-xs font-black uppercase text-slate-800 dark:text-slate-200 mb-1">
                   Kata Sandi Baru <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -870,12 +870,12 @@ export default function UserManagementPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Masukkan kata sandi baru (min 6 karakter)"
-                    className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none"
+                    className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:bg-white dark:focus:bg-slate-900 focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowResetPassword(!showResetPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900 transition-colors p-1 cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors p-1 cursor-pointer"
                     title={showResetPassword ? "Sembunyikan password" : "Tampilkan password"}
                   >
                     {showResetPassword ? (
@@ -892,22 +892,22 @@ export default function UserManagementPage() {
                 </div>
               </div>
 
-              <div className="p-3 bg-[#FEF3C7] border-1.5 border-slate-900 rounded-xl text-[11px] text-[#B45309] font-bold shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
+              <div className="p-3 bg-[#FEF3C7] dark:bg-amber-950/50 border-1.5 border-slate-900 dark:border-slate-100 rounded-xl text-[11px] text-[#B45309] dark:text-amber-200 font-bold shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
                 ⚠️ Kata sandi pengguna akan langsung diperbarui di Firebase Auth. Pastikan Anda menyampaikan kata sandi baru kepada pengguna yang bersangkutan.
               </div>
 
-              <div className="pt-3 border-t-2 border-slate-900 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsResetModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 text-xs font-bold text-slate-900 hover:bg-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-xs font-bold text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-black border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-xs font-black border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
                 >
                   {isSubmitting && (
                     <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />

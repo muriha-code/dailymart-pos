@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import AppShell from "@/components/layout/AppShell";
 import ToastProvider from "@/components/providers/ToastProvider";
+import Providers from "./providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,9 +31,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col font-sans antialiased bg-slate-50 text-slate-900" suppressHydrationWarning>
-        <ToastProvider />
-        <AppShell>{children}</AppShell>
+      <body className="min-h-full flex flex-col font-sans antialiased bg-slate-100 text-slate-900 dark:bg-[#0F172A] dark:text-slate-100 transition-colors duration-200" suppressHydrationWarning>
+        <Providers>
+          <ToastProvider />
+          <AppShell>{children}</AppShell>
+        </Providers>
       </body>
     </html>
   );

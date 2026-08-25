@@ -268,25 +268,17 @@ export default function StockReturnsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] p-4 sm:p-6 lg:p-8 font-sans">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-200">
+      <div className="max-w-7xl mx-auto">
         {/* ========================================================================= */}
-        {/* 1. PAGE HEADER                                                            */}
+        {/* 1. PAGE HEADER COMPACT & CLEAN (HAPUS BADGE)                             */}
         {/* ========================================================================= */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800 font-extrabold text-[11px] uppercase tracking-wider">
-                Gudang & Inventaris
-              </span>
-              <span className="text-xs text-slate-400">• Retur & Damage</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
+            <h1 className="text-lg font-black text-slate-900 dark:text-slate-50 tracking-tight">
               Kelola Retur & Barang Rusak
             </h1>
-
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mt-0.5">
               Pencatatan pengembalian barang ke vendor supplier dan pemusnahan barang rusak/kedaluwarsa.
             </p>
           </div>
@@ -294,105 +286,71 @@ export default function StockReturnsPage() {
           <button
             type="button"
             onClick={handleOpenModal}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer shrink-0"
+            className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:hover:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-all flex items-center gap-2 cursor-pointer shrink-0"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
             </svg>
             <span>Catat Retur / Barang Rusak</span>
           </button>
         </div>
 
         {/* ========================================================================= */}
-        {/* 2. KPI METRICS CARDS                                                      */}
+        {/* 2. KPI RETURN STAT CARDS (3 GRID METRICS - COMPACT)                       */}
         {/* ========================================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
           {/* Card 1: Total Unit Diproses */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Total Unit Diproses
-              </span>
-              <span className="text-2xl font-black text-slate-900 mt-1 block font-mono">
-                {totalUnitProcessed}{" "}
-                <span className="text-xs font-normal text-slate-400">unit</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 block mb-1">
+              Total Unit Diproses
+            </span>
+            <span className="text-lg font-black font-mono text-slate-900 dark:text-slate-50 block">
+              {totalUnitProcessed}{" "}
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">unit</span>
+            </span>
           </div>
 
           {/* Card 2: Retur ke Supplier */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Retur ke Supplier (Claim)
-              </span>
-              <span className="text-2xl font-black text-amber-600 mt-1 block font-mono">
-                {totalSupplierReturns}{" "}
-                <span className="text-xs font-normal text-slate-400">unit</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8" />
-              </svg>
-            </div>
+          <div className="bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#B45309] dark:text-amber-300 block mb-1">
+              Retur ke Supplier (Claim)
+            </span>
+            <span className="text-[#B45309] dark:text-amber-300 font-mono font-black text-lg block">
+              {totalSupplierReturns}{" "}
+              <span className="text-xs font-bold text-[#B45309]/80 dark:text-amber-300/80">unit</span>
+            </span>
           </div>
 
           {/* Card 3: Pemusnahan Barang Rusak */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
-                Pemusnahan / Write-Off
-              </span>
-              <span className="text-2xl font-black text-red-600 mt-1 block font-mono">
-                {totalDisposals}{" "}
-                <span className="text-xs font-normal text-slate-400">unit</span>
-              </span>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-700 shrink-0">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </div>
+          <div className="bg-[#FFE4E6] dark:bg-rose-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] flex flex-col justify-between transition-all">
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#E11D48] dark:text-rose-400 block mb-1">
+              Pemusnahan / Write-Off
+            </span>
+            <span className="text-[#E11D48] dark:text-rose-400 font-mono font-black text-lg block">
+              {totalDisposals}{" "}
+              <span className="text-xs font-bold text-[#E11D48]/80 dark:text-rose-400/80">unit</span>
+            </span>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. TOOLBAR SEARCH & FILTER                                                */}
+        {/* 3. INLINE FILTER BAR                                                      */}
         {/* ========================================================================= */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex flex-wrap items-center gap-2 mb-4 transition-colors">
           {/* Search Input Bar */}
-          <div className="relative flex-1">
-            <svg
-              className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+          <div className="relative flex-1 min-w-[200px]">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari Kode Retur (RTN-...), SKU, Nama Produk, atau Supplier..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-slate-900 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none transition-all"
+              className="bg-slate-50 dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 rounded-lg px-3 py-1 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 placeholder:text-slate-400 dark:placeholder:text-slate-500 flex-1 w-full"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-900 dark:text-slate-100 hover:text-slate-600 dark:hover:text-slate-400"
               >
                 ✕
               </button>
@@ -400,14 +358,14 @@ export default function StockReturnsPage() {
           </div>
 
           {/* Filters Dropdown */}
-          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
             {/* Tipe Filter */}
-            <div className="flex items-center gap-1.5 min-w-[150px]">
-              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Tipe:</label>
+            <div className="flex items-center gap-1.5 min-w-[140px]">
+              <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 whitespace-nowrap">Tipe:</label>
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
+                className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] w-full cursor-pointer"
               >
                 <option value="ALL">Semua Tipe</option>
                 <option value="RETURN_TO_SUPPLIER">Retur Supplier</option>
@@ -416,12 +374,12 @@ export default function StockReturnsPage() {
             </div>
 
             {/* Alasan Filter */}
-            <div className="flex items-center gap-1.5 min-w-[160px]">
-              <label className="text-xs font-semibold text-slate-500 whitespace-nowrap">Alasan:</label>
+            <div className="flex items-center gap-1.5 min-w-[150px]">
+              <label className="text-[11px] font-black text-slate-700 dark:text-slate-300 whitespace-nowrap">Alasan:</label>
               <select
                 value={reasonFilter}
                 onChange={(e) => setReasonFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none"
+                className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] w-full cursor-pointer"
               >
                 <option value="ALL">Semua Alasan</option>
                 <option value="EXPIRED">Kedaluwarsa</option>
@@ -436,10 +394,11 @@ export default function StockReturnsPage() {
             <button
               type="button"
               onClick={loadReturnLogs}
-              className="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer shrink-0 inline-flex items-center gap-1.5"
+              className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] text-slate-900 dark:text-slate-100 transition-all cursor-pointer flex items-center gap-1"
+              title="Refresh Data"
             >
               <svg
-                className={`w-4 h-4 ${isLoadingLogs ? "animate-spin" : ""}`}
+                className={`w-3.5 h-3.5 ${isLoadingLogs ? "animate-spin" : ""}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -447,58 +406,57 @@ export default function StockReturnsPage() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
-              <span>Refresh</span>
             </button>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 4. TABEL RIWAYAT RETUR / BARANG RUSAK                                      */}
+        {/* 4. TABLE DATA RETUR & DAMAGE                                              */}
         {/* ========================================================================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[3.5px_3.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3.5px_3.5px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors">
           {isLoadingLogs ? (
-            <div className="p-12 text-center text-slate-500 space-y-3">
-              <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-medium">Memuat riwayat retur & barang rusak...</p>
+            <div className="p-12 text-center text-slate-700 dark:text-slate-300 space-y-2">
+              <div className="w-8 h-8 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs font-black">Memuat riwayat retur & barang rusak...</p>
             </div>
           ) : logsError ? (
-            <div className="p-12 text-center text-red-600 space-y-3">
-              <p className="text-sm font-bold">{logsError}</p>
+            <div className="p-12 text-center text-rose-600 dark:text-rose-400 space-y-2">
+              <p className="text-sm font-black">{logsError}</p>
               <button
                 type="button"
                 onClick={loadReturnLogs}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold"
+                className="px-4 py-2 bg-[#6366F1] text-white border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:bg-[#4F46E5] cursor-pointer"
               >
                 Coba Lagi
               </button>
             </div>
           ) : returnLogs.length === 0 ? (
-            <div className="p-12 text-center text-slate-500 space-y-2">
-              <p className="text-sm font-bold text-slate-800">
+            <div className="p-12 text-center text-slate-900 dark:text-slate-100 space-y-1">
+              <p className="text-sm font-black text-slate-900 dark:text-slate-100">
                 Belum ada data retur atau pemusnahan barang rusak.
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
                 Klik tombol &quot;Catat Retur / Barang Rusak&quot; untuk memulai pencatatan baru.
               </p>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
-              <table className="w-full table-fixed text-left border-collapse text-xs text-slate-600">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                    <th className="w-[15%] px-3.5 py-3">Waktu & Kode Retur</th>
-                    <th className="w-[26%] px-3 py-3">Produk & SKU</th>
-                    <th className="w-[10%] px-3 py-3 text-center">Jumlah</th>
-                    <th className="w-[18%] px-3 py-3">Tipe & Alasan</th>
-                    <th className="w-[19%] px-3 py-3">Supplier / Keterangan</th>
-                    <th className="w-[12%] px-3.5 py-3 text-right">Status</th>
+                  <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 font-black text-[10px] uppercase tracking-wider">
+                    <th className="py-3 px-3.5">Waktu & Kode Retur</th>
+                    <th className="py-3 px-3">Produk & SKU</th>
+                    <th className="py-3 px-3 text-center">Jumlah</th>
+                    <th className="py-3 px-3">Tipe & Alasan</th>
+                    <th className="py-3 px-3">Supplier / Keterangan</th>
+                    <th className="py-3 px-3.5 text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-xs">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs text-slate-900 dark:text-slate-100 font-bold">
                   {paginatedLogs.map((log) => {
                     const isSupplierReturn = log.type === "RETURN_TO_SUPPLIER";
                     const reasonText = REASON_LABELS[log.reason] || log.reason;
@@ -506,88 +464,87 @@ export default function StockReturnsPage() {
                     return (
                       <tr
                         key={log.id || log.returnCode}
-                        className="hover:bg-slate-50/80 transition-colors"
+                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors border-b border-slate-200 dark:border-slate-800"
                       >
                         {/* 1. Waktu & Kode Retur */}
-                        <td className="px-3.5 py-3 align-top">
-                          <div className="font-mono font-bold text-slate-900 truncate">
+                        <td className="py-3 px-3.5 align-top whitespace-nowrap">
+                          <div className="font-mono font-bold text-slate-900 dark:text-slate-100">
                             {log.returnCode || log.id}
                           </div>
-                          <div className="text-[11px] text-slate-400 mt-0.5 whitespace-nowrap">
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
                             {formatDate(log.createdAt)}
                           </div>
                         </td>
 
-                        {/* 2. Produk & SKU */}
-                        <td className="px-3 py-3 align-top">
-                          <div className="font-semibold text-slate-900 leading-snug line-clamp-1" title={log.productName}>
+                        {/* 2. Produk & SKU Tag */}
+                        <td className="py-3 px-3 align-top">
+                          <div className="font-black text-slate-900 dark:text-slate-100 leading-snug line-clamp-1" title={log.productName}>
                             {log.productName}
                           </div>
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1">
-                            <span className="font-mono font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
-                              {log.sku}
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="font-mono text-[10px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700">
+                              SKU: {log.sku}
                             </span>
                             {log.category && (
-                              <>
-                                <span>•</span>
-                                <span className="truncate text-slate-400">{log.category}</span>
-                              </>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">• {log.category}</span>
                             )}
                           </div>
                         </td>
 
-                        {/* 3. Jumlah (Qty) */}
-                        <td className="px-3 py-3 align-top text-center">
-                          <span className="inline-block font-mono font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100 text-xs whitespace-nowrap">
+                        {/* 3. Jumlah (Qty) (-Unit) */}
+                        <td className="py-3 px-3 align-top text-center">
+                          <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-black text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                             -{log.quantity} Unit
                           </span>
                         </td>
 
-                        {/* 4. Tipe & Alasan */}
-                        <td className="px-3 py-3 align-top">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
-                            !isSupplierReturn 
-                              ? 'bg-rose-50 text-rose-700 border-rose-200' 
-                              : 'bg-amber-50 text-amber-700 border-amber-200'
-                          }`}>
-                            {!isSupplierReturn ? '🗑️ Pemusnahan' : '📦 Retur Vendor'}
-                          </span>
-                          <p className="text-[11px] font-medium text-slate-700 mt-1 line-clamp-1" title={reasonText}>
+                        {/* 4. Tipe & Alasan Badges */}
+                        <td className="py-3 px-3 align-top">
+                          {!isSupplierReturn ? (
+                            <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
+                              🗑️ PEMUSNAHAN
+                            </span>
+                          ) : (
+                            <span className="bg-[#FEF3C7] dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md inline-block">
+                              📦 RETUR VENDOR
+                            </span>
+                          )}
+                          <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-1 line-clamp-1" title={reasonText}>
                             {reasonText}
                           </p>
                         </td>
 
                         {/* 5. Supplier / Keterangan */}
-                        <td className="px-3 py-3 align-top">
+                        <td className="py-3 px-3 align-top">
                           {isSupplierReturn && log.supplierName && log.supplierName !== '-' ? (
-                            <div className="font-semibold text-slate-800 text-[11px] line-clamp-1" title={log.supplierName}>
+                            <div className="font-black text-slate-800 dark:text-slate-200 text-xs line-clamp-1" title={log.supplierName}>
                               {log.supplierName}
                             </div>
                           ) : (
-                            <div className="text-[11px] text-slate-400 italic">Pemusnahan Internal</div>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 italic font-medium">Pemusnahan Internal</div>
                           )}
                           {log.notes && (
-                            <p className="text-[11px] text-slate-500 italic line-clamp-2 mt-0.5" title={log.notes}>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-400 italic font-medium line-clamp-2 mt-0.5" title={log.notes}>
                               &quot;{log.notes}&quot;
                             </p>
                           )}
                         </td>
 
-                        {/* 6. Status */}
-                        <td className="px-3.5 py-3 align-top text-right whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                            log.actionStatus === 'COMPLETED'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : log.actionStatus === 'DISPOSED'
-                              ? 'bg-slate-100 text-slate-700 border-slate-200'
-                              : 'bg-amber-50 text-amber-700 border-amber-200'
-                          }`}>
-                            {log.actionStatus === 'COMPLETED'
-                              ? '✓ Selesai'
-                              : log.actionStatus === 'DISPOSED'
-                              ? '🔥 Dimusnahkan'
-                              : '⏳ Menunggu'}
-                          </span>
+                        {/* 6. Status Badges */}
+                        <td className="py-3 px-3.5 align-top text-right whitespace-nowrap">
+                          {log.actionStatus === 'COMPLETED' ? (
+                            <span className="bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                              ✓ Selesai
+                            </span>
+                          ) : log.actionStatus === 'DISPOSED' ? (
+                            <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                              🔥 Dimusnahkan
+                            </span>
+                          ) : (
+                            <span className="bg-[#FEF3C7] dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                              ⏳ Menunggu
+                            </span>
+                          )}
                         </td>
                       </tr>
                     );
@@ -610,16 +567,16 @@ export default function StockReturnsPage() {
       {/* 5. MODAL FORM PENCATATAN RETUR & BARANG RUSAK                             */}
       {/* ========================================================================= */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] transition-colors">
             
             {/* Modal Header */}
-            <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
+            <div className="px-5 py-4 bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between shrink-0 transition-colors">
               <div>
-                <h3 className="text-base font-extrabold text-slate-900">
+                <h3 className="text-sm font-black text-slate-900 dark:text-slate-50">
                   Formulir Retur & Barang Rusak
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-bold mt-0.5">
                   Pencatatan barang cacat/expired untuk dipotong dari stok produk secara atomik.
                 </p>
               </div>
@@ -627,7 +584,8 @@ export default function StockReturnsPage() {
                 type="button"
                 onClick={handleCloseModal}
                 disabled={isSubmitting}
-                className="text-slate-400 hover:text-slate-600 text-base font-bold p-1 cursor-pointer"
+                className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 flex items-center justify-center font-black text-xs transition-colors cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
+                title="Tutup Modal"
               >
                 ✕
               </button>
@@ -636,15 +594,15 @@ export default function StockReturnsPage() {
             {/* Modal Body Form */}
             <form onSubmit={handleSubmitReturn} className="p-5 overflow-y-auto space-y-4 flex-1">
               {submitError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-bold text-red-600">
+                <div className="p-3 bg-rose-100 dark:bg-rose-950/60 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black text-rose-800 dark:text-rose-300 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
                   {submitError}
                 </div>
               )}
 
               {/* 1. Pemilihan Produk */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Pilih Produk Yang Diretur / Rusak <span className="text-red-500">*</span>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                  Pilih Produk Yang Diretur / Rusak <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
 
                 <input
@@ -652,14 +610,14 @@ export default function StockReturnsPage() {
                   value={productSearchModal}
                   onChange={(e) => setProductSearchModal(e.target.value)}
                   placeholder="Ketik untuk filter nama produk / SKU..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium mb-1"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 mb-1.5 w-full shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]"
                 />
 
                 <select
                   value={selectedProductId}
                   onChange={(e) => setSelectedProductId(e.target.value)}
                   required
-                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full cursor-pointer"
                 >
                   <option value="">-- Pilih Produk --</option>
                   {modalFilteredProducts.map((p) => {
@@ -670,7 +628,7 @@ export default function StockReturnsPage() {
                         key={pId}
                         value={pId}
                         disabled={stock <= 0}
-                        className={stock <= 0 ? "text-slate-400 bg-slate-100" : "text-slate-900 font-bold"}
+                        className={stock <= 0 ? "text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 font-normal" : "text-slate-900 dark:text-slate-100 font-bold bg-white dark:bg-slate-900"}
                       >
                         {p.name} (SKU: {p.sku} | Stok: {stock} {p.unit}){stock <= 0 ? " [Stok Habis]" : ""}
                       </option>
@@ -681,20 +639,20 @@ export default function StockReturnsPage() {
 
               {/* 2. Ringkasan Info Produk Terpilih */}
               {selectedProduct && (
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between transition-colors">
                   <div>
-                    <h4 className="font-extrabold text-xs text-slate-900">
+                    <h4 className="font-black text-xs text-slate-900 dark:text-slate-100">
                       {selectedProduct.name}
                     </h4>
-                    <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 font-mono font-bold mt-0.5">
                       SKU: {selectedProduct.sku} • {selectedProduct.categoryName || "Umum"}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                       Stok Tersedia
                     </span>
-                    <span className="text-sm font-black font-mono text-slate-800">
+                    <span className="text-sm font-black font-mono text-slate-900 dark:text-slate-100">
                       {maxAvailableStock} {selectedProduct.unit}
                     </span>
                   </div>
@@ -702,23 +660,23 @@ export default function StockReturnsPage() {
               )}
 
               {/* 3. Tipe Proses Retur (Pill Selector) */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Tipe Proses Retur <span className="text-red-500">*</span>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                  Tipe Proses Retur <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
 
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setReturnType("RETURN_TO_SUPPLIER")}
-                    className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                    className={`px-3 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-xs font-black transition-all cursor-pointer flex flex-col items-center gap-1 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] ${
                       returnType === "RETURN_TO_SUPPLIER"
-                        ? "bg-amber-50 border-amber-500 text-amber-950 shadow-xs"
-                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                        ? "bg-[#FEF3C7] dark:bg-amber-950/60 text-amber-950 dark:text-amber-300"
+                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
                     }`}
                   >
                     <span>📦 Retur ke Supplier</span>
-                    <span className="text-[10px] font-normal text-slate-500 text-center">
+                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 text-center">
                       Klaim pengembalian barang ke vendor
                     </span>
                   </button>
@@ -726,14 +684,14 @@ export default function StockReturnsPage() {
                   <button
                     type="button"
                     onClick={() => setReturnType("DISPOSAL_DAMAGED")}
-                    className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                    className={`px-3 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-xs font-black transition-all cursor-pointer flex flex-col items-center gap-1 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] ${
                       returnType === "DISPOSAL_DAMAGED"
-                        ? "bg-red-50 border-red-500 text-red-950 shadow-xs"
-                        : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                        ? "bg-[#FFE4E6] dark:bg-rose-950/60 text-rose-950 dark:text-rose-300"
+                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
                     }`}
                   >
                     <span>🗑️ Pemusnahan Barang Rusak</span>
-                    <span className="text-[10px] font-normal text-slate-500 text-center">
+                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 text-center">
                       Write-off pecah / expired / busuk
                     </span>
                   </button>
@@ -741,9 +699,9 @@ export default function StockReturnsPage() {
               </div>
 
               {/* 4. Input Jumlah Retur / Rusak */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Jumlah Barang (Qty Unit) <span className="text-red-500">*</span>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                  Jumlah Barang (Qty Unit) <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
 
                 <div className="flex items-center gap-2">
@@ -751,7 +709,7 @@ export default function StockReturnsPage() {
                     type="button"
                     onClick={() => setQuantityInput(String(Math.max(1, numericQty - 1)))}
                     disabled={!selectedProduct || numericQty <= 1}
-                    className="w-10 h-10 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-base flex items-center justify-center cursor-pointer disabled:opacity-40"
+                    className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-base flex items-center justify-center cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] active:translate-y-[1px] disabled:opacity-40"
                   >
                     -
                   </button>
@@ -764,36 +722,36 @@ export default function StockReturnsPage() {
                     onChange={(e) => setQuantityInput(e.target.value)}
                     placeholder="Masukkan Qty..."
                     required
-                    className="flex-1 px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-base font-black font-mono text-center text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    className="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-base font-black font-mono text-center text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                   />
 
                   <button
                     type="button"
                     onClick={() => setQuantityInput(String(Math.min(maxAvailableStock || 1, numericQty + 1)))}
                     disabled={!selectedProduct || numericQty >= maxAvailableStock}
-                    className="w-10 h-10 rounded-xl border border-slate-300 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-base flex items-center justify-center cursor-pointer disabled:opacity-40"
+                    className="w-10 h-10 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-base flex items-center justify-center cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] active:translate-y-[1px] disabled:opacity-40"
                   >
                     +
                   </button>
                 </div>
 
                 {selectedProduct && numericQty > maxAvailableStock && (
-                  <p className="text-[11px] text-red-600 font-bold">
+                  <p className="text-[11px] text-rose-600 dark:text-rose-400 font-black">
                     ⚠️ Jumlah retur melebihi stok yang tersedia ({maxAvailableStock} {selectedProduct.unit}).
                   </p>
                 )}
               </div>
 
               {/* 5. Alasan Kerusakan / Retur */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                  Alasan Kerusakan / Retur <span className="text-red-500">*</span>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                  Alasan Kerusakan / Retur <span className="text-rose-600 dark:text-rose-400">*</span>
                 </label>
 
                 <select
                   value={reasonInput}
                   onChange={(e) => setReasonInput(e.target.value as any)}
-                  className="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full cursor-pointer"
                 >
                   <option value="PACKAGING_DAMAGED">Kemasan Rusak / Bocor / Pecah</option>
                   <option value="EXPIRED">Kedaluwarsa / Expired</option>
@@ -803,11 +761,11 @@ export default function StockReturnsPage() {
                 </select>
               </div>
 
-              {/* 6. Nama Supplier (Searchable Dropdown dari Database) */}
+              {/* 6. Nama Supplier */}
               {returnType === "RETURN_TO_SUPPLIER" && (
-                <div className="space-y-1.5 animate-fade-in">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                    Nama Supplier / Vendor <span className="text-red-500">*</span>
+                <div className="space-y-1 animate-fade-in">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                    Nama Supplier / Vendor <span className="text-rose-600 dark:text-rose-400">*</span>
                   </label>
 
                   <SearchableSelect
@@ -824,8 +782,8 @@ export default function StockReturnsPage() {
               )}
 
               {/* 7. Catatan Tambahan (Opsional) */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
                   Catatan Kondisi Barang (Opsional)
                 </label>
                 <textarea
@@ -833,17 +791,17 @@ export default function StockReturnsPage() {
                   value={notesInput}
                   onChange={(e) => setNotesInput(e.target.value)}
                   placeholder="Keterangan nomor faktur pengiriman, detail bocor/rusak..."
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"
+                  className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] w-full placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 />
               </div>
 
               {/* Modal Actions */}
-              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
+              <div className="pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end gap-2.5 shrink-0 transition-colors">
                 <button
                   type="button"
                   onClick={handleCloseModal}
                   disabled={isSubmitting}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
+                  className="bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs px-3.5 py-2 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
@@ -857,10 +815,10 @@ export default function StockReturnsPage() {
                     numericQty > maxAvailableStock ||
                     (returnType === "RETURN_TO_SUPPLIER" && !supplierNameInput.trim())
                   }
-                  className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="bg-[#FFB800] hover:bg-[#FFA800] text-slate-950 font-black text-xs px-5 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSubmitting && (
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
                   )}
                   <span>{isSubmitting ? "Memproses..." : "Proses & Potong Stok"}</span>
                 </button>

@@ -56,10 +56,10 @@ const formatRupiah = (amount: number): string => {
 // Helper Fallback Icon Kategori Netral (Minimalist Cube / Box Package)
 const CategoryIconFallback = () => {
   return (
-    <div className="flex items-center justify-center bg-slate-100/70 border border-slate-200/70 rounded-xl w-full h-full p-2 text-center select-none">
+    <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70 rounded-xl w-full h-full p-2 text-center select-none">
       {/* Box Package 3D Cube Icon */}
       <svg
-        className="w-8 h-8 text-slate-400"
+        className="w-8 h-8 text-slate-400 dark:text-slate-500"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -540,7 +540,7 @@ export default function CashierTransactionsPage() {
   }, [grandTotal]);
 
   return (
-    <div className="h-screen w-full overflow-hidden p-3 bg-slate-50 text-slate-900 select-none font-sans flex flex-col">
+    <div className="h-screen w-full overflow-hidden p-3 bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 select-none font-sans flex flex-col transition-colors duration-200">
       {/* ========================================================================= */}
       {/* MAIN FULL-HEIGHT GRID LAYOUT (Col 8 Catalog | Col 4 Cart)                  */}
       {/* ========================================================================= */}
@@ -548,12 +548,12 @@ export default function CashierTransactionsPage() {
         {/* ========================================================================= */}
         {/* 1. KATALOG PRODUK (col-span-12 lg:col-span-8)                             */}
         {/* ========================================================================= */}
-        <div className="col-span-12 lg:col-span-8 flex flex-col h-full min-h-0 bg-white rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] overflow-hidden">
+        <div className="col-span-12 lg:col-span-8 flex flex-col h-full min-h-0 bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors">
           {/* Top Search & Filter Bar */}
-          <div className="p-3 bg-slate-50 border-b-2 border-slate-900 space-y-2.5 shrink-0">
+          <div className="p-3 bg-slate-50 dark:bg-slate-800/80 border-b-2 border-slate-900 dark:border-slate-100 space-y-2.5 shrink-0 transition-colors">
             {/* Search Input Bar */}
             <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-slate-700 pointer-events-none">
+              <span className="absolute left-3.5 text-slate-700 dark:text-slate-300 pointer-events-none">
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -574,7 +574,7 @@ export default function CashierTransactionsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari nama produk / SKU / Barcode... [F2]"
-                className="bg-white border-2 border-slate-900 rounded-xl pl-10 pr-16 py-2.5 text-xs font-bold text-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] focus:outline-none focus:ring-0 placeholder:text-slate-400 w-full"
+                className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl pl-10 pr-16 py-2.5 text-xs font-bold text-slate-900 dark:text-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] focus:outline-none focus:ring-0 placeholder:text-slate-400 dark:placeholder:text-slate-500 w-full"
               />
               {searchQuery && (
                 <button
@@ -583,7 +583,7 @@ export default function CashierTransactionsPage() {
                     setSearchQuery("");
                     searchInputRef.current?.focus();
                   }}
-                  className="absolute right-3 px-2 py-0.5 text-xs font-bold text-slate-900 bg-slate-200 hover:bg-slate-300 border border-slate-900 rounded transition-colors cursor-pointer"
+                  className="absolute right-3 px-2 py-0.5 text-xs font-bold text-slate-900 dark:text-slate-100 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 border border-slate-900 dark:border-slate-100 rounded transition-colors cursor-pointer"
                 >
                   Clear ✕
                 </button>
@@ -601,8 +601,8 @@ export default function CashierTransactionsPage() {
                     onClick={() => setSelectedCategory(cat.id)}
                     className={
                       isActive
-                        ? "bg-[#6366F1] text-white font-black text-xs px-3.5 py-1.5 rounded-lg border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] shrink-0 cursor-pointer"
-                        : "bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs px-3.5 py-1.5 rounded-lg border-2 border-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] shrink-0 transition-all cursor-pointer"
+                        ? "bg-[#6366F1] text-white font-black text-xs px-3.5 py-1.5 rounded-lg border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] shrink-0 cursor-pointer"
+                        : "bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs px-3.5 py-1.5 rounded-lg border-2 border-slate-900 dark:border-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] shrink-0 transition-all cursor-pointer"
                     }
                   >
                     <span>{cat.name}</span>
@@ -620,41 +620,41 @@ export default function CashierTransactionsPage() {
                 {Array.from({ length: 8 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="bg-white rounded-xl border-2 border-slate-900 p-3 h-36 flex flex-col justify-between shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] animate-pulse"
+                    className="bg-white dark:bg-slate-800/80 rounded-xl border-2 border-slate-900 dark:border-slate-100 p-3 h-36 flex flex-col justify-between shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] animate-pulse"
                   >
                     <div className="flex justify-between">
-                      <div className="w-16 h-3 bg-slate-200 rounded" />
-                      <div className="w-8 h-3 bg-slate-200 rounded" />
+                      <div className="w-16 h-3 bg-slate-200 dark:bg-slate-700 rounded" />
+                      <div className="w-8 h-3 bg-slate-200 dark:bg-slate-700 rounded" />
                     </div>
                     <div className="space-y-1.5 my-2">
-                      <div className="w-full h-3.5 bg-slate-200 rounded" />
-                      <div className="w-2/3 h-3.5 bg-slate-200 rounded" />
+                      <div className="w-full h-3.5 bg-slate-200 dark:bg-slate-700 rounded" />
+                      <div className="w-2/3 h-3.5 bg-slate-200 dark:bg-slate-700 rounded" />
                     </div>
-                    <div className="flex justify-between items-end border-t border-slate-200 pt-2">
-                      <div className="w-16 h-4 bg-slate-200 rounded" />
-                      <div className="w-12 h-3 bg-slate-200 rounded" />
+                    <div className="flex justify-between items-end border-t border-slate-200 dark:border-slate-700 pt-2">
+                      <div className="w-16 h-4 bg-slate-200 dark:bg-slate-700 rounded" />
+                      <div className="w-12 h-3 bg-slate-200 dark:bg-slate-700 rounded" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : fetchError ? (
               /* Error State */
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-600">
-                <div className="w-12 h-12 rounded-xl bg-red-100 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-red-600 flex items-center justify-center mb-3 font-black text-lg">
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-600 dark:text-slate-400">
+                <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-950/60 border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] text-red-600 dark:text-red-400 flex items-center justify-center mb-3 font-black text-lg">
                   !
                 </div>
-                <p className="font-black text-slate-900 text-sm">{fetchError}</p>
+                <p className="font-black text-slate-900 dark:text-slate-100 text-sm">{fetchError}</p>
                 <button
                   onClick={loadProducts}
-                  className="mt-3 px-4 py-2 bg-[#6366F1] text-white border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] rounded-xl text-xs font-black hover:bg-[#4F46E5] cursor-pointer transition-all"
+                  className="mt-3 px-4 py-2 bg-[#6366F1] text-white border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] rounded-xl text-xs font-black hover:bg-[#4F46E5] cursor-pointer transition-all"
                 >
                   Coba Lagi
                 </button>
               </div>
             ) : products.length === 0 ? (
               /* Empty State */
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-500">
-                <div className="w-12 h-12 rounded-xl bg-slate-100 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center text-slate-600 mb-3">
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-500 dark:text-slate-400">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center text-slate-600 dark:text-slate-400 mb-3">
                   <svg
                     className="w-6 h-6"
                     fill="none"
@@ -669,10 +669,10 @@ export default function CashierTransactionsPage() {
                     />
                   </svg>
                 </div>
-                <p className="font-black text-slate-900 text-sm">
+                <p className="font-black text-slate-900 dark:text-slate-100 text-sm">
                   Tidak ada produk yang ditemukan
                 </p>
-                <p className="text-xs font-bold text-slate-500 mt-1 max-w-xs">
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 max-w-xs">
                   Coba kata kunci lain atau pilih kategori &quot;Semua Kategori&quot;.
                 </p>
                 <button
@@ -681,7 +681,7 @@ export default function CashierTransactionsPage() {
                     setSelectedCategory("all");
                     searchInputRef.current?.focus();
                   }}
-                  className="mt-4 px-3.5 py-2 text-xs font-black bg-white hover:bg-slate-100 text-slate-900 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] rounded-xl cursor-pointer transition-all"
+                  className="mt-4 px-3.5 py-2 text-xs font-black bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] rounded-xl cursor-pointer transition-all"
                 >
                   Reset Filter
                 </button>
@@ -701,12 +701,12 @@ export default function CashierTransactionsPage() {
                       onClick={() => !isOutOfStock && handleAddToCart(product)}
                       className={
                         isOutOfStock
-                          ? "bg-slate-100 border-2 border-slate-400 rounded-xl p-3 shadow-[2px_2px_0px_0px_rgba(15,23,42,0.3)] opacity-60 cursor-not-allowed flex flex-col justify-between relative overflow-hidden text-left"
-                          : "bg-white border-2 border-slate-900 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden text-left"
+                          ? "bg-slate-100 dark:bg-slate-800/50 border-2 border-slate-400 dark:border-slate-600 rounded-xl p-3 shadow-[2px_2px_0px_0px_rgba(15,23,42,0.3)] opacity-60 cursor-not-allowed flex flex-col justify-between relative overflow-hidden text-left"
+                          : "bg-white dark:bg-slate-800/90 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:hover:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden text-left"
                       }
                     >
                       {/* Product Thumbnail Container */}
-                      <div className="w-full h-24 bg-slate-100 border-[1.5px] border-slate-900 rounded-lg overflow-hidden flex items-center justify-center mb-2 relative shrink-0 p-1.5">
+                      <div className="w-full h-24 bg-slate-100 dark:bg-slate-900 border-[1.5px] border-slate-900 dark:border-slate-100 rounded-lg overflow-hidden flex items-center justify-center mb-2 relative shrink-0 p-1.5">
                         {product.imageUrl && !failedImages[product.id || product.sku] ? (
                           <img
                             src={product.imageUrl}
@@ -719,13 +719,13 @@ export default function CashierTransactionsPage() {
                         )}
 
                         {/* Overlaid SKU Badge */}
-                        <span className="absolute top-1.5 left-1.5 text-[9px] font-mono font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300 self-start mb-1 shadow-2xs z-10">
+                        <span className="absolute top-1.5 left-1.5 text-[9px] font-mono font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 self-start mb-1 shadow-2xs z-10">
                           {product.sku}
                         </span>
 
                         {/* Overlaid Discount Badge */}
                         {hasDiscount && (
-                          <span className="absolute top-1.5 right-1.5 text-[9px] font-black bg-rose-500 text-white border border-slate-900 px-1.5 py-0.5 rounded shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] z-10">
+                          <span className="absolute top-1.5 right-1.5 text-[9px] font-black bg-rose-500 text-white border border-slate-900 dark:border-slate-100 px-1.5 py-0.5 rounded shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] z-10">
                             -{product.discountPercentage || 10}%
                           </span>
                         )}
@@ -733,23 +733,23 @@ export default function CashierTransactionsPage() {
 
                       {/* Product Name & Category */}
                       <div className="mb-2">
-                        <h3 className="text-xs font-black text-slate-900 line-clamp-2 leading-snug">
+                        <h3 className="text-xs font-black text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug">
                           {product.name}
                         </h3>
-                        <p className="text-[10px] font-bold text-slate-500 mt-0.5 truncate">
+                        <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                           {product.categoryName || product.categoryId}
                         </p>
                       </div>
 
                       {/* Footer: Price & Stock Badge */}
-                      <div className="pt-2 border-t-2 border-slate-900/10 flex items-end justify-between gap-1 mt-auto">
+                      <div className="pt-2 border-t-2 border-slate-900/10 dark:border-slate-100/10 flex items-end justify-between gap-1 mt-auto">
                         <div>
                           {hasDiscount && product.originalPrice && (
-                            <span className="block text-[9px] font-mono text-slate-400 line-through">
+                            <span className="block text-[9px] font-mono text-slate-400 dark:text-slate-500 line-through">
                               {formatRupiah(product.originalPrice)}
                             </span>
                           )}
-                          <span className="font-mono font-black text-xs text-[#065F46] tabular-nums">
+                          <span className="font-mono font-black text-xs text-[#065F46] dark:text-emerald-400 tabular-nums">
                             {formatRupiah(product.sellingPrice)}
                           </span>
                         </div>
@@ -759,10 +759,10 @@ export default function CashierTransactionsPage() {
                           <span
                             className={
                               isOutOfStock
-                                ? "font-mono font-bold text-[10px] text-white bg-rose-600 px-1.5 py-0.5 rounded border border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                                ? "font-mono font-bold text-[10px] text-white bg-rose-600 px-1.5 py-0.5 rounded border border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
                                 : isLowStock
-                                ? "font-mono font-bold text-[10px] text-slate-900 bg-[#FFB800] px-1.5 py-0.5 rounded border border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
-                                : "font-mono font-bold text-[10px] text-slate-700 bg-amber-100 px-1.5 py-0.5 rounded border border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                                ? "font-mono font-bold text-[10px] text-slate-900 bg-[#FFB800] px-1.5 py-0.5 rounded border border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                                : "font-mono font-bold text-[10px] text-slate-700 dark:text-slate-300 bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.5 rounded border border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
                             }
                           >
                             {isOutOfStock
@@ -779,11 +779,11 @@ export default function CashierTransactionsPage() {
           </div>
 
           {/* Footer Info Strip */}
-          <div className="px-4 py-2 bg-slate-100 border-t-2 border-slate-900 text-xs font-bold text-slate-700 flex items-center justify-between shrink-0">
+          <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-900 dark:border-slate-100 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between shrink-0 transition-colors">
             <span>
-              Menampilkan <strong className="text-slate-950 font-black">{products.length}</strong> produk aktif
+              Menampilkan <strong className="text-slate-950 dark:text-slate-50 font-black">{products.length}</strong> produk aktif
             </span>
-            <span className="text-[11px] font-bold text-slate-500">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
               Tekan [F2] Cari • [F10] Bayar
             </span>
           </div>
@@ -792,12 +792,12 @@ export default function CashierTransactionsPage() {
         {/* ========================================================================= */}
         {/* 2. KERANJANG BELANJA (col-span-12 lg:col-span-4)                           */}
         {/* ========================================================================= */}
-        <div className="col-span-12 lg:col-span-4 bg-white border-2 border-slate-900 rounded-2xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] flex flex-col h-full overflow-hidden">
+        <div className="col-span-12 lg:col-span-4 bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-2xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] flex flex-col h-full overflow-hidden transition-colors">
           {/* Cart Header */}
-          <div className="bg-slate-100 border-b-2 border-slate-900 p-3.5 font-black text-xs text-slate-900 flex items-center justify-between shrink-0 gap-2">
+          <div className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 p-3.5 font-black text-xs text-slate-900 dark:text-slate-50 flex items-center justify-between shrink-0 gap-2 transition-colors">
             <div className="flex items-center gap-2 min-w-0">
               <svg
-                className="w-4 h-4 text-slate-900 shrink-0"
+                className="w-4 h-4 text-slate-900 dark:text-slate-100 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -809,7 +809,7 @@ export default function CashierTransactionsPage() {
                   d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                 />
               </svg>
-              <h2 className="font-black text-xs sm:text-sm text-slate-900 truncate whitespace-nowrap">
+              <h2 className="font-black text-xs sm:text-sm text-slate-900 dark:text-slate-50 truncate whitespace-nowrap">
                 Keranjang Belanja
               </h2>
               <span className="bg-[#FFB800] text-slate-950 border-[1.5px] border-slate-900 font-mono font-black text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]">
@@ -821,7 +821,7 @@ export default function CashierTransactionsPage() {
               <button
                 type="button"
                 onClick={handleClearCart}
-                className="text-xs font-black text-rose-600 hover:text-rose-700 bg-white border-1.5 border-slate-900 px-2 py-1 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] hover:bg-rose-50 transition-all cursor-pointer whitespace-nowrap shrink-0"
+                className="text-xs font-black text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 px-2 py-1 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all cursor-pointer whitespace-nowrap shrink-0"
               >
                 Kosongkan
               </button>
@@ -831,8 +831,8 @@ export default function CashierTransactionsPage() {
           {/* Cart Item List (Scrollable) */}
           <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2">
             {cart.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-400">
-                <div className="w-14 h-14 rounded-xl bg-slate-100 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center text-slate-500 mb-3">
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-400 dark:text-slate-500">
+                <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center text-slate-500 dark:text-slate-400 mb-3">
                   <svg
                     className="w-7 h-7"
                     fill="none"
@@ -847,10 +847,10 @@ export default function CashierTransactionsPage() {
                     />
                   </svg>
                 </div>
-                <p className="font-black text-slate-900 text-sm">
+                <p className="font-black text-slate-900 dark:text-slate-100 text-sm">
                   Keranjang Kosong
                 </p>
-                <p className="text-xs font-bold text-slate-500 mt-1 max-w-[220px]">
+                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 max-w-[220px]">
                   Pilih produk dari katalog di sebelah kiri untuk memulai transaksi.
                 </p>
               </div>
@@ -862,10 +862,10 @@ export default function CashierTransactionsPage() {
                 return (
                   <div
                     key={productId}
-                    className="bg-slate-50 border-[1.5px] border-slate-900 rounded-xl p-2.5 mb-2 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between gap-2"
+                    className="bg-slate-50 dark:bg-slate-800 border-[1.5px] border-slate-900 dark:border-slate-100 rounded-xl p-2.5 mb-2 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between gap-2 transition-colors"
                   >
                     {/* Thumbnail Mini */}
-                    <div className="w-9 h-9 rounded-lg bg-white border-[1.5px] border-slate-900 overflow-hidden shrink-0 flex items-center justify-center p-0.5">
+                    <div className="w-9 h-9 rounded-lg bg-white dark:bg-slate-900 border-[1.5px] border-slate-900 dark:border-slate-100 overflow-hidden shrink-0 flex items-center justify-center p-0.5">
                       {imageUrl && !failedImages[productId] ? (
                         <img
                           src={imageUrl}
@@ -875,7 +875,7 @@ export default function CashierTransactionsPage() {
                         />
                       ) : (
                         <svg
-                          className="w-4 h-4 text-slate-500"
+                          className="w-4 h-4 text-slate-500 dark:text-slate-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -892,30 +892,30 @@ export default function CashierTransactionsPage() {
 
                     {/* Area Informasi Nama */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-[11px] font-black text-slate-900 truncate leading-tight">
+                      <h4 className="text-[11px] font-black text-slate-900 dark:text-slate-100 truncate leading-tight">
                         {item.product.name}
                       </h4>
-                      <div className="text-[10px] text-slate-600 font-mono font-bold leading-none mt-0.5">
+                      <div className="text-[10px] text-slate-600 dark:text-slate-400 font-mono font-bold leading-none mt-0.5">
                         {formatRupiah(item.unitPrice)} / {item.product.unit}
                       </div>
                     </div>
 
                     {/* Kontrol Qty */}
-                    <div className="flex items-center gap-1 bg-white border-[1.5px] border-slate-900 rounded-lg p-0.5 shrink-0">
+                    <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border-[1.5px] border-slate-900 dark:border-slate-100 rounded-lg p-0.5 shrink-0">
                       <button
                         type="button"
                         onClick={() => handleUpdateQuantity(item.product.id, -1)}
-                        className="bg-white border-[1.5px] border-slate-900 w-6 h-6 rounded-md font-black text-xs flex items-center justify-center hover:bg-slate-200 active:translate-y-[1px] cursor-pointer"
+                        className="bg-white dark:bg-slate-800 border-[1.5px] border-slate-900 dark:border-slate-100 w-6 h-6 rounded-md font-black text-xs text-slate-900 dark:text-slate-100 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 active:translate-y-[1px] cursor-pointer"
                       >
                         -
                       </button>
-                      <span className="w-5 text-center text-[11px] font-black font-mono text-slate-900">
+                      <span className="w-5 text-center text-[11px] font-black font-mono text-slate-900 dark:text-slate-100">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleUpdateQuantity(item.product.id, 1)}
-                        className="bg-white border-[1.5px] border-slate-900 w-6 h-6 rounded-md font-black text-xs flex items-center justify-center hover:bg-slate-200 active:translate-y-[1px] cursor-pointer"
+                        className="bg-white dark:bg-slate-800 border-[1.5px] border-slate-900 dark:border-slate-100 w-6 h-6 rounded-md font-black text-xs text-slate-900 dark:text-slate-100 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 active:translate-y-[1px] cursor-pointer"
                       >
                         +
                       </button>
@@ -923,13 +923,13 @@ export default function CashierTransactionsPage() {
 
                     {/* Total & Action */}
                     <div className="text-right shrink-0">
-                      <div className="font-mono font-black text-xs text-slate-900 leading-tight">
+                      <div className="font-mono font-black text-xs text-slate-900 dark:text-slate-100 leading-tight">
                         {formatRupiah(item.subtotal)}
                       </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveFromCart(item.product.id)}
-                        className="text-[9px] font-bold text-rose-600 hover:text-rose-700 block ml-auto mt-0.5 hover:underline cursor-pointer"
+                        className="text-[9px] font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 block ml-auto mt-0.5 hover:underline cursor-pointer"
                       >
                         Hapus
                       </button>
@@ -941,17 +941,17 @@ export default function CashierTransactionsPage() {
           </div>
 
           {/* Cart Summary & Total Bayar Box */}
-          <div className="p-4 bg-slate-50 border-t-2 border-slate-900 shrink-0 space-y-3">
+          <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-t-2 border-slate-900 dark:border-slate-100 shrink-0 space-y-3 transition-colors">
             {/* Breakdown Rincian */}
-            <div className="space-y-1.5 text-xs font-bold text-slate-700">
+            <div className="space-y-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
               <div className="flex justify-between">
                 <span>Subtotal ({totalItemCount} item)</span>
-                <span className="font-mono font-bold text-slate-900">
+                <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                   {formatRupiah(subtotalCart)}
                 </span>
               </div>
               {totalDiscountCart > 0 && (
-                <div className="flex justify-between text-rose-600 font-bold">
+                <div className="flex justify-between text-rose-600 dark:text-rose-400 font-bold">
                   <span>Total Diskon Promo</span>
                   <span className="font-mono">
                     -{formatRupiah(totalDiscountCart)}
@@ -961,17 +961,17 @@ export default function CashierTransactionsPage() {
             </div>
 
             {/* Box TOTAL BAYAR Dominan */}
-            <div className="bg-[#FEF3C7] border-2 border-slate-900 rounded-xl p-3 mb-3 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between">
+            <div className="bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-3 mb-3 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between transition-colors">
               <div>
-                <span className="text-xs font-black uppercase tracking-wider text-slate-900 block">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-amber-200 block">
                   Total Bayar
                 </span>
-                <span className="text-[10px] font-bold text-slate-600">
+                <span className="text-[10px] font-bold text-slate-600 dark:text-amber-300/80">
                   Termasuk PPN jika berlaku
                 </span>
               </div>
               <div className="text-right">
-                <span className="font-mono font-black text-xl sm:text-2xl text-slate-950 tabular-nums">
+                <span className="font-mono font-black text-xl sm:text-2xl text-slate-950 dark:text-amber-300 tabular-nums">
                   {formatRupiah(grandTotal)}
                 </span>
               </div>
@@ -984,8 +984,8 @@ export default function CashierTransactionsPage() {
               onClick={handleOpenPaymentModal}
               className={
                 cart.length === 0
-                  ? "bg-slate-200 text-slate-400 font-black text-sm py-3.5 rounded-xl border-2 border-slate-400 cursor-not-allowed w-full uppercase tracking-wider"
-                  : "bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-sm py-3.5 rounded-xl border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all w-full uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2"
+                  ? "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 font-black text-sm py-3.5 rounded-xl border-2 border-slate-400 dark:border-slate-700 cursor-not-allowed w-full uppercase tracking-wider"
+                  : "bg-[#6366F1] hover:bg-[#4F46E5] text-white font-black text-sm py-3.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all w-full uppercase tracking-wider cursor-pointer flex items-center justify-center gap-2"
               }
             >
               <span>PROSES BAYAR</span>
@@ -1003,22 +1003,22 @@ export default function CashierTransactionsPage() {
       {/* 4. MODAL / POP-UP PEMBAYARAN INTERAKTIF                                    */}
       {/* ========================================================================= */}
       {isPaymentModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-lg overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-lg overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transition-colors">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b-2 border-slate-900 flex items-center justify-between bg-slate-100">
+            <div className="px-6 py-4 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between bg-slate-100 dark:bg-slate-800 transition-colors">
               <div>
-                <h3 className="font-black text-base text-slate-900">
+                <h3 className="font-black text-base text-slate-900 dark:text-slate-50">
                   Pembayaran Transaksi
                 </h3>
-                <p className="text-xs font-bold text-slate-600 mt-0.5">
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mt-0.5">
                   Pilih metode bayar dan input nominal
                 </p>
               </div>
               <button
                 type="button"
                 onClick={handleClosePaymentModal}
-                className="w-8 h-8 rounded-xl bg-white border-2 border-slate-900 hover:bg-slate-200 text-slate-900 flex items-center justify-center font-black text-sm transition-colors cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
+                className="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 flex items-center justify-center font-black text-sm transition-colors cursor-pointer shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)]"
               >
                 ✕
               </button>
@@ -1027,18 +1027,18 @@ export default function CashierTransactionsPage() {
             {/* Modal Body */}
             <div className="p-6 space-y-5 overflow-y-auto max-h-[80vh]">
               {/* Grand Total Display */}
-              <div className="p-4 bg-[#FEF3C7] border-2 border-slate-900 rounded-xl text-center shadow-[3px_3px_0px_0px_rgba(15,23,42,1)]">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-900 block mb-1">
+              <div className="p-4 bg-[#FEF3C7] dark:bg-amber-950/40 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-center shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] transition-colors">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-amber-200 block mb-1">
                   Total Tagihan
                 </span>
-                <span className="text-3xl font-black font-mono tracking-tight text-slate-950 tabular-nums">
+                <span className="text-3xl font-black font-mono tracking-tight text-slate-950 dark:text-amber-300 tabular-nums">
                   {formatRupiah(grandTotal)}
                 </span>
               </div>
 
               {/* Payment Method Tabs */}
               <div>
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block mb-2">
+                <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block mb-2">
                   Metode Pembayaran
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -1051,8 +1051,8 @@ export default function CashierTransactionsPage() {
                         onClick={() => setPaymentMethod(method)}
                         className={
                           isSelected
-                            ? "py-2.5 px-3 rounded-xl font-black text-xs border-2 border-slate-900 bg-[#6366F1] text-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex flex-col items-center justify-center gap-1 cursor-pointer"
-                            : "py-2.5 px-3 rounded-xl font-bold text-xs border-2 border-slate-900 bg-white hover:bg-slate-100 text-slate-900 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] flex flex-col items-center justify-center gap-1 cursor-pointer transition-all"
+                            ? "py-2.5 px-3 rounded-xl font-black text-xs border-2 border-slate-900 dark:border-slate-100 bg-[#6366F1] text-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex flex-col items-center justify-center gap-1 cursor-pointer"
+                            : "py-2.5 px-3 rounded-xl font-bold text-xs border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] flex flex-col items-center justify-center gap-1 cursor-pointer transition-all"
                         }
                       >
                         <span>{method === "CASH" ? "TUNAI / CASH" : method}</span>
@@ -1068,15 +1068,15 @@ export default function CashierTransactionsPage() {
                   {/* Input Uang Diterima */}
                   <div>
                     <div className="flex justify-between items-center mb-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
                         Uang Diterima
                       </label>
-                      <span className="text-[11px] font-medium text-slate-500">
+                      <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                         Input manual atau pilih pecahan
                       </span>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-black text-sm text-slate-600">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono font-black text-sm text-slate-600 dark:text-slate-400">
                         Rp
                       </span>
                       <input
@@ -1088,21 +1088,21 @@ export default function CashierTransactionsPage() {
                           setAmountPaidInput(val);
                         }}
                         placeholder="0"
-                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border-2 border-slate-900 focus:bg-white focus:outline-none rounded-xl font-mono text-xl font-black text-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all tabular-nums"
+                        className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none rounded-xl font-mono text-xl font-black text-slate-900 dark:text-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all tabular-nums"
                       />
                     </div>
                   </div>
 
                   {/* Quick Cash Buttons */}
                   <div>
-                    <span className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
                       Pecahan Uang Cepat (Quick Cash):
                     </span>
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                       <button
                         type="button"
                         onClick={() => handleQuickCash(grandTotal)}
-                        className="py-2 px-2 bg-[#FFB800] hover:bg-amber-400 text-slate-950 border-2 border-slate-900 rounded-lg text-xs font-black font-mono shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+                        className="py-2 px-2 bg-[#FFB800] hover:bg-amber-400 text-slate-950 border-2 border-slate-900 dark:border-slate-100 rounded-lg text-xs font-black font-mono shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
                       >
                         Uang Pas
                       </button>
@@ -1113,7 +1113,7 @@ export default function CashierTransactionsPage() {
                             key={amt}
                             type="button"
                             onClick={() => handleQuickCash(amt)}
-                            className="py-2 px-2 bg-white hover:bg-slate-100 text-slate-900 border-2 border-slate-900 rounded-lg text-xs font-black font-mono shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer tabular-nums"
+                            className="py-2 px-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border-2 border-slate-900 dark:border-slate-100 rounded-lg text-xs font-black font-mono shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer tabular-nums"
                           >
                             {formatRupiah(amt)}
                           </button>
@@ -1125,8 +1125,8 @@ export default function CashierTransactionsPage() {
                   <div
                     className={
                       numericAmountPaid < grandTotal
-                        ? "p-3.5 rounded-xl border-2 border-slate-900 bg-rose-100 text-rose-950 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between"
-                        : "p-3.5 rounded-xl border-2 border-slate-900 bg-emerald-100 text-emerald-950 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-between"
+                        ? "p-3.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-rose-100 dark:bg-rose-950/50 text-rose-950 dark:text-rose-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between"
+                        : "p-3.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-950 dark:text-emerald-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between"
                     }
                   >
                     <div>
@@ -1150,8 +1150,8 @@ export default function CashierTransactionsPage() {
 
               {/* METHOD: QRIS */}
               {paymentMethod === "QRIS" && (
-                <div className="p-4 bg-slate-50 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex flex-col items-center text-center space-y-3">
-                  <div className="p-3 bg-white border-2 border-slate-900 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex flex-col items-center text-center space-y-3 transition-colors">
+                  <div className="p-3 bg-white border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
                     {/* Simulated QR Code SVG */}
                     <svg className="w-36 h-36" viewBox="0 0 100 100" fill="none">
                       <rect width="100" height="100" fill="white" />
@@ -1180,10 +1180,10 @@ export default function CashierTransactionsPage() {
                     </svg>
                   </div>
                   <div>
-                    <span className="font-black text-xs text-slate-900 block">
+                    <span className="font-black text-xs text-slate-900 dark:text-slate-100 block">
                       Arahkan Pembeli untuk Scan QRIS
                     </span>
-                    <span className="text-[11px] font-medium text-slate-600 mt-0.5 block">
+                    <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 mt-0.5 block">
                       Mendukung GoPay, OVO, Dana, ShopeePay, BCA Mobile, dll.
                     </span>
                   </div>
@@ -1194,13 +1194,13 @@ export default function CashierTransactionsPage() {
               {paymentMethod === "DEBIT" && (
                 <div className="space-y-3">
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block mb-1">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block mb-1">
                       Pilih Mesin EDC / Bank
                     </label>
                     <select
                       value={debitBank}
                       onChange={(e) => setDebitBank(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                     >
                       <option value="BCA">EDC BCA Debit / Prima</option>
                       <option value="Mandiri">EDC Bank Mandiri</option>
@@ -1209,7 +1209,7 @@ export default function CashierTransactionsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 block mb-1">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block mb-1">
                       No. Referensi / Kode Approval Kartu
                     </label>
                     <input
@@ -1217,7 +1217,7 @@ export default function CashierTransactionsPage() {
                       value={debitRefNumber}
                       onChange={(e) => setDebitRefNumber(e.target.value)}
                       placeholder="Contoh: 839201948"
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-900 rounded-xl text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-mono font-bold text-slate-900 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-900 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                     />
                   </div>
                 </div>
@@ -1225,11 +1225,11 @@ export default function CashierTransactionsPage() {
             </div>
 
             {/* Modal Footer Actions */}
-            <div className="px-6 py-4 bg-slate-100 border-t-2 border-slate-900 flex items-center justify-between gap-3">
+            <div className="px-6 py-4 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-between gap-3 transition-colors">
               <button
                 type="button"
                 onClick={handleClosePaymentModal}
-                className="px-4 py-2.5 rounded-xl border-2 border-slate-900 bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-colors cursor-pointer"
               >
                 Batal [ESC]
               </button>
@@ -1240,8 +1240,8 @@ export default function CashierTransactionsPage() {
                 onClick={handleProcessCheckout}
                 className={
                   !isCashSufficient || isProcessingCheckout
-                    ? "flex-1 py-2.5 px-4 rounded-xl font-black text-xs bg-slate-200 text-slate-400 border-2 border-slate-400 cursor-not-allowed uppercase tracking-wider"
-                    : "flex-1 py-2.5 px-4 rounded-xl font-black text-xs bg-[#6366F1] hover:bg-[#4F46E5] text-white border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
+                    ? "flex-1 py-2.5 px-4 rounded-xl font-black text-xs bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 border-2 border-slate-400 dark:border-slate-600 cursor-not-allowed uppercase tracking-wider"
+                    : "flex-1 py-2.5 px-4 rounded-xl font-black text-xs bg-[#6366F1] hover:bg-[#4F46E5] text-white border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
                 }
               >
                 {isProcessingCheckout ? (
@@ -1264,7 +1264,7 @@ export default function CashierTransactionsPage() {
       {/* 5. MODAL / STRUK TRANSAKSI BERHASIL & THERMAL PRINT RECEIPT                 */}
       {/* ========================================================================= */}
       {isSuccessModalOpen && lastTransaction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-xs p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4">
           {/* Style Khusus @media print untuk Printer Thermal (58mm/80mm) */}
           <style jsx global>{`
             @media print {
@@ -1367,9 +1367,9 @@ export default function CashierTransactionsPage() {
           </div>
 
           {/* On-screen UI Modal */}
-          <div className="print:hidden bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+          <div className="print:hidden bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transition-colors">
             {/* Header Sukses */}
-            <div className="p-6 bg-[#065F46] text-white border-b-2 border-slate-900 text-center flex flex-col items-center">
+            <div className="p-6 bg-[#065F46] text-white border-b-2 border-slate-900 dark:border-slate-100 text-center flex flex-col items-center">
               <div className="w-12 h-12 rounded-xl bg-white border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-[#065F46] flex items-center justify-center mb-2">
                 <svg
                   className="w-7 h-7"
@@ -1395,27 +1395,27 @@ export default function CashierTransactionsPage() {
 
             {/* Receipt Summary Body */}
             <div className="p-6 space-y-4 text-xs">
-              <div className="p-3.5 bg-slate-50 rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] space-y-2 font-mono">
-                <div className="flex justify-between text-slate-600 text-[11px] font-bold">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] space-y-2 font-mono transition-colors">
+                <div className="flex justify-between text-slate-600 dark:text-slate-400 text-[11px] font-bold">
                   <span>Waktu:</span>
                   <span>{lastTransaction.date}</span>
                 </div>
-                <div className="flex justify-between text-slate-600 text-[11px] font-bold">
+                <div className="flex justify-between text-slate-600 dark:text-slate-400 text-[11px] font-bold">
                   <span>Metode:</span>
-                  <span className="font-black text-slate-900">
+                  <span className="font-black text-slate-900 dark:text-slate-100">
                     {lastTransaction.paymentMethod}
                   </span>
                 </div>
-                <div className="h-px bg-slate-300 my-1" />
-                <div className="flex justify-between font-black text-slate-900 text-sm">
+                <div className="h-px bg-slate-300 dark:bg-slate-700 my-1" />
+                <div className="flex justify-between font-black text-slate-900 dark:text-slate-100 text-sm">
                   <span>Total Tagihan:</span>
                   <span>{formatRupiah(lastTransaction.grandTotal)}</span>
                 </div>
-                <div className="flex justify-between text-slate-700 text-xs font-bold">
+                <div className="flex justify-between text-slate-700 dark:text-slate-300 text-xs font-bold">
                   <span>Dibayar ({lastTransaction.paymentMethod}):</span>
                   <span>{formatRupiah(lastTransaction.amountPaid)}</span>
                 </div>
-                <div className="flex justify-between font-black text-[#065F46] text-sm bg-emerald-100 p-1.5 rounded border border-emerald-300">
+                <div className="flex justify-between font-black text-[#065F46] dark:text-emerald-300 text-sm bg-emerald-100 dark:bg-emerald-950/60 p-1.5 rounded border border-emerald-300 dark:border-emerald-700">
                   <span>Kembalian:</span>
                   <span>{formatRupiah(lastTransaction.changeAmount)}</span>
                 </div>
@@ -1423,14 +1423,14 @@ export default function CashierTransactionsPage() {
 
               {/* Rincian Barang */}
               <div>
-                <span className="text-[10px] font-black text-slate-700 block mb-1 uppercase tracking-wider">
+                <span className="text-[10px] font-black text-slate-700 dark:text-slate-300 block mb-1 uppercase tracking-wider">
                   Rincian Barang ({lastTransaction.items.length} jenis)
                 </span>
-                <div className="max-h-32 overflow-y-auto space-y-1 text-slate-800 pr-1">
+                <div className="max-h-32 overflow-y-auto space-y-1 text-slate-800 dark:text-slate-200 pr-1">
                   {lastTransaction.items.map((it) => (
                     <div
                       key={it.product.id || it.product.sku}
-                      className="flex justify-between text-[11px] py-0.5 border-b border-slate-200 font-bold"
+                      className="flex justify-between text-[11px] py-0.5 border-b border-slate-200 dark:border-slate-800 font-bold"
                     >
                       <span className="truncate pr-2">
                         {it.product.name} (x{it.quantity})
@@ -1445,14 +1445,14 @@ export default function CashierTransactionsPage() {
             </div>
 
             {/* Footer Buttons */}
-            <div className="p-4 bg-slate-100 border-t-2 border-slate-900 flex items-center gap-2">
+            <div className="p-4 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-900 dark:border-slate-100 flex items-center gap-2 transition-colors">
               <button
                 type="button"
                 onClick={handlePrintReceipt}
-                className="flex-1 py-2.5 px-3 rounded-xl border-2 border-slate-900 bg-white hover:bg-slate-100 text-slate-900 font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+                className="flex-1 py-2.5 px-3 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
               >
                 <svg
-                  className="w-4 h-4 text-slate-900"
+                  className="w-4 h-4 text-slate-900 dark:text-slate-100"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1470,7 +1470,7 @@ export default function CashierTransactionsPage() {
               <button
                 type="button"
                 onClick={handleNewTransaction}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] text-white border-2 border-slate-900 font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+                className="flex-1 py-2.5 px-3 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] text-white border-2 border-slate-900 dark:border-slate-100 font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
               >
                 <span>Transaksi Baru</span>
                 <span className="px-1 py-0.2 rounded bg-slate-900 text-white font-mono text-[10px]">
@@ -1486,9 +1486,9 @@ export default function CashierTransactionsPage() {
       {/* 6. MODAL KONFIRMASI KOSONGKAN KERANJANG (TANPA BROWSER DIALOG)            */}
       {/* ========================================================================= */}
       {isClearCartModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] max-w-sm w-full p-6 text-center space-y-4">
-            <div className="w-12 h-12 mx-auto rounded-xl bg-[#FFB800] border-2 border-slate-900 text-slate-950 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center shrink-0">
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] max-w-sm w-full p-6 text-center space-y-4 transition-colors">
+            <div className="w-12 h-12 mx-auto rounded-xl bg-[#FFB800] border-2 border-slate-900 dark:border-slate-100 text-slate-950 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center shrink-0">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -1500,10 +1500,10 @@ export default function CashierTransactionsPage() {
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-base font-black text-slate-900 tracking-tight">
+              <h3 className="text-base font-black text-slate-900 dark:text-slate-50 tracking-tight">
                 Kosongkan Keranjang Belanja?
               </h3>
-              <p className="text-xs font-bold text-slate-600 leading-relaxed">
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 leading-relaxed">
                 Seluruh item ({totalItemCount} produk) yang ada di keranjang akan dihapus dari daftar transaksi ini.
               </p>
             </div>
@@ -1512,14 +1512,14 @@ export default function CashierTransactionsPage() {
               <button
                 type="button"
                 onClick={() => setIsClearCartModalOpen(false)}
-                className="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-900 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+                className="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="button"
                 onClick={confirmClearCart}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
               >
                 Ya, Kosongkan
               </button>

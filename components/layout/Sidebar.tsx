@@ -7,6 +7,8 @@ import { signOut } from "firebase/auth";
 import { clientAuth } from "@/lib/firebase/client";
 import { AppUser, UserRole } from "@/types/auth.types";
 import { useSidebarContext } from "@/context/SidebarContext";
+import { useTheme } from "next-themes";
+import ThemeToggle from "@/components/common/ThemeToggle";
 
 /**
  * Generates 2-letter uppercase initials from display name or email.
@@ -39,6 +41,92 @@ interface MenuSection {
   sectionTitle: string;
   items?: MenuItem[];
   accordionGroups?: AccordionGroup[];
+}
+
+/**
+ * Neo-Brutalist Sidebar Theme Toggle Card placed right above User Profile info card.
+ */
+function SidebarThemeToggleCard({ isCollapsed }: { isCollapsed: boolean }) {
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const activeTheme = theme === "system" ? resolvedTheme : theme;
+  const isDark = activeTheme === "dark";
+
+  const toggleTheme = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
+
+  if (isCollapsed) {
+    return (
+      <button
+        type="button"
+        onClick={toggleTheme}
+        title={isDark ? "Beralih ke Mode Terang (Light Mode)" : "Beralih ke Mode Gelap (Dark Mode)"}
+        className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center transition-all cursor-pointer"
+      >
+        {!mounted ? (
+          <div className="w-4 h-4" />
+        ) : isDark ? (
+          <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        ) : (
+          <svg className="w-4 h-4 text-slate-900 dark:text-slate-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        )}
+      </button>
+    );
+  }
+
+  return (
+    <div className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between transition-all">
+      <div className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+        {!mounted ? (
+          <div className="w-4 h-4" />
+        ) : isDark ? (
+          <>
+            <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <span>Mode Terang</span>
+          </>
+        ) : (
+          <>
+            <svg className="w-4 h-4 text-slate-900 dark:text-slate-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+            <span>Mode Gelap</span>
+          </>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={toggleTheme}
+        title={isDark ? "Beralih ke Mode Terang" : "Beralih ke Mode Gelap"}
+        className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[0.5px] hover:translate-y-[0.5px] transition-all cursor-pointer text-slate-900 dark:text-amber-400 flex items-center justify-center"
+      >
+        {!mounted ? (
+          <div className="w-4 h-4" />
+        ) : isDark ? (
+          <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <circle cx="12" cy="12" r="5" fill="currentColor" className="opacity-20" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        ) : (
+          <svg className="w-4 h-4 text-slate-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        )}
+      </button>
+    </div>
+  );
 }
 
 export default function Sidebar() {
@@ -394,7 +482,7 @@ export default function Sidebar() {
   return (
     <>
       <aside
-        className={`fixed left-0 top-0 h-screen bg-white border-r-2 border-slate-900 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans transition-all duration-300 ease-in-out print:hidden ${
+        className={`fixed left-0 top-0 h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-r-2 border-slate-900 dark:border-slate-800 z-40 flex flex-col justify-between overflow-y-auto select-none font-sans transition-all duration-300 ease-in-out print:hidden ${
           isCollapsed ? "w-20" : "w-64"
         }`}
       >
@@ -403,7 +491,7 @@ export default function Sidebar() {
         {/* ========================================== */}
         <div>
           <div
-            className={`p-4 border-b-2 border-slate-900 flex items-center ${
+            className={`p-4 border-b-2 border-slate-900 dark:border-slate-800 flex items-center ${
               isCollapsed ? "justify-center flex-col gap-2" : "justify-between gap-3"
             }`}
           >
@@ -414,10 +502,10 @@ export default function Sidebar() {
               {!isCollapsed && (
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
-                    <span className="font-black text-base text-slate-900 tracking-tight">DailyMart</span>
+                    <span className="font-black text-base text-slate-900 dark:text-slate-100 tracking-tight">DailyMart</span>
                     <span className="font-black text-base text-[#6366F1]">POS</span>
                   </div>
-                  <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase block -mt-0.5">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase block -mt-0.5">
                     Smart Retail System
                   </span>
                 </div>
@@ -428,7 +516,7 @@ export default function Sidebar() {
             <button
               type="button"
               onClick={toggleSidebar}
-              className="w-7 h-7 bg-slate-100 hover:bg-slate-200 text-slate-900 border-1.5 border-slate-900 rounded-lg flex items-center justify-center shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer shrink-0"
+              className="w-7 h-7 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border-1.5 border-slate-900 dark:border-slate-700 rounded-lg flex items-center justify-center shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer shrink-0"
               title={isCollapsed ? "Buka Sidebar (Expanded)" : "Kecilkan Sidebar (Collapsed)"}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -448,11 +536,11 @@ export default function Sidebar() {
             {activeMenuSections.map((section, idx) => (
               <div key={section.sectionTitle} className="space-y-1.5">
                 {!isCollapsed ? (
-                  <h3 className="text-[10px] font-black tracking-widest text-slate-400 uppercase my-3 px-2">
+                  <h3 className="text-[10px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase my-3 px-2">
                     {section.sectionTitle}
                   </h3>
                 ) : (
-                  idx > 0 && <div className="h-0.5 bg-slate-900 my-2"></div>
+                  idx > 0 && <div className="h-0.5 bg-slate-900 dark:bg-slate-700 my-2"></div>
                 )}
 
                 {/* Normal Direct Menu Items */}
@@ -470,17 +558,17 @@ export default function Sidebar() {
                             isCollapsed
                               ? `justify-center py-2.5 rounded-xl border-2 ${
                                   active
-                                    ? "bg-[#6366F1] text-white font-black border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)]"
-                                    : "bg-white hover:bg-slate-50 text-slate-700 font-bold border-transparent hover:border-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                                    ? "bg-[#6366F1] text-white font-black border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
+                                    : "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border-transparent hover:border-slate-900 dark:hover:border-slate-700 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                                 }`
                               : `gap-3 p-2.5 rounded-xl border-2 ${
                                   active
-                                    ? "bg-[#6366F1] text-white font-black border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)]"
-                                    : "bg-white hover:bg-slate-50 text-slate-700 font-bold border-transparent hover:border-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                                    ? "bg-[#6366F1] text-white font-black border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
+                                    : "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border-transparent hover:border-slate-900 dark:hover:border-slate-700 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                                 }`
                           }`}
                         >
-                          <span className={`${active ? "text-white" : "text-slate-500"} shrink-0`}>
+                          <span className={`${active ? "text-white" : "text-slate-500 dark:text-slate-400"} shrink-0`}>
                             {item.icon}
                           </span>
                           {!isCollapsed && <span className="truncate">{item.title}</span>}
@@ -613,11 +701,15 @@ export default function Sidebar() {
         {/* FOOTER USER PROFILE & AVATAR */}
         {/* ========================================== */}
         <div
-          className={`border-t-2 border-slate-900 bg-slate-50 shrink-0 ${
+          className={`border-t-2 border-slate-900 dark:border-slate-700 bg-white dark:bg-slate-900 shrink-0 ${
             isCollapsed ? "p-2 space-y-2 text-center" : "p-4 space-y-3"
           }`}
         >
-          <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
+          {/* 1. Toggle Switch Light/Dark Mode (PERSIS DI ATAS INFO USER CARD) */}
+          <SidebarThemeToggleCard isCollapsed={isCollapsed} />
+
+          {/* 2. User Info Card */}
+          <div className={`flex items-center rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 p-2.5 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] ${isCollapsed ? "justify-center" : "gap-3"}`}>
             {/* Avatar Container with Image or Initials Fallback */}
             <div
               className="w-10 h-10 rounded-xl bg-[#FFB800] text-slate-950 flex items-center justify-center font-black text-sm border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] shrink-0 overflow-hidden"
@@ -638,10 +730,10 @@ export default function Sidebar() {
             {/* User Name, Email, & Role Badge (Hidden when Collapsed) */}
             {!isCollapsed && (
               <div className="min-w-0 flex-1">
-                <h4 className="text-xs font-black text-slate-900 truncate">
+                <h4 className="text-xs font-black text-slate-900 dark:text-slate-100 truncate">
                   {user?.displayName || "Pengguna POS"}
                 </h4>
-                <p className="text-[10px] font-medium text-slate-500 truncate">
+                <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate">
                   {user?.email || "user@dailymart.id"}
                 </p>
                 <div className="mt-1">
@@ -654,24 +746,28 @@ export default function Sidebar() {
                         : "bg-emerald-100 text-emerald-900"
                     }`}
                   >
-                    {userRole}
+                    {userRole === "ADMIN"
+                      ? "Store Manager"
+                      : userRole === "WAREHOUSE"
+                      ? "Pegawai Gudang"
+                      : "Kasir Utama 01"}
                   </span>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Logout Action Button */}
+          {/* 3. Logout Action Button */}
           <button
             type="button"
             onClick={() => setIsLogoutModalOpen(true)}
             title={isCollapsed ? "Keluar Sesi (Logout)" : undefined}
-            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-rose-50 text-slate-900 hover:text-rose-700 font-bold text-xs border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer group ${
-              isCollapsed ? "p-2.5" : "gap-2 px-3 py-2"
+            className={`w-full inline-flex items-center justify-center rounded-xl bg-white hover:bg-rose-50 text-slate-900 hover:text-rose-700 font-bold text-xs border-2 border-slate-900 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:bg-slate-800 dark:hover:bg-rose-950/40 dark:text-slate-100 dark:border-slate-100 dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer group ${
+              isCollapsed ? "p-2.5" : "gap-2 px-3.5 py-2.5"
             }`}
           >
             <svg
-              className="w-4 h-4 text-slate-500 group-hover:text-rose-600 transition-colors"
+              className="w-4 h-4 text-slate-500 group-hover:text-rose-600 dark:text-slate-400 transition-colors"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
