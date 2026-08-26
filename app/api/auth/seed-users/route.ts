@@ -4,6 +4,12 @@ import { UserRole } from '@/types/auth.types';
 
 const INITIAL_USERS = [
   {
+    email: 'superadmin@dailymart.com',
+    password: 'password123',
+    displayName: 'Super Administrator',
+    role: 'SUPER_ADMIN' as UserRole,
+  },
+  {
     email: 'admin@dailymart.com',
     password: 'password123',
     displayName: 'Administrator Utama',
