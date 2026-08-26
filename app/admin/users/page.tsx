@@ -11,6 +11,8 @@ import {
   UpdateUserPayload,
 } from "@/services/userManagement.service";
 import { useAuth } from "@/components/providers/AuthProvider";
+import Cropper from "react-easy-crop";
+import { getCroppedImg, Area } from "@/lib/cropImage";
 
 export default function UserManagementPage() {
   const { user: currentUser, setUser: setCurrentUser, refreshUserData } = useAuth();
@@ -29,6 +31,7 @@ export default function UserManagementPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [selectedUser, setSelectedUser] = useState<AppUser | null>(null);
 
   // Form States - Create
@@ -56,12 +59,26 @@ export default function UserManagementPage() {
   const [isUploadingAddPhoto, setIsUploadingAddPhoto] = useState<boolean>(false);
   const [isUploadingEditPhoto, setIsUploadingEditPhoto] = useState<boolean>(false);
 
+  // Image Editor / Cropper States
+  const [isCropperOpen, setIsCropperOpen] = useState<boolean>(false);
+  const [tempImageSrc, setTempImageSrc] = useState<string | null>(null);
+  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState<number>(1);
+  const [rotation, setRotation] = useState<number>(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [isCropperForEdit, setIsCropperForEdit] = useState<boolean>(false);
+  const [isCroppingAndUploading, setIsCroppingAndUploading] = useState<boolean>(false);
+
   // Form States - Reset Password
   const [newPassword, setNewPassword] = useState<string>("");
+
+  // Form States - Edit Password
+  const [editPassword, setEditPassword] = useState<string>("");
 
   // Password Visibility Toggle States
   const [showAddPassword, setShowAddPassword] = useState<boolean>(false);
   const [showResetPassword, setShowResetPassword] = useState<boolean>(false);
+  const [showEditPassword, setShowEditPassword] = useState<boolean>(false);
 
   // Submitting State
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -134,8 +151,12 @@ export default function UserManagementPage() {
     setIsAddModalOpen(true);
   };
 
-  // Handle Photo Upload (Cloudinary to dailymart-pos/store/foto-profil)
-  const handlePhotoUpload = async (
+  const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  // Handle Photo Select (Pilih foto & buka Modal Image Editor / Cropper)
+  const handlePhotoUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
     isEdit: boolean
   ) => {
@@ -147,19 +168,59 @@ export default function UserManagementPage() {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Ukuran foto maksimal 2MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Ukuran foto mentah maksimal 10MB.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("folderType", "dailymart-pos/store/foto-profil");
+    const reader = new FileReader();
+    reader.onload = () => {
+      setTempImageSrc(reader.result as string);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setRotation(0);
+      setIsCropperForEdit(isEdit);
+      setIsCropperOpen(true);
+    };
+    reader.readAsDataURL(file);
+
+    // Reset input value agar jika memilih file yang sama tetap memicu onChange
+    e.target.value = "";
+  };
+
+  // Handle Potong Foto & Unggah ke Cloudinary
+  const handleCropSaveAndUpload = async () => {
+    if (!tempImageSrc || !croppedAreaPixels) {
+      toast.error("Gagal memproses gambar terpotong.");
+      return;
+    }
+
+    setIsCroppingAndUploading(true);
+    if (isCropperForEdit) setIsUploadingEditPhoto(true);
+    else setIsUploadingAddPhoto(true);
 
     try {
-      if (isEdit) setIsUploadingEditPhoto(true);
-      else setIsUploadingAddPhoto(true);
+      // 1. Potong gambar menggunakan getCroppedImg
+      const croppedResult = await getCroppedImg(
+        tempImageSrc,
+        croppedAreaPixels,
+        rotation,
+        500,
+        500,
+        "image/png"
+      );
 
+      if (!croppedResult) {
+        toast.error("Gagal memotong gambar.");
+        return;
+      }
+
+      // 2. Buat FormData dengan file terpotong
+      const formData = new FormData();
+      formData.append("file", croppedResult.file);
+      formData.append("folderType", "dailymart-pos/store/foto-profil");
+
+      // 3. Unggah ke Cloudinary API
       const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
@@ -167,7 +228,7 @@ export default function UserManagementPage() {
       const json = await res.json();
 
       if (res.ok && json.success && json.imageUrl) {
-        if (isEdit) {
+        if (isCropperForEdit) {
           // Hapus foto lama di Cloudinary jika foto diganti
           if (editForm.photoPublicId && editForm.photoPublicId !== json.publicId) {
             try {
@@ -193,15 +254,20 @@ export default function UserManagementPage() {
             photoPublicId: json.publicId || "",
           }));
         }
-        toast.success("Foto profil berhasil diunggah.");
+
+        toast.success("Foto profil berhasil disesuaikan dan diunggah.");
+        setIsCropperOpen(false);
+        setTempImageSrc(null);
       } else {
         toast.error(json.message || "Gagal mengunggah foto profil.");
       }
     } catch (err: any) {
-      toast.error(err.message || "Terjadi kesalahan saat mengunggah foto.");
+      console.error("Gagal memotong & mengunggah foto:", err);
+      toast.error(err.message || "Terjadi kesalahan saat memproses foto.");
     } finally {
-      if (isEdit) setIsUploadingEditPhoto(false);
-      else setIsUploadingAddPhoto(false);
+      setIsCroppingAndUploading(false);
+      setIsUploadingAddPhoto(false);
+      setIsUploadingEditPhoto(false);
     }
   };
 
@@ -274,6 +340,8 @@ export default function UserManagementPage() {
       photoURL: user.photoURL || "",
       photoPublicId: user.photoPublicId || "",
     });
+    setEditPassword("");
+    setShowEditPassword(false);
     setIsEditModalOpen(true);
   };
 
@@ -286,10 +354,28 @@ export default function UserManagementPage() {
       return;
     }
 
+    if (editPassword && editPassword.trim().length < 6) {
+      toast.error("Kata sandi baru minimal 6 karakter!");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      // 1. Update data profil umum (nama, role, status, photoURL) ke Firestore
       await userManagementService.updateUser(selectedUser.uid, editForm);
-      toast.success("Profil pengguna berhasil diperbarui");
+
+      // 2. Jika field editPassword diisi oleh Admin, panggil API Route /api/admin/users/update-password
+      let passwordUpdated = false;
+      if (editPassword.trim()) {
+        await userManagementService.updateUserPassword(selectedUser.uid, editPassword.trim());
+        passwordUpdated = true;
+      }
+
+      if (passwordUpdated) {
+        toast.success("Data pengguna dan kata sandi berhasil diperbarui!");
+      } else {
+        toast.success("Profil pengguna berhasil diperbarui");
+      }
 
       // Sinkronisasi real-time dengan AuthContext & Client Firebase Auth jika user yang diedit adalah user yang sedang aktif
       if (selectedUser.uid === (currentUser?.uid || clientAuth.currentUser?.uid)) {
@@ -315,6 +401,7 @@ export default function UserManagementPage() {
 
       setIsEditModalOpen(false);
       setSelectedUser(null);
+      setEditPassword("");
       loadUsers();
     } catch (err: any) {
       toast.error(err.message || "Gagal memperbarui pengguna.");
@@ -354,22 +441,26 @@ export default function UserManagementPage() {
     }
   };
 
-  // Handle Delete User
-  const handleDeleteUser = async (user: AppUser) => {
-    if (
-      !confirm(
-        `Apakah Anda yakin ingin menghapus akun pengguna "${user.displayName}" (${user.email})? Tindakan ini tidak dapat dibatalkan.`
-      )
-    ) {
-      return;
-    }
+  // Open Delete Modal
+  const handleOpenDeleteModal = (user: AppUser) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+  };
 
+  // Handle Confirm Delete User
+  const handleConfirmDeleteUser = async () => {
+    if (!selectedUser) return;
+    setIsSubmitting(true);
     try {
-      await userManagementService.deleteUser(user.uid);
+      await userManagementService.deleteUser(selectedUser.uid);
       toast.success("Pengguna berhasil dihapus");
+      setIsDeleteModalOpen(false);
+      setSelectedUser(null);
       loadUsers();
     } catch (err: any) {
       toast.error(err.message || "Gagal menghapus pengguna.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -691,7 +782,7 @@ export default function UserManagementPage() {
                             {/* Delete */}
                             <button
                               type="button"
-                              onClick={() => handleDeleteUser(user)}
+                              onClick={() => handleOpenDeleteModal(user)}
                               title="Hapus Pengguna"
                               className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-rose-600 dark:text-rose-400"
                             >
@@ -1053,6 +1144,39 @@ export default function UserManagementPage() {
                 />
               </div>
 
+              <div>
+                <label className="text-[10px] font-black uppercase text-slate-700 dark:text-slate-300 mb-1 block">
+                  KATA SANDI BARU (OPSIONAL)
+                </label>
+                <div className="relative">
+                  <input
+                    type={showEditPassword ? "text" : "password"}
+                    value={editPassword}
+                    onChange={(e) => setEditPassword(e.target.value)}
+                    placeholder="Kosongkan jika tidak ingin mengubah password"
+                    className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] w-full"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEditPassword(!showEditPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors p-1 cursor-pointer"
+                    title={showEditPassword ? "Sembunyikan password" : "Tampilkan password"}
+                  >
+                    {showEditPassword ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                <span className="text-[10px] text-slate-400 mt-1 block">Minimal 6 karakter.</span>
+              </div>
+
               <div className="pt-3 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
@@ -1160,6 +1284,180 @@ export default function UserManagementPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* ========================================================================= */}
+      {/* 8. MODAL 4: KONFIRMASI HAPUS PENGGUNA                                     */}
+      {/* ========================================================================= */}
+      {isDeleteModalOpen && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] max-w-sm w-full p-6 text-center space-y-4 transition-colors">
+            {/* Warning Icon Badge */}
+            <div className="w-12 h-12 mx-auto rounded-2xl bg-rose-100 dark:bg-rose-950/60 border-2 border-slate-900 dark:border-slate-100 text-rose-600 dark:text-rose-400 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] flex items-center justify-center shrink-0">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </div>
+
+            {/* Title & Description */}
+            <div className="space-y-1.5">
+              <h3 className="text-base font-black text-slate-900 dark:text-slate-50 tracking-tight">
+                Konfirmasi Hapus Pengguna
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                Apakah Anda yakin ingin menghapus akun pengguna <strong className="text-slate-900 dark:text-slate-100 font-bold">"{selectedUser.displayName}"</strong> (<span className="font-mono">{selectedUser.email}</span>)? Tindakan ini tidak dapat dibatalkan.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setSelectedUser(null);
+                }}
+                disabled={isSubmitting}
+                className="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDeleteUser}
+                disabled={isSubmitting}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                {isSubmitting && (
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                )}
+                <span>{isSubmitting ? "Menghapus..." : "Ya, Hapus"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ========================================================================= */}
+      {/* 9. MODAL 5: IMAGE EDITOR / CROPPER FOTO PROFIL                           */}
+      {/* ========================================================================= */}
+      {isCropperOpen && tempImageSrc && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] max-w-md w-full overflow-hidden flex flex-col transition-colors">
+            {/* Header */}
+            <div className="px-6 py-4 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between bg-slate-100 dark:bg-slate-800">
+              <div>
+                <h3 className="font-black text-base text-slate-900 dark:text-slate-50">
+                  Edit & Sesuaikan Posisi Foto
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  Geser, perbesar (zoom), dan putar foto profil sesuai kebutuhan.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (isCroppingAndUploading) return;
+                  setIsCropperOpen(false);
+                  setTempImageSrc(null);
+                }}
+                disabled={isCroppingAndUploading}
+                className="text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 text-lg font-black p-1 cursor-pointer disabled:opacity-50"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Cropper Box */}
+            <div className="p-6 space-y-5">
+              <div className="relative w-full h-64 bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]">
+                <Cropper
+                  image={tempImageSrc}
+                  crop={crop}
+                  zoom={zoom}
+                  rotation={rotation}
+                  aspect={1}
+                  cropShape="round"
+                  showGrid={false}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onRotationChange={setRotation}
+                  onCropComplete={onCropComplete}
+                />
+              </div>
+
+              {/* Controls: Zoom & Rotate */}
+              <div className="space-y-4 bg-slate-50 dark:bg-slate-800/60 p-4 border-2 border-slate-900 dark:border-slate-100 rounded-xl">
+                {/* Zoom Slider */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-black text-slate-800 dark:text-slate-200">
+                    <span className="flex items-center gap-1.5">
+                      <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                      </svg>
+                      Perbesar (Zoom): {zoom.toFixed(1)}x
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.1}
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[#6366F1]"
+                  />
+                </div>
+
+                {/* Rotate Button */}
+                <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+                  <span className="text-xs font-black text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Rotasi Foto
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setRotation((prev) => (prev + 90) % 360)}
+                    className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-900 dark:text-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer inline-flex items-center gap-1.5"
+                  >
+                    <span>Putar 90°</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCropperOpen(false);
+                    setTempImageSrc(null);
+                  }}
+                  disabled={isCroppingAndUploading}
+                  className="px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-xs font-bold text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1.5px_1.5px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer disabled:opacity-50"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCropSaveAndUpload}
+                  disabled={isCroppingAndUploading}
+                  className="px-4 py-2.5 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white text-xs font-black border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] disabled:opacity-50 cursor-pointer flex items-center gap-2"
+                >
+                  {isCroppingAndUploading && (
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  )}
+                  <span>{isCroppingAndUploading ? "Memproses & Mengunggah..." : "Terapkan & Unggah Foto"}</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -85,6 +85,22 @@ export const userManagementService = {
   },
 
   /**
+   * Memperbarui kata sandi pengguna via API Route /api/admin/users/update-password
+   */
+  async updateUserPassword(targetUid: string, newPassword: string): Promise<void> {
+    const res = await fetch('/api/admin/users/update-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetUid, newPassword }),
+    });
+    const json = await res.json();
+
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || json.error || 'Gagal memperbarui kata sandi pengguna.');
+    }
+  },
+
+  /**
    * Menghapus pengguna dari Firebase Auth & Firestore
    */
   async deleteUser(uid: string): Promise<void> {
