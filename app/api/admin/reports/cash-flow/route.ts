@@ -83,10 +83,11 @@ export async function GET(req: NextRequest) {
       ...Object.entries(categoryOptionsMap).map(([id, name]) => ({ id, name })),
     ];
 
-    // 2. Fetch Transactions & Operating Expenses from Firestore
-    const [transactionsSnapshot, expensesSnapshot] = await Promise.all([
+    // 2. Fetch Transactions, Operating Expenses, and Stock In Logs from Firestore
+    const [transactionsSnapshot, expensesSnapshot, stockInLogsSnapshot] = await Promise.all([
       adminDb.collection('transactions').get(),
       adminDb.collection('operating_expenses').get().catch(() => ({ docs: [], empty: true })),
+      adminDb.collection('stock_in_logs').get().catch(() => ({ docs: [], empty: true })),
     ]);
 
     let allTransactions: any[] = [];
@@ -100,6 +101,25 @@ export async function GET(req: NextRequest) {
       });
     });
 
+    // Helper: Identify if expense item is an inventory restock/purchase
+    const isStockPurchase = (category?: string, name?: string): boolean => {
+      const catStr = (category || '').toLowerCase();
+      const nameStr = (name || '').toLowerCase();
+      const stockKeywords = [
+        'restock',
+        'purchase',
+        'stock_in',
+        'stock-in',
+        'inventory',
+        'stok',
+        'pembelian',
+        'modal stok',
+        'restok',
+        'kulakan',
+      ];
+      return stockKeywords.some((kw) => catStr.includes(kw) || nameStr.includes(kw));
+    };
+
     let allExpenses: any[] = [];
     if (!expensesSnapshot.empty && Array.isArray((expensesSnapshot as any).docs)) {
       (expensesSnapshot as any).docs.forEach((doc: any) => {
@@ -110,6 +130,21 @@ export async function GET(req: NextRequest) {
           name: data.name,
           category: data.category,
           amount: Number(data.amount || 0),
+          isPurchase: isStockPurchase(data.category, data.name),
+          parsedDate,
+        });
+      });
+    }
+
+    let allStockInLogs: any[] = [];
+    if (!stockInLogsSnapshot.empty && Array.isArray((stockInLogsSnapshot as any).docs)) {
+      (stockInLogsSnapshot as any).docs.forEach((doc: any) => {
+        const data = doc.data();
+        const parsedDate = parseFirestoreDate(data.createdAt || data.date);
+        allStockInLogs.push({
+          id: doc.id,
+          invoiceNumber: data.invoiceNumber,
+          totalCost: Number(data.totalCost || 0),
           parsedDate,
         });
       });
@@ -159,10 +194,18 @@ export async function GET(req: NextRequest) {
       return true;
     });
 
+    const filteredStockInLogs = allStockInLogs.filter((log) => {
+      const logDate: Date = log.parsedDate;
+      if (filterStart && logDate < filterStart) return false;
+      if (filterEnd && logDate > filterEnd) return false;
+      return true;
+    });
+
     // 4. Agregasi data Arus Kas & Pendapatan
     let totalGrossRevenue = 0;
     let totalCogs = 0;
-    let totalOperatingExpenses = 0;
+    let totalOperatingExpenses = 0; // Pure OPEX non-stok
+    let totalPurchases = 0; // Modal Restok Pembelian Stok
 
     const dailyMap: Record<
       string,
@@ -175,6 +218,7 @@ export async function GET(req: NextRequest) {
         totalCogs: number;
         grossProfit: number;
         operatingExpenses: number;
+        purchases: number;
         netProfit: number;
         txIds: Set<string>;
       }
@@ -248,6 +292,7 @@ export async function GET(req: NextRequest) {
             totalCogs: 0,
             grossProfit: 0,
             operatingExpenses: 0,
+            purchases: 0,
             netProfit: 0,
             txIds: new Set<string>(),
           };
@@ -262,8 +307,12 @@ export async function GET(req: NextRequest) {
       });
     });
 
-    // Aggregate Operating Expenses per day
+    // Track processed expense document IDs to avoid duplicate counting with stock_in_logs
+    const processedExpenseIds = new Set<string>();
+
+    // Aggregate Operating Expenses & Stock Purchases from expenses collection
     filteredExpenses.forEach((exp) => {
+      processedExpenseIds.add(exp.id);
       const expDate: Date = exp.parsedDate;
       const year = expDate.getFullYear();
       const month = String(expDate.getMonth() + 1).padStart(2, '0');
@@ -271,7 +320,6 @@ export async function GET(req: NextRequest) {
       const isoDate = `${year}-${month}-${day}`;
 
       const expAmount = Number(exp.amount || 0);
-      totalOperatingExpenses += expAmount;
 
       const chartLabel = expDate.toLocaleDateString('id-ID', {
         day: 'numeric',
@@ -293,26 +341,84 @@ export async function GET(req: NextRequest) {
           totalCogs: 0,
           grossProfit: 0,
           operatingExpenses: 0,
+          purchases: 0,
           netProfit: 0,
           txIds: new Set<string>(),
         };
       }
 
-      dailyMap[isoDate].operatingExpenses += expAmount;
+      if (exp.isPurchase) {
+        // Stock Purchase Expense (Modal Restok)
+        totalPurchases += expAmount;
+        dailyMap[isoDate].purchases += expAmount;
+      } else {
+        // Pure Operational Expense (OPEX Toko)
+        totalOperatingExpenses += expAmount;
+        dailyMap[isoDate].operatingExpenses += expAmount;
+      }
     });
 
-    // Update daily transaction count and Net Profit
+    // Aggregate Restock Purchases from stock_in_logs collection (excluding duplicates already logged in expenses)
+    filteredStockInLogs.forEach((log) => {
+      if (processedExpenseIds.has(log.id) || (log.invoiceNumber && processedExpenseIds.has(log.invoiceNumber))) {
+        return; // Avoid double counting
+      }
+
+      const logDate: Date = log.parsedDate;
+      const year = logDate.getFullYear();
+      const month = String(logDate.getMonth() + 1).padStart(2, '0');
+      const day = String(logDate.getDate()).padStart(2, '0');
+      const isoDate = `${year}-${month}-${day}`;
+
+      const logAmount = Number(log.totalCost || 0);
+      totalPurchases += logAmount;
+
+      const chartLabel = logDate.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+      });
+      const formattedDate = logDate.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+
+      if (!dailyMap[isoDate]) {
+        dailyMap[isoDate] = {
+          isoDate,
+          formattedDate,
+          chartLabel,
+          transactionCount: 0,
+          grossRevenue: 0,
+          totalCogs: 0,
+          grossProfit: 0,
+          operatingExpenses: 0,
+          purchases: 0,
+          netProfit: 0,
+          txIds: new Set<string>(),
+        };
+      }
+
+      dailyMap[isoDate].purchases += logAmount;
+    });
+
+    // Update daily transaction count and Net Profit per day
+    // RUMUS PERHITUNGAN: Laba Bersih = Laba Kotor - Biaya Operasional Toko Pure (non-stok)
     Object.keys(dailyMap).forEach((dateKey) => {
       const d = dailyMap[dateKey];
       d.transactionCount = d.txIds.size;
       d.netProfit = d.grossProfit - d.operatingExpenses;
     });
 
+    // RUMUS PERHITUNGAN UTAMA:
+    // 1. Laba Kotor = Total Pendapatan - Total HPP
     const totalGrossProfit = totalGrossRevenue - totalCogs;
+    // 2. Laba Bersih = Laba Kotor - Biaya Operasional Toko Pure (OPEX non-stok)
     const netProfit = totalGrossProfit - totalOperatingExpenses;
+    // 3. Profit Margin (%) = (Laba Bersih / Total Pendapatan) * 100
     const marginPercentage =
       totalGrossRevenue > 0
-        ? Number(((totalGrossProfit / totalGrossRevenue) * 100).toFixed(2))
+        ? Number(((netProfit / totalGrossRevenue) * 100).toFixed(2))
         : 0;
 
     // Build Chart Data (sorted by date ascending)
@@ -325,6 +431,7 @@ export async function GET(req: NextRequest) {
         cogs: d.totalCogs,
         profit: d.grossProfit,
         operatingExpenses: d.operatingExpenses,
+        purchases: d.purchases,
         netProfit: d.netProfit,
       };
     });
@@ -376,7 +483,7 @@ export async function GET(req: NextRequest) {
     const dailyBreakdown: DailyCashFlowBreakdown[] = sortedDatesDesc.map((dateKey) => {
       const d = dailyMap[dateKey];
       const margin =
-        d.grossRevenue > 0 ? Number(((d.grossProfit / d.grossRevenue) * 100).toFixed(2)) : 0;
+        d.grossRevenue > 0 ? Number(((d.netProfit / d.grossRevenue) * 100).toFixed(2)) : 0;
       return {
         date: d.isoDate,
         formattedDate: d.formattedDate,
@@ -385,6 +492,7 @@ export async function GET(req: NextRequest) {
         totalCogs: d.totalCogs,
         grossProfit: d.grossProfit,
         operatingExpenses: d.operatingExpenses,
+        purchases: d.purchases,
         netProfit: d.netProfit,
         margin,
       };
@@ -394,8 +502,9 @@ export async function GET(req: NextRequest) {
       grossRevenue: totalGrossRevenue,
       totalCogs,
       grossProfit: totalGrossProfit,
-      totalOperatingExpenses,
-      netProfit,
+      totalOperatingExpenses, // Pure OPEX Toko
+      totalPurchases, // Modal Pembelian Stok / Restok
+      netProfit, // Laba Kotor - totalOperatingExpenses
       marginPercentage,
     };
 

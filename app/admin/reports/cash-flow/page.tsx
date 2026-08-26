@@ -256,9 +256,10 @@ export default function AdminCashFlowReportPage() {
   const totalCogs = reportData?.summary.totalCogs || 0;
   const grossProfit = reportData?.summary.grossProfit || 0;
   const totalOperatingExpenses = reportData?.summary.totalOperatingExpenses || 0;
+  const totalPurchases = reportData?.summary.totalPurchases || 0;
   const netProfit = reportData?.summary.netProfit ?? (grossProfit - totalOperatingExpenses);
   const marginPercentage = reportData?.summary.marginPercentage || 0;
-  const surplusDefisit = grossRevenue - totalOperatingExpenses;
+  const surplusDefisit = grossRevenue - (totalOperatingExpenses + totalPurchases);
 
   const periodLabel = useMemo(() => {
     if (periodFilter === "today") {
@@ -391,12 +392,23 @@ export default function AdminCashFlowReportPage() {
 
               <div className="grid grid-cols-12 px-3.5 py-2">
                 <div className="col-span-6 font-medium text-slate-800">
-                  Total Biaya Operasional / Pengeluaran
+                  Total Biaya Operasional Toko (Pure OPEX)
                 </div>
                 <div className="col-span-6 font-medium text-slate-700 border-l border-slate-300 pl-3.5 font-mono">
                   {formatRupiah(totalOperatingExpenses)}
                 </div>
               </div>
+
+              {totalPurchases > 0 && (
+                <div className="grid grid-cols-12 px-3.5 py-2">
+                  <div className="col-span-6 font-medium text-slate-800">
+                    Modal Pembelian Stok (Restok Barang)
+                  </div>
+                  <div className="col-span-6 font-medium text-slate-700 border-l border-slate-300 pl-3.5 font-mono">
+                    {formatRupiah(totalPurchases)}
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-12 px-3.5 py-2.5 bg-slate-100 border-t border-slate-900">
                 <div className="col-span-6 font-extrabold text-slate-900 uppercase">
@@ -429,12 +441,23 @@ export default function AdminCashFlowReportPage() {
 
               <div className="grid grid-cols-12 px-3.5 py-2">
                 <div className="col-span-6 font-medium text-slate-800">
-                  Kas Keluar (Pengeluaran Operasional & Restok)
+                  Kas Keluar Operasional (Biaya OPEX Toko)
                 </div>
                 <div className="col-span-6 font-medium text-slate-700 border-l border-slate-300 pl-3.5 font-mono">
                   - {formatRupiah(totalOperatingExpenses)}
                 </div>
               </div>
+
+              {totalPurchases > 0 && (
+                <div className="grid grid-cols-12 px-3.5 py-2">
+                  <div className="col-span-6 font-medium text-slate-800">
+                    Kas Keluar Restok (Pembelian Stok Barang)
+                  </div>
+                  <div className="col-span-6 font-medium text-slate-700 border-l border-slate-300 pl-3.5 font-mono">
+                    - {formatRupiah(totalPurchases)}
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-12 px-3.5 py-2.5 bg-slate-50 border-t border-slate-900">
                 <div className="col-span-6 font-extrabold text-slate-900 uppercase">
