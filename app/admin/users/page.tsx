@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { updateProfile } from "firebase/auth";
 import { clientAuth } from "@/lib/firebase/client";
-import { AppUser, UserRole } from "@/types/auth.types";
+import { AppUser, UserRole, isSuperAdmin, isAdminOrSuperAdmin } from "@/types/auth.types";
 import {
   userManagementService,
   CreateUserPayload,
@@ -16,6 +17,17 @@ import { getCroppedImg, Area } from "@/lib/cropImage";
 
 export default function UserManagementPage() {
   const { user: currentUser, setUser: setCurrentUser, refreshUserData } = useAuth();
+  const router = useRouter();
+
+  const isUserSuperAdmin = isSuperAdmin(currentUser?.role);
+  const isUserAdminOrSuperAdmin = isAdminOrSuperAdmin(currentUser?.role);
+
+  // Redirect Cashier/Warehouse away from user management
+  useEffect(() => {
+    if (currentUser && !isUserAdminOrSuperAdmin) {
+      router.replace("/cashier/transactions");
+    }
+  }, [currentUser, isUserAdminOrSuperAdmin, router]);
 
   // Data States
   const [users, setUsers] = useState<AppUser[]>([]);
@@ -105,9 +117,19 @@ export default function UserManagementPage() {
   // Calculated KPI Summaries
   const kpiData = useMemo(() => {
     const total = users.length;
-    const admin = users.filter((u) => u.role === "ADMIN").length;
-    const cashier = users.filter((u) => u.role === "CASHIER").length;
-    const warehouse = users.filter((u) => u.role === "WAREHOUSE").length;
+    const admin = users.filter(
+      (u) =>
+        u.role === "ADMIN" ||
+        u.role === "admin" ||
+        u.role === "SUPER_ADMIN" ||
+        u.role === "super_admin"
+    ).length;
+    const cashier = users.filter(
+      (u) => u.role === "CASHIER" || u.role === "cashier"
+    ).length;
+    const warehouse = users.filter(
+      (u) => u.role === "WAREHOUSE" || u.role === "warehouse"
+    ).length;
 
     return { total, admin, cashier, warehouse };
   }, [users]);
@@ -138,6 +160,10 @@ export default function UserManagementPage() {
 
   // Open Add Modal
   const handleOpenAddModal = () => {
+    if (!isUserSuperAdmin) {
+      toast.error("Akses ditolak. Hanya Super Admin yang dapat menambahkan pengguna baru.");
+      return;
+    }
     setAddForm({
       displayName: "",
       email: "",
@@ -331,6 +357,10 @@ export default function UserManagementPage() {
 
   // Open Edit Modal
   const handleOpenEdit = (user: AppUser) => {
+    if (!isUserSuperAdmin) {
+      toast.error("Akses ditolak. Hanya Super Admin yang dapat mengubah data pengguna.");
+      return;
+    }
     setSelectedUser(user);
     setEditForm({
       displayName: user.displayName,
@@ -412,6 +442,10 @@ export default function UserManagementPage() {
 
   // Open Reset Password Modal
   const handleOpenResetPassword = (user: AppUser) => {
+    if (!isUserSuperAdmin) {
+      toast.error("Akses ditolak. Hanya Super Admin yang dapat mereset kata sandi.");
+      return;
+    }
     setSelectedUser(user);
     setNewPassword("");
     setShowResetPassword(false);
@@ -443,6 +477,10 @@ export default function UserManagementPage() {
 
   // Open Delete Modal
   const handleOpenDeleteModal = (user: AppUser) => {
+    if (!isUserSuperAdmin) {
+      toast.error("Akses ditolak. Hanya Super Admin yang dapat menghapus pengguna.");
+      return;
+    }
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
   };
@@ -491,16 +529,18 @@ export default function UserManagementPage() {
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              type="button"
-              onClick={handleOpenAddModal}
-              className="bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white font-black text-xs px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer inline-flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
-              <span>+ Tambah Pengguna Baru</span>
-            </button>
+            {isUserSuperAdmin && (
+              <button
+                type="button"
+                onClick={handleOpenAddModal}
+                className="bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white font-black text-xs px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer inline-flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+                <span>+ Tambah Pengguna Baru</span>
+              </button>
+            )}
 
             <button
               type="button"
@@ -615,6 +655,7 @@ export default function UserManagementPage() {
                 className="bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
               >
                 <option value="ALL">Semua Role</option>
+                <option value="SUPER_ADMIN">SUPER ADMIN</option>
                 <option value="ADMIN">ADMIN</option>
                 <option value="CASHIER">CASHIER (Kasir)</option>
                 <option value="WAREHOUSE">WAREHOUSE (Gudang)</option>
@@ -719,11 +760,15 @@ export default function UserManagementPage() {
 
                         {/* Role / Hak Akses */}
                         <td className="px-3 py-3.5 align-middle text-center">
-                          {user.role === "ADMIN" ? (
+                          {user.role === "SUPER_ADMIN" || user.role === "super_admin" ? (
+                            <span className="bg-[#F3E8FF] dark:bg-purple-950/60 text-[#7E22CE] dark:text-purple-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                              SUPER ADMIN
+                            </span>
+                          ) : user.role === "ADMIN" || user.role === "admin" ? (
                             <span className="bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                               ADMIN
                             </span>
-                          ) : user.role === "CASHIER" ? (
+                          ) : user.role === "CASHIER" || user.role === "cashier" ? (
                             <span className="bg-[#FEF3C7] dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
                               CASHIER
                             </span>
@@ -754,43 +799,49 @@ export default function UserManagementPage() {
 
                         {/* Aksi */}
                         <td className="px-4 py-3.5 align-middle text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            {/* Edit */}
-                            <button
-                              type="button"
-                              onClick={() => handleOpenEdit(user)}
-                              title="Edit Pengguna"
-                              className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-slate-900 dark:text-slate-100"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                            </button>
+                          {isUserSuperAdmin ? (
+                            <div className="flex items-center justify-center gap-1.5">
+                              {/* Edit */}
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEdit(user)}
+                                title="Edit Pengguna"
+                                className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-slate-900 dark:text-slate-100"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </button>
 
-                            {/* Reset Password */}
-                            <button
-                              type="button"
-                              onClick={() => handleOpenResetPassword(user)}
-                              title="Reset Password"
-                              className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-amber-700 dark:text-amber-400"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                              </svg>
-                            </button>
+                              {/* Reset Password */}
+                              <button
+                                type="button"
+                                onClick={() => handleOpenResetPassword(user)}
+                                title="Reset Password"
+                                className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-amber-700 dark:text-amber-400"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
+                              </button>
 
-                            {/* Delete */}
-                            <button
-                              type="button"
-                              onClick={() => handleOpenDeleteModal(user)}
-                              title="Hapus Pengguna"
-                              className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-rose-600 dark:text-rose-400"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
+                              {/* Delete */}
+                              <button
+                                type="button"
+                                onClick={() => handleOpenDeleteModal(user)}
+                                title="Hapus Pengguna"
+                                className="bg-white dark:bg-slate-800 border-1.5 border-slate-900 dark:border-slate-100 p-1.5 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer text-rose-600 dark:text-rose-400"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="inline-block px-2.5 py-1 rounded-lg text-[10px] font-black uppercase font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
+                              [ Read-Only ]
+                            </span>
+                          )}
                         </td>
                       </tr>
                     );
@@ -956,6 +1007,7 @@ export default function UserManagementPage() {
                     <option value="" disabled>
                       -- Pilih Role --
                     </option>
+                    <option value="SUPER_ADMIN">SUPER ADMIN</option>
                     <option value="CASHIER">CASHIER (Kasir)</option>
                     <option value="WAREHOUSE">WAREHOUSE (Gudang)</option>
                     <option value="ADMIN">ADMIN</option>
@@ -1104,6 +1156,7 @@ export default function UserManagementPage() {
                     }
                     className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-bold text-slate-900 dark:text-slate-100 focus:outline-none"
                   >
+                    <option value="SUPER_ADMIN">SUPER ADMIN</option>
                     <option value="CASHIER">CASHIER (Kasir)</option>
                     <option value="WAREHOUSE">WAREHOUSE (Gudang)</option>
                     <option value="ADMIN">ADMIN</option>

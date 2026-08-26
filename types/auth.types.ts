@@ -1,4 +1,24 @@
-export type UserRole = 'ADMIN' | 'CASHIER' | 'WAREHOUSE';
+export type UserRole =
+  | 'SUPER_ADMIN'
+  | 'ADMIN'
+  | 'CASHIER'
+  | 'WAREHOUSE'
+  | 'super_admin'
+  | 'admin'
+  | 'cashier'
+  | 'warehouse';
+
+export function isSuperAdmin(role?: string | null): boolean {
+  if (!role) return false;
+  const normalized = role.toUpperCase();
+  return normalized === 'SUPER_ADMIN';
+}
+
+export function isAdminOrSuperAdmin(role?: string | null): boolean {
+  if (!role) return false;
+  const normalized = role.toUpperCase();
+  return normalized === 'SUPER_ADMIN' || normalized === 'ADMIN';
+}
 
 export interface AppUser {
   uid: string;

@@ -516,11 +516,13 @@ export default function Sidebar() {
     },
   ];
 
+  const normalizedRole = (currentUser?.role || user?.role || "ADMIN").toUpperCase();
+
   // Select section configuration based on user role
   const activeMenuSections =
-    userRole === "ADMIN"
+    normalizedRole === "SUPER_ADMIN" || normalizedRole === "ADMIN"
       ? adminSections
-      : userRole === "WAREHOUSE"
+      : normalizedRole === "WAREHOUSE"
         ? warehouseSections
         : cashierSections;
 
@@ -786,18 +788,22 @@ export default function Sidebar() {
                 <div className="mt-1">
                   <span
                     className={`inline-block px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] ${
-                      userRole === "ADMIN"
-                        ? "bg-amber-100 text-amber-900"
-                        : userRole === "WAREHOUSE"
-                        ? "bg-blue-100 text-blue-900"
-                        : "bg-emerald-100 text-emerald-900"
+                      normalizedRole === "SUPER_ADMIN"
+                        ? "bg-purple-100 dark:bg-purple-950/60 text-purple-900 dark:text-purple-300"
+                        : normalizedRole === "ADMIN"
+                        ? "bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300"
+                        : normalizedRole === "WAREHOUSE"
+                        ? "bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300"
+                        : "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300"
                     }`}
                   >
-                    {userRole === "ADMIN"
+                    {normalizedRole === "SUPER_ADMIN"
+                      ? "Super Admin"
+                      : normalizedRole === "ADMIN"
                       ? "Store Manager"
-                      : userRole === "WAREHOUSE"
+                      : normalizedRole === "WAREHOUSE"
                       ? "Pegawai Gudang"
-                      : "Kasir Utama 01"}
+                      : "Kasir Utama"}
                   </span>
                 </div>
               </div>

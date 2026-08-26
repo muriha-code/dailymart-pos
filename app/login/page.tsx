@@ -7,10 +7,15 @@ import { clientAuth } from '@/lib/firebase/client';
 import { UserRole } from '@/types/auth.types';
 import { useTheme } from 'next-themes';
 
-const ROLE_REDIRECT_MAP: Record<UserRole, string> = {
+const ROLE_REDIRECT_MAP: Record<string, string> = {
+  SUPER_ADMIN: '/admin/dashboard',
   ADMIN: '/admin/dashboard',
   CASHIER: '/cashier/transactions',
   WAREHOUSE: '/warehouse/stock-in',
+  super_admin: '/admin/dashboard',
+  admin: '/admin/dashboard',
+  cashier: '/cashier/transactions',
+  warehouse: '/warehouse/stock-in',
 };
 
 export default function LoginPage() {

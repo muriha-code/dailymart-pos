@@ -72,12 +72,17 @@ export async function POST(req: NextRequest) {
     });
 
     const isProduction = process.env.NODE_ENV === 'production';
-    const ROLE_MAP: Record<UserRole, string> = {
+    const ROLE_MAP: Record<string, string> = {
+      SUPER_ADMIN: '/admin/dashboard',
       ADMIN: '/admin/dashboard',
       CASHIER: '/cashier/transactions',
       WAREHOUSE: '/warehouse/stock-in',
+      super_admin: '/admin/dashboard',
+      admin: '/admin/dashboard',
+      cashier: '/cashier/transactions',
+      warehouse: '/warehouse/stock-in',
     };
-    const redirectTo = ROLE_MAP[role] || '/cashier/transactions';
+    const redirectTo = ROLE_MAP[role] || ROLE_MAP[String(role).toUpperCase()] || '/cashier/transactions';
 
     // 4. Siapkan NextResponse JSON dengan Cookie Store
     const response = NextResponse.json(

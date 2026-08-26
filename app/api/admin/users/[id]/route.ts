@@ -17,12 +17,38 @@ interface Params {
   params: Promise<{ id: string }>;
 }
 
+async function verifySuperAdmin(req: NextRequest): Promise<boolean> {
+  const sessionCookie = req.cookies.get('session')?.value;
+  if (!sessionCookie) return false;
+  try {
+    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
+    let role = (decodedToken.role || decodedToken.userRole || '') as string;
+    if (!role) {
+      const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
+      if (userDoc.exists) {
+        role = userDoc.data()?.role || '';
+      }
+    }
+    const r = role.toUpperCase();
+    return r === 'SUPER_ADMIN';
+  } catch (err) {
+    return false;
+  }
+}
+
 /**
  * PUT /api/admin/users/[id]
  * Memperbarui profil pengguna (displayName, role, isActive, phone, photoURL, photoPublicId)
  */
 export async function PUT(req: NextRequest, { params }: Params) {
   try {
+    const isSuper = await verifySuperAdmin(req);
+    if (!isSuper) {
+      return NextResponse.json(
+        { success: false, message: 'Akses ditolak. Hanya Super Admin yang diizinkan memperbarui data pengguna.' },
+        { status: 403 }
+      );
+    }
     const { id } = await params;
     const body = await req.json();
     const { displayName, role, isActive, phone, photoURL, photoPublicId } = body;
@@ -77,6 +103,14 @@ export async function PUT(req: NextRequest, { params }: Params) {
  */
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
+    const isSuper = await verifySuperAdmin(req);
+    if (!isSuper) {
+      return NextResponse.json(
+        { success: false, message: 'Akses ditolak. Hanya Super Admin yang diizinkan mereset kata sandi.' },
+        { status: 403 }
+      );
+    }
+
     const { id } = await params;
     const body = await req.json();
     const { password } = body;
@@ -117,6 +151,14 @@ export async function PATCH(req: NextRequest, { params }: Params) {
  */
 export async function DELETE(req: NextRequest, { params }: Params) {
   try {
+    const isSuper = await verifySuperAdmin(req);
+    if (!isSuper) {
+      return NextResponse.json(
+        { success: false, message: 'Akses ditolak. Hanya Super Admin yang diizinkan menghapus pengguna.' },
+        { status: 403 }
+      );
+    }
+
     const { id } = await params;
 
     if (!id) {

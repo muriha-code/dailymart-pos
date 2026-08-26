@@ -5,10 +5,15 @@ import { AppUser, UserRole } from '@/types/auth.types';
 // Duration: 5 days in milliseconds
 const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
 
-const ROLE_REDIRECT_MAP: Record<UserRole, string> = {
+const ROLE_REDIRECT_MAP: Record<string, string> = {
+  SUPER_ADMIN: '/admin/dashboard',
   ADMIN: '/admin/dashboard',
   CASHIER: '/cashier/transactions',
   WAREHOUSE: '/warehouse/stock-in',
+  super_admin: '/admin/dashboard',
+  admin: '/admin/dashboard',
+  cashier: '/cashier/transactions',
+  warehouse: '/warehouse/stock-in',
 };
 
 /**

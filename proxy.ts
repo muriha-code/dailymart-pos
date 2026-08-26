@@ -2,10 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { UserRole } from '@/types/auth.types';
 
 // Home base default route per user role
-const ROLE_HOME_MAP: Record<UserRole, string> = {
+const ROLE_HOME_MAP: Record<string, string> = {
+    SUPER_ADMIN: '/admin/dashboard',
     ADMIN: '/admin/dashboard',
     CASHIER: '/cashier/transactions',
     WAREHOUSE: '/warehouse/stock-in',
+    super_admin: '/admin/dashboard',
+    admin: '/admin/dashboard',
+    cashier: '/cashier/transactions',
+    warehouse: '/warehouse/stock-in',
 };
 
 /**
@@ -16,7 +21,8 @@ export function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
     const sessionCookie = req.cookies.get('session')?.value;
-    const userRole = (req.cookies.get('user_role')?.value as UserRole) || null;
+    const rawUserRole = req.cookies.get('user_role')?.value || null;
+    const normalizedRole = rawUserRole ? rawUserRole.toUpperCase() : null;
 
     const isAuthenticated = !!sessionCookie;
 
@@ -38,7 +44,7 @@ export function proxy(req: NextRequest) {
     }
 
     // 2. Pengguna Terautentikasi (Authenticated)
-    const homePath = (userRole && ROLE_HOME_MAP[userRole]) || '/cashier/transactions';
+    const homePath = (normalizedRole && ROLE_HOME_MAP[normalizedRole]) || '/cashier/transactions';
 
     // Jika sudah login tapi buka /login atau /
     if (pathname === '/login' || pathname === '/') {
@@ -46,11 +52,11 @@ export function proxy(req: NextRequest) {
     }
 
     // 3. RBAC Matrix Enforcement
-    if (userRole === 'CASHIER') {
+    if (normalizedRole === 'CASHIER') {
         if (pathname.startsWith('/admin') || pathname.startsWith('/warehouse')) {
             return NextResponse.redirect(new URL(ROLE_HOME_MAP.CASHIER, req.url));
         }
-    } else if (userRole === 'WAREHOUSE') {
+    } else if (normalizedRole === 'WAREHOUSE') {
         if (pathname.startsWith('/admin') || pathname.startsWith('/cashier')) {
             return NextResponse.redirect(new URL(ROLE_HOME_MAP.WAREHOUSE, req.url));
         }

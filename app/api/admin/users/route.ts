@@ -39,12 +39,39 @@ export async function GET() {
   }
 }
 
+async function verifySuperAdmin(req: NextRequest): Promise<boolean> {
+  const sessionCookie = req.cookies.get('session')?.value;
+  if (!sessionCookie) return false;
+  try {
+    const decodedToken = await adminAuth.verifySessionCookie(sessionCookie, true);
+    let role = (decodedToken.role || decodedToken.userRole || '') as string;
+    if (!role) {
+      const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
+      if (userDoc.exists) {
+        role = userDoc.data()?.role || '';
+      }
+    }
+    const r = role.toUpperCase();
+    return r === 'SUPER_ADMIN';
+  } catch (err) {
+    return false;
+  }
+}
+
 /**
  * POST /api/admin/users
  * Membuat pengguna baru di Firebase Auth & Firestore
  */
 export async function POST(req: NextRequest) {
   try {
+    const isSuper = await verifySuperAdmin(req);
+    if (!isSuper) {
+      return NextResponse.json(
+        { success: false, message: 'Akses ditolak. Hanya Super Admin yang diizinkan membuat pengguna baru.' },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const { displayName, email, password, role, phone, photoURL, photoPublicId } = body;
 
