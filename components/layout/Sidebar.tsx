@@ -154,10 +154,10 @@ export default function Sidebar() {
 
   // Listener real-time Firestore onSnapshot untuk dokumen user aktif
   useEffect(() => {
-    const activeUid = authUser?.uid || user?.uid || clientAuth.currentUser?.uid;
-    if (!activeUid) return;
+    const currentFbUser = clientAuth.currentUser;
+    if (!currentFbUser || !currentFbUser.uid) return;
 
-    const userDocRef = doc(clientDb, "users", activeUid);
+    const userDocRef = doc(clientDb, "users", currentFbUser.uid);
     const unsubscribe = onSnapshot(
       userDocRef,
       (snapshot) => {

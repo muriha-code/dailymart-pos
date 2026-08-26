@@ -188,10 +188,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   // Listener real-time onSnapshot untuk dokumen Firestore users/{activeUid}
   useEffect(() => {
-    const activeUid = user?.uid || clientAuth.currentUser?.uid;
-    if (!activeUid) return;
+    const currentFbUser = clientAuth.currentUser;
+    if (!currentFbUser || !currentFbUser.uid) return;
 
-    const userDocRef = doc(clientDb, 'users', activeUid);
+    const userDocRef = doc(clientDb, 'users', currentFbUser.uid);
     const unsubscribe = onSnapshot(
       userDocRef,
       (snapshot) => {
@@ -211,7 +211,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   // Listener onAuthStateChanged untuk sinkronisasi otomatis status autentikasi & tema
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(clientAuth, async (fbUser) => {
-      if (fbUser) {
+      if (fbUser && fbUser.uid) {
         try {
           const userDocRef = doc(clientDb, 'users', fbUser.uid);
           const userSnap = await getDoc(userDocRef);
