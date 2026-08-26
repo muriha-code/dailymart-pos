@@ -2,6 +2,7 @@ import {
   SalesReportFilterParams,
   SalesReportResponse,
 } from '@/types/salesReport.types';
+import { safeParseDate } from '@/lib/utils/date';
 
 export const salesReportService = {
   /**
@@ -10,13 +11,32 @@ export const salesReportService = {
   async getSalesReport(filters?: SalesReportFilterParams): Promise<SalesReportResponse> {
     const query = new URLSearchParams();
 
-    if (filters?.period) query.append('period', filters.period);
-    if (filters?.startDate) query.append('startDate', filters.startDate);
-    if (filters?.endDate) query.append('endDate', filters.endDate);
-    if (filters?.cashierId) query.append('cashierId', filters.cashierId);
-    if (filters?.paymentMethod) query.append('paymentMethod', filters.paymentMethod);
+    if (filters?.period && (filters.period as any) !== 'undefined') {
+      query.append('period', String(filters.period));
+    }
 
-    const res = await fetch(`/api/admin/reports/sales?${query.toString()}`, {
+    if (filters?.startDate && filters.startDate !== 'undefined' && String(filters.startDate).trim() !== '') {
+      const parsedStart = safeParseDate(filters.startDate);
+      query.append('startDate', parsedStart.toISOString());
+    }
+
+    if (filters?.endDate && filters.endDate !== 'undefined' && String(filters.endDate).trim() !== '') {
+      const parsedEnd = safeParseDate(filters.endDate);
+      query.append('endDate', parsedEnd.toISOString());
+    }
+
+    if (filters?.cashierId && filters.cashierId !== 'undefined' && filters.cashierId !== 'ALL') {
+      query.append('cashierId', String(filters.cashierId));
+    }
+
+    if (filters?.paymentMethod && filters.paymentMethod !== 'undefined' && filters.paymentMethod !== 'ALL') {
+      query.append('paymentMethod', String(filters.paymentMethod));
+    }
+
+    const queryString = query.toString();
+    const url = `/api/admin/reports/sales${queryString ? `?${queryString}` : ''}`;
+
+    const res = await fetch(url, {
       cache: 'no-store',
     });
     const json = await res.json();

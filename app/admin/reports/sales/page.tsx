@@ -4,7 +4,11 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from "react"
 import {
   SalesReportResponse,
   TransactionReportItem,
+  PaymentMethodBreakdown,
+  TopSellingProduct,
+  DailySalesChartData,
 } from "@/types/salesReport.types";
+import { PaymentMethod } from "@/types/transaction.types";
 import { salesReportService } from "@/services/salesReport.service";
 import Pagination from "@/components/common/Pagination";
 import {
@@ -20,9 +24,56 @@ import {
   Cell,
 } from "recharts";
 
+import { safeParseDate } from "@/lib/utils/date";
+
 // Helper Rupiah
 const formatRupiah = (amount: number): string => {
   return "Rp " + (amount || 0).toLocaleString("id-ID");
+};
+
+// Helper Date Range Checker with Safe Date Parsing
+const checkDateInPeriod = (
+  dateInput: any,
+  period: string,
+  startStr?: string,
+  endStr?: string
+): boolean => {
+  const date = safeParseDate(dateInput);
+  const now = new Date();
+
+  if (period === "today") {
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    return date >= startOfToday && date <= endOfToday;
+  }
+  if (period === "7days") {
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6, 0, 0, 0, 0);
+    return date >= start;
+  }
+  if (period === "30days") {
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29, 0, 0, 0, 0);
+    return date >= start;
+  }
+  if (period === "thisMonth") {
+    const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+    return date >= start;
+  }
+  if (period === "thisYear") {
+    const start = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+    return date >= start;
+  }
+  if (period === "custom") {
+    if (!startStr || String(startStr).trim() === "") return true;
+    const start = safeParseDate(startStr);
+    start.setHours(0, 0, 0, 0);
+    let end = new Date();
+    if (endStr && String(endStr).trim() !== "") {
+      end = safeParseDate(endStr);
+      end.setHours(23, 59, 59, 999);
+    }
+    return date >= start && date <= end;
+  }
+  return true; // 'all'
 };
 
 // Helper Export CSV
@@ -124,20 +175,24 @@ export default function AdminSalesReportPage() {
 
   const staffName = user?.displayName || user?.name || "Administrator Retail";
 
-  // Load Sales Report Data
+  // Load Sales Report Data with Safe Guard
   const loadSalesReport = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
+      // Guard Check: pastikan period dan filter valid
+      const targetPeriod = periodFilter && periodFilter !== "undefined" ? periodFilter : "all";
+      const targetPayment = paymentFilter && paymentFilter !== "undefined" ? paymentFilter : "ALL";
+
       const data = await salesReportService.getSalesReport({
-        period: periodFilter as any,
-        startDate: periodFilter === "custom" ? startDate : undefined,
-        endDate: periodFilter === "custom" ? endDate : undefined,
-        paymentMethod: paymentFilter !== "ALL" ? paymentFilter : undefined,
+        period: targetPeriod as any,
+        startDate: targetPeriod === "custom" && startDate ? startDate : undefined,
+        endDate: targetPeriod === "custom" && endDate ? endDate : undefined,
+        paymentMethod: targetPayment !== "ALL" ? targetPayment : undefined,
       });
       setReportData(data);
     } catch (err: any) {
-      console.error("Gagal memuat laporan penjualan:", err);
+      console.error("Error loading sales report:", err);
       setError(
         err.message || "Gagal terhubung ke database server. Silakan coba lagi."
       );
@@ -155,19 +210,152 @@ export default function AdminSalesReportPage() {
     setCurrentPage(1);
   }, [periodFilter, startDate, endDate, paymentFilter, searchQuery]);
 
-  // Filtered Transaction List (Search)
-  const filteredTransactions = useMemo(() => {
+  // 1. Centralized Reactive Data Filtering (filteredSales)
+  const filteredSales = useMemo(() => {
     if (!reportData?.transactions) return [];
-    if (!searchQuery.trim()) return reportData.transactions;
+
+    return reportData.transactions.filter((sale) => {
+      // 1. Filter Tanggal / Periode dengan safe date parser
+      const saleDate = safeParseDate(sale.createdAt || sale.date);
+      const isDateMatch = checkDateInPeriod(saleDate, periodFilter, startDate, endDate);
+
+      // 2. Filter Jenis Pembayaran
+      const isPaymentMatch =
+        paymentFilter === "ALL" ||
+        sale.paymentMethod?.toUpperCase() === paymentFilter.toUpperCase();
+
+      return isDateMatch && isPaymentMatch;
+    });
+  }, [reportData?.transactions, periodFilter, startDate, endDate, paymentFilter]);
+
+  // 2. Dynamic KPI Summaries calculated live from filteredSales
+  const summaryMetrics = useMemo(() => {
+    let totalRevenue = 0;
+    let totalItemsSold = 0;
+
+    filteredSales.forEach((tx) => {
+      totalRevenue += tx.grandTotal || tx.subtotal || 0;
+      if (tx.itemsCount) {
+        totalItemsSold += tx.itemsCount;
+      } else if (tx.items) {
+        totalItemsSold += tx.items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+      }
+    });
+
+    const totalTransactions = filteredSales.length;
+    const averageTransactionValue =
+      totalTransactions > 0 ? Math.round(totalRevenue / totalTransactions) : 0;
+
+    return {
+      totalRevenue,
+      totalTransactions,
+      totalItemsSold,
+      averageTransactionValue,
+    };
+  }, [filteredSales]);
+
+  // 3. Dynamic Daily Sales Chart calculated live from filteredSales
+  const dailyChartData = useMemo<DailySalesChartData[]>(() => {
+    const dailyMap: Record<string, { date: string; timestamp: number; revenue: number; transactions: number }> = {};
+
+    filteredSales.forEach((tx) => {
+      const d = safeParseDate(tx.createdAt || tx.date);
+
+      const dateKey = `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}`;
+      const dayTimestamp = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
+      if (!dailyMap[dateKey]) {
+        dailyMap[dateKey] = { date: dateKey, timestamp: dayTimestamp, revenue: 0, transactions: 0 };
+      }
+      dailyMap[dateKey].revenue += tx.grandTotal || tx.subtotal || 0;
+      dailyMap[dateKey].transactions += 1;
+    });
+
+    return Object.values(dailyMap)
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .map(({ date, revenue, transactions }) => ({ date, revenue, transactions }));
+  }, [filteredSales]);
+
+  // 4. Dynamic Payment Breakdown calculated live from filteredSales
+  const paymentBreakdownData = useMemo<PaymentMethodBreakdown[]>(() => {
+    const paymentMap: Record<string, { amount: number; count: number }> = {
+      CASH: { amount: 0, count: 0 },
+      QRIS: { amount: 0, count: 0 },
+      DEBIT: { amount: 0, count: 0 },
+      TRANSFER: { amount: 0, count: 0 },
+    };
+
+    let totalRev = 0;
+    filteredSales.forEach((tx) => {
+      const grandTotal = tx.grandTotal || tx.subtotal || 0;
+      totalRev += grandTotal;
+      const method = (tx.paymentMethod?.toUpperCase() as PaymentMethod) || "CASH";
+
+      if (!paymentMap[method]) {
+        paymentMap[method] = { amount: 0, count: 0 };
+      }
+      paymentMap[method].amount += grandTotal;
+      paymentMap[method].count += 1;
+    });
+
+    const methodsToShow = ["CASH", "QRIS", "DEBIT", "TRANSFER"] as PaymentMethod[];
+    return methodsToShow
+      .map((method) => {
+        const item = paymentMap[method] || { amount: 0, count: 0 };
+        return {
+          method,
+          amount: item.amount,
+          count: item.count,
+          percentage: totalRev > 0 ? Math.round((item.amount / totalRev) * 100) : 0,
+        };
+      })
+      .filter((pb) => paymentFilter === "ALL" || pb.method === paymentFilter.toUpperCase());
+  }, [filteredSales, paymentFilter]);
+
+  // 5. Dynamic Top 5 Products calculated live from filteredSales
+  const topProductsData = useMemo<TopSellingProduct[]>(() => {
+    const productMap: Record<string, TopSellingProduct> = {};
+
+    filteredSales.forEach((tx) => {
+      const items = tx.items || [];
+      items.forEach((it) => {
+        const qty = it.quantity || 1;
+        const pId = it.productId || it.productName || "UNKNOWN";
+
+        if (!productMap[pId]) {
+          productMap[pId] = {
+            productId: pId,
+            sku: it.sku || pId,
+            productName: it.productName || "Produk Non-SKU",
+            categoryName: it.categoryName || "Umum",
+            quantitySold: 0,
+            totalRevenue: 0,
+          };
+        }
+        productMap[pId].quantitySold += qty;
+        productMap[pId].totalRevenue += it.subtotal || it.price * qty;
+      });
+    });
+
+    return Object.values(productMap)
+      .sort((a, b) => b.quantitySold - a.quantitySold || b.totalRevenue - a.totalRevenue)
+      .slice(0, 5);
+  }, [filteredSales]);
+
+  // 6. Filtered Transaction List (with Search Query)
+  const filteredTransactions = useMemo(() => {
+    if (!searchQuery.trim()) return filteredSales;
 
     const query = searchQuery.toLowerCase().trim();
-    return reportData.transactions.filter(
+    return filteredSales.filter(
       (tx) =>
         tx.invoiceNumber.toLowerCase().includes(query) ||
         tx.cashierName.toLowerCase().includes(query) ||
         tx.paymentMethod.toLowerCase().includes(query)
     );
-  }, [reportData, searchQuery]);
+  }, [filteredSales, searchQuery]);
 
   // Paginated Transactions
   const paginatedTransactions = useMemo(() => {
@@ -209,8 +397,10 @@ export default function AdminSalesReportPage() {
   // Handle Export CSV
   const handleExportCSV = () => {
     setIsExportOpen(false);
-    if (reportData?.transactions) {
-      exportTransactionsCSV(reportData.transactions);
+    if (filteredTransactions && filteredTransactions.length > 0) {
+      exportTransactionsCSV(filteredTransactions);
+    } else {
+      alert("Tidak ada data transaksi terfilter untuk diekspor!");
     }
   };
 
@@ -219,6 +409,8 @@ export default function AdminSalesReportPage() {
       ? "Hari Ini"
       : periodFilter === "7days"
       ? "7 Hari Terakhir"
+      : periodFilter === "30days"
+      ? "30 Hari Terakhir"
       : periodFilter === "thisMonth"
       ? "Bulan Ini"
       : periodFilter === "thisYear"
@@ -232,6 +424,7 @@ export default function AdminSalesReportPage() {
     CASH: "#10B981", // Mint / Emerald
     QRIS: "#6366F1", // Indigo
     DEBIT: "#F59E0B", // Amber
+    TRANSFER: "#3B82F6", // Blue
   };
 
   return (
@@ -296,7 +489,7 @@ export default function AdminSalesReportPage() {
                   Total Volume Transaksi
                 </div>
                 <div className="col-span-6 font-bold text-slate-900 border-l border-slate-300 pl-3.5">
-                  {reportData?.summary.totalTransactions || 0} Transaksi
+                  {summaryMetrics.totalTransactions} Transaksi
                 </div>
               </div>
 
@@ -305,7 +498,7 @@ export default function AdminSalesReportPage() {
                   Total Barang Terjual (Unit)
                 </div>
                 <div className="col-span-6 font-bold text-slate-900 border-l border-slate-300 pl-3.5">
-                  {reportData?.summary.totalItemsSold || 0} Unit Item
+                  {summaryMetrics.totalItemsSold} Unit Item
                 </div>
               </div>
 
@@ -314,7 +507,7 @@ export default function AdminSalesReportPage() {
                   Rata-Rata Nilai Transaksi (AOV)
                 </div>
                 <div className="col-span-6 font-semibold text-slate-700 border-l border-slate-300 pl-3.5 font-mono">
-                  {formatRupiah(reportData?.summary.averageTransactionValue || 0)} / Transaksi
+                  {formatRupiah(summaryMetrics.averageTransactionValue)} / Transaksi
                 </div>
               </div>
 
@@ -323,7 +516,7 @@ export default function AdminSalesReportPage() {
                   TOTAL OMZET PENJUALAN (GROSS SALES)
                 </div>
                 <div className="col-span-6 font-extrabold text-slate-900 border-l border-slate-300 pl-3.5 font-mono">
-                  {formatRupiah(reportData?.summary.totalRevenue || 0)}
+                  {formatRupiah(summaryMetrics.totalRevenue)}
                 </div>
               </div>
             </div>
@@ -340,8 +533,8 @@ export default function AdminSalesReportPage() {
               <div className="col-span-3 border-l border-slate-300 pl-3 text-right">TOTAL PENERIMAAN</div>
             </div>
             <div className="divide-y divide-slate-300 text-xs">
-              {reportData?.paymentBreakdown && reportData.paymentBreakdown.length > 0 ? (
-                reportData.paymentBreakdown.map((item) => {
+              {paymentBreakdownData && paymentBreakdownData.length > 0 ? (
+                paymentBreakdownData.map((item) => {
                   const label =
                     item.method === "CASH"
                       ? "Tunai / Cash"
@@ -349,6 +542,8 @@ export default function AdminSalesReportPage() {
                       ? "Non-Tunai / QRIS"
                       : item.method === "DEBIT"
                       ? "Kartu Debit"
+                      : item.method === "TRANSFER"
+                      ? "Transfer Bank"
                       : item.method;
                   return (
                     <div key={item.method} className="grid grid-cols-12 px-3.5 py-2">
@@ -378,10 +573,10 @@ export default function AdminSalesReportPage() {
                   TOTAL PENERIMAAN KAS
                 </div>
                 <div className="col-span-3 text-slate-900 border-l border-slate-300 pl-3">
-                  {reportData?.summary.totalTransactions || 0} Transaksi
+                  {summaryMetrics.totalTransactions} Transaksi
                 </div>
                 <div className="col-span-3 text-slate-900 border-l border-slate-300 pl-3 font-mono text-right">
-                  {formatRupiah(reportData?.summary.totalRevenue || 0)}
+                  {formatRupiah(summaryMetrics.totalRevenue)}
                 </div>
               </div>
             </div>
@@ -521,7 +716,7 @@ export default function AdminSalesReportPage() {
                 Total Omset Penjualan
               </span>
               <span className="text-[#065F46] dark:text-emerald-300 font-mono font-black text-base sm:text-lg tracking-tight block">
-                {formatRupiah(reportData?.summary.totalRevenue || 0)}
+                {formatRupiah(summaryMetrics.totalRevenue)}
               </span>
             </div>
 
@@ -531,7 +726,7 @@ export default function AdminSalesReportPage() {
                 Total Transaksi
               </span>
               <span className="text-base sm:text-lg font-black font-mono text-slate-900 dark:text-slate-50 tracking-tight block">
-                {reportData?.summary.totalTransactions || 0}{" "}
+                {summaryMetrics.totalTransactions}{" "}
                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">tx</span>
               </span>
             </div>
@@ -542,7 +737,7 @@ export default function AdminSalesReportPage() {
                 Total Unit Terjual
               </span>
               <span className="text-[#B45309] dark:text-amber-300 font-mono font-black text-base sm:text-lg tracking-tight block">
-                {reportData?.summary.totalItemsSold || 0}{" "}
+                {summaryMetrics.totalItemsSold}{" "}
                 <span className="text-[10px] font-bold text-amber-800 dark:text-amber-300/80">unit</span>
               </span>
             </div>
@@ -553,7 +748,7 @@ export default function AdminSalesReportPage() {
                 Rata-Rata Transaksi (AOV)
               </span>
               <span className="text-[#4338CA] dark:text-indigo-300 font-mono font-black text-base sm:text-lg tracking-tight block">
-                {formatRupiah(reportData?.summary.averageTransactionValue || 0)}
+                {formatRupiah(summaryMetrics.averageTransactionValue)}
               </span>
             </div>
           </div>
@@ -570,6 +765,7 @@ export default function AdminSalesReportPage() {
                 <option value="all">Semua Waktu</option>
                 <option value="today">Hari Ini</option>
                 <option value="7days">7 Hari Terakhir</option>
+                <option value="30days">30 Hari Terakhir</option>
                 <option value="thisMonth">Bulan Ini</option>
                 <option value="thisYear">Tahun Ini</option>
                 <option value="custom">Kustom Tanggal</option>
@@ -605,6 +801,7 @@ export default function AdminSalesReportPage() {
                 <option value="CASH">CASH (Tunai)</option>
                 <option value="QRIS">QRIS</option>
                 <option value="DEBIT">KARTU DEBIT</option>
+                <option value="TRANSFER">TRANSFER BANK</option>
               </select>
             </div>
 
@@ -643,9 +840,9 @@ export default function AdminSalesReportPage() {
               </div>
 
               <div className="w-full h-[190px] sm:h-[210px]">
-                {reportData?.dailyChart && reportData.dailyChart.length > 0 ? (
+                {dailyChartData && dailyChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={reportData.dailyChart} margin={{ top: 10, right: 10, left: 5, bottom: -5 }}>
+                    <AreaChart data={dailyChartData} margin={{ top: 10, right: 10, left: 5, bottom: -5 }}>
                       <defs>
                         <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#6366F1" stopOpacity={0.35} />
@@ -694,9 +891,9 @@ export default function AdminSalesReportPage() {
               </div>
 
               <div className="w-full h-[130px] sm:h-[140px] mb-1">
-                {reportData?.paymentBreakdown && reportData.paymentBreakdown.length > 0 ? (
+                {paymentBreakdownData && paymentBreakdownData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={reportData.paymentBreakdown} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: -5 }}>
+                    <BarChart data={paymentBreakdownData} layout="vertical" margin={{ top: 5, right: 10, left: 0, bottom: -5 }}>
                       <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#94A3B8" opacity={0.3} />
                       <XAxis type="number" tick={{ fontSize: 10, fontWeight: 'bold', fill: 'currentColor' }} className="text-slate-700 dark:text-slate-300" tickFormatter={(v) => `Rp${(v / 1000).toFixed(0)}k`} />
                       <YAxis dataKey="method" type="category" width={45} tick={{ fontSize: 10, fontWeight: '900', fill: 'currentColor' }} className="text-slate-700 dark:text-slate-300" />
@@ -712,7 +909,7 @@ export default function AdminSalesReportPage() {
                         }}
                       />
                       <Bar dataKey="amount" stroke="#0F172A" strokeWidth={1.5} radius={[0, 6, 6, 0]}>
-                        {reportData.paymentBreakdown.map((entry, index) => (
+                        {paymentBreakdownData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={METHOD_COLORS[entry.method] || "#6366F1"} />
                         ))}
                       </Bar>
@@ -727,7 +924,7 @@ export default function AdminSalesReportPage() {
 
               {/* List Legend Persentase Pembayaran */}
               <div className="space-y-1 pt-1.5 border-t-2 border-slate-200 dark:border-slate-800">
-                {reportData?.paymentBreakdown.map((pb) => (
+                {paymentBreakdownData.map((pb) => (
                   <div
                     key={pb.method}
                     className="py-1 px-2 text-[10px] font-mono font-bold mb-1 bg-slate-50 dark:bg-slate-800 border-[1.5px] border-slate-900 dark:border-slate-100 rounded-lg shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between"
@@ -751,7 +948,7 @@ export default function AdminSalesReportPage() {
           </div>
 
           {/* 5. Table 5 Produk Terlaris */}
-          {reportData?.topProducts && reportData.topProducts.length > 0 && (
+          {topProductsData && topProductsData.length > 0 && (
             <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden mb-6 transition-colors">
               <div className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 p-4 font-black text-sm text-slate-900 dark:text-slate-50 flex items-center gap-2">
                 <span>🔥</span>
@@ -769,7 +966,7 @@ export default function AdminSalesReportPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                    {reportData.topProducts.map((p, idx) => (
+                    {topProductsData.map((p, idx) => (
                       <tr key={p.productId || idx} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors">
                         <td className="py-3 px-4">
                           <span className="font-mono text-[11px] font-bold text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700">

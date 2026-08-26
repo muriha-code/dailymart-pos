@@ -29,20 +29,32 @@ export interface DailySalesChartData {
   transactions: number;
 }
 
+export interface TransactionReportItemDetail {
+  productId: string;
+  sku: string;
+  productName: string;
+  categoryName?: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+}
+
 export interface TransactionReportItem {
   id: string;
   invoiceNumber: string;
   date: string;
+  createdAt?: string;
   cashierName: string;
   paymentMethod: PaymentMethod;
   subtotal: number;
   discountTotal: number;
   grandTotal: number;
   itemsCount: number;
+  items?: TransactionReportItemDetail[];
 }
 
 export interface SalesReportFilterParams {
-  period?: 'today' | '7days' | 'thisMonth' | 'thisYear' | 'custom';
+  period?: 'all' | 'today' | '7days' | '30days' | 'thisMonth' | 'thisYear' | 'custom';
   startDate?: string;
   endDate?: string;
   cashierId?: string;

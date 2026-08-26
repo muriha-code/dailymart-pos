@@ -8,6 +8,7 @@ import {
   TransactionReportItem,
 } from '@/types/salesReport.types';
 import { PaymentMethod } from '@/types/transaction.types';
+import { safeParseDate, safeFormatISO } from '@/lib/utils/date';
 
 export async function GET(req: NextRequest) {
   try {
@@ -46,18 +47,18 @@ export async function GET(req: NextRequest) {
     } else if (period === 'thisYear') {
       filterStart = new Date(now.getFullYear(), 0, 1);
     } else if (period === 'custom' && startDateParam) {
-      filterStart = new Date(startDateParam);
+      filterStart = safeParseDate(startDateParam);
       filterStart.setHours(0, 0, 0, 0);
       if (endDateParam) {
-        filterEnd = new Date(endDateParam);
+        filterEnd = safeParseDate(endDateParam);
         filterEnd.setHours(23, 59, 59, 999);
       }
     }
 
     // Apply Filter
     const filtered = allTransactions.filter((tx) => {
-      const txDate = tx.createdAt ? new Date(tx.createdAt) : null;
-      if (!txDate || isNaN(txDate.getTime())) return true;
+      const txDate = tx.createdAt ? safeParseDate(tx.createdAt) : null;
+      if (!txDate) return true;
 
       if (filterStart && txDate < filterStart) return false;
       if (filterEnd && txDate > filterEnd) return false;
@@ -68,7 +69,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Sort by date desc
-    filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    filtered.sort((a, b) => safeParseDate(b.createdAt).getTime() - safeParseDate(a.createdAt).getTime());
 
     // 3. Compute Summary KPI
     let totalRevenue = 0;
@@ -94,10 +95,7 @@ export async function GET(req: NextRequest) {
       paymentMap[method].count += 1;
 
       // Daily chart aggregation
-      let d = tx.createdAt ? new Date(tx.createdAt) : new Date();
-      if (isNaN(d.getTime())) {
-        d = new Date();
-      }
+      const d = safeParseDate(tx.createdAt);
       const dateKey = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1)
         .toString()
         .padStart(2, '0')}`;
@@ -162,7 +160,7 @@ export async function GET(req: NextRequest) {
       id: tx.id,
       invoiceNumber: tx.invoiceNumber || tx.id,
       date: tx.createdAt
-        ? new Date(tx.createdAt).toLocaleDateString('id-ID', {
+        ? safeParseDate(tx.createdAt).toLocaleDateString('id-ID', {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
@@ -170,12 +168,22 @@ export async function GET(req: NextRequest) {
             minute: '2-digit',
           })
         : '-',
+      createdAt: safeFormatISO(tx.createdAt),
       cashierName: tx.cashierName || 'Kasir POS',
       paymentMethod: (tx.paymentMethod as PaymentMethod) || 'CASH',
       subtotal: tx.subtotal || 0,
       discountTotal: tx.discountTotal || 0,
       grandTotal: tx.grandTotal || tx.subtotal || 0,
-      itemsCount: (tx.items || []).length,
+      itemsCount: (tx.items || []).reduce((acc: number, item: any) => acc + (item.quantity || 1), 0) || (tx.items || []).length,
+      items: (tx.items || []).map((it: any) => ({
+        productId: it.productId || it.productName || 'UNKNOWN',
+        sku: it.sku || it.productId || 'SKU-NONE',
+        productName: it.productName || 'Produk',
+        categoryName: it.categoryName || 'Umum',
+        quantity: it.quantity || 1,
+        price: it.price || 0,
+        subtotal: it.subtotal || (it.price || 0) * (it.quantity || 1),
+      })),
     }));
 
     const responseData: SalesReportResponse = {
