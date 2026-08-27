@@ -29,6 +29,17 @@ export default function UserManagementPage() {
     }
   }, [currentUser, isUserAdminOrSuperAdmin, router]);
 
+  // Check for auto-redirect restriction notification from middleware
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("restricted") === "true") {
+        toast.error("Super Admin hanya diizinkan mengelola manajemen pengguna.");
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    }
+  }, []);
+
   // Data States
   const [users, setUsers] = useState<AppUser[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);

@@ -256,7 +256,25 @@ export default function Sidebar() {
   // RBAC MENU STRUCTURE DEFINITIONS
   // ==========================================
 
-  // A. ADMIN MENU SECTIONS (With Accordion Submenus for Akses Operasional)
+  // A. SUPER ADMIN MENU SECTIONS (Isolated to HANYA Kelola Pengguna)
+  const superAdminSections: MenuSection[] = [
+    {
+      sectionTitle: "MANAJEMEN PENGGUNA",
+      items: [
+        {
+          title: "Kelola Pengguna",
+          href: "/admin/users",
+          icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          ),
+        },
+      ],
+    },
+  ];
+
+  // B. ADMIN MENU SECTIONS (With Accordion Submenus for Akses Operasional)
   const adminSections: MenuSection[] = [
     {
       sectionTitle: "MANAJEMEN UTAMA",
@@ -426,7 +444,7 @@ export default function Sidebar() {
     },
   ];
 
-  // B. CASHIER MENU SECTIONS
+  // C. CASHIER MENU SECTIONS
   const cashierSections: MenuSection[] = [
     {
       sectionTitle: "OPERASIONAL KASIR",
@@ -453,7 +471,7 @@ export default function Sidebar() {
     },
   ];
 
-  // C. WAREHOUSE MENU SECTIONS
+  // D. WAREHOUSE MENU SECTIONS
   const warehouseSections: MenuSection[] = [
     {
       sectionTitle: "INVENTARIS & LOGISTIK",
@@ -520,11 +538,13 @@ export default function Sidebar() {
 
   // Select section configuration based on user role
   const activeMenuSections =
-    normalizedRole === "SUPER_ADMIN" || normalizedRole === "ADMIN"
-      ? adminSections
-      : normalizedRole === "WAREHOUSE"
-        ? warehouseSections
-        : cashierSections;
+    normalizedRole === "SUPER_ADMIN"
+      ? superAdminSections
+      : normalizedRole === "ADMIN"
+        ? adminSections
+        : normalizedRole === "WAREHOUSE"
+          ? warehouseSections
+          : cashierSections;
 
   const initials = getInitials(currentUser?.displayName || currentUser?.email);
 

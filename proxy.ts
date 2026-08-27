@@ -3,11 +3,11 @@ import { UserRole } from '@/types/auth.types';
 
 // Home base default route per user role
 const ROLE_HOME_MAP: Record<string, string> = {
-    SUPER_ADMIN: '/admin/dashboard',
+    SUPER_ADMIN: '/admin/users',
     ADMIN: '/admin/dashboard',
     CASHIER: '/cashier/transactions',
     WAREHOUSE: '/warehouse/stock-in',
-    super_admin: '/admin/dashboard',
+    super_admin: '/admin/users',
     admin: '/admin/dashboard',
     cashier: '/cashier/transactions',
     warehouse: '/warehouse/stock-in',
@@ -52,7 +52,14 @@ export function proxy(req: NextRequest) {
     }
 
     // 3. RBAC Matrix Enforcement
-    if (normalizedRole === 'CASHIER') {
+    if (normalizedRole === 'SUPER_ADMIN') {
+        // Super Admin HANYA diizinkan mengelola manajemen pengguna (/admin/users)
+        if (pathname !== '/admin/users' && !pathname.startsWith('/admin/users/')) {
+            const redirectUrl = new URL('/admin/users', req.url);
+            redirectUrl.searchParams.set('restricted', 'true');
+            return NextResponse.redirect(redirectUrl);
+        }
+    } else if (normalizedRole === 'CASHIER') {
         if (pathname.startsWith('/admin') || pathname.startsWith('/warehouse')) {
             return NextResponse.redirect(new URL(ROLE_HOME_MAP.CASHIER, req.url));
         }

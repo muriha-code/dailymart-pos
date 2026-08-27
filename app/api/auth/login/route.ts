@@ -6,11 +6,11 @@ import { AppUser, UserRole } from '@/types/auth.types';
 const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
 
 const ROLE_REDIRECT_MAP: Record<string, string> = {
-  SUPER_ADMIN: '/admin/dashboard',
+  SUPER_ADMIN: '/admin/users',
   ADMIN: '/admin/dashboard',
   CASHIER: '/cashier/transactions',
   WAREHOUSE: '/warehouse/stock-in',
-  super_admin: '/admin/dashboard',
+  super_admin: '/admin/users',
   admin: '/admin/dashboard',
   cashier: '/cashier/transactions',
   warehouse: '/warehouse/stock-in',
