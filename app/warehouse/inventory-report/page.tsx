@@ -6,6 +6,7 @@ import {
   InventoryReportSummary,
 } from "@/types/inventoryReport.types";
 import { inventoryReportService } from "@/services/inventoryReport.service";
+import { exportInventoryExcel } from "@/lib/utils/exportInventoryExcel";
 import Pagination from "@/components/common/Pagination";
 
 // Helper Export to CSV (Metode Blob + Directive sep=, untuk Excel)
@@ -193,10 +194,10 @@ export default function InventoryReportPage() {
     window.print();
   };
 
-  // Handle Export CSV
-  const handleDownloadCSV = () => {
+  // Handle Export Excel (.xlsx)
+  const handleDownloadExcel = () => {
     setIsExportOpen(false);
-    exportToCSV(records);
+    exportInventoryExcel(records, periodText);
   };
 
   const periodText =
@@ -443,10 +444,10 @@ export default function InventoryReportPage() {
 
                     <div className="my-1 border-t border-slate-200 dark:border-slate-800" />
 
-                    {/* Opsi 2: Ekspor CSV Excel */}
+                    {/* Opsi 2: Ekspor Excel (.xlsx) */}
                     <button
                       type="button"
-                      onClick={handleDownloadCSV}
+                      onClick={handleDownloadExcel}
                       className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors cursor-pointer group"
                     >
                       <div className="p-2 rounded-md bg-[#E8F5E9] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border border-slate-900 dark:border-slate-100 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]">
@@ -455,8 +456,8 @@ export default function InventoryReportPage() {
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Ekspor CSV (Excel)</div>
-                        <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Unduh lembar kerja mentah (.csv)</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Ekspor Excel (.xlsx)</div>
+                        <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Unduh Executive Dashboard (.xlsx)</div>
                       </div>
                     </button>
                   </div>
