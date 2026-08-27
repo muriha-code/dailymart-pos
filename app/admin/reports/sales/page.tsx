@@ -25,6 +25,7 @@ import {
 } from "recharts";
 
 import { safeParseDate } from "@/lib/utils/date";
+import { exportSalesExcel } from "@/lib/utils/exportSalesExcel";
 
 // Helper Rupiah
 const formatRupiah = (amount: number): string => {
@@ -394,11 +395,11 @@ export default function AdminSalesReportPage() {
     window.print();
   };
 
-  // Handle Export CSV
-  const handleExportCSV = () => {
+  // Handle Export Excel (.XLSX)
+  const handleExportExcel = async () => {
     setIsExportOpen(false);
     if (filteredTransactions && filteredTransactions.length > 0) {
-      exportTransactionsCSV(filteredTransactions);
+      await exportSalesExcel(filteredTransactions, periodText);
     } else {
       alert("Tidak ada data transaksi terfilter untuk diekspor!");
     }
@@ -664,10 +665,10 @@ export default function AdminSalesReportPage() {
 
                     <div className="my-1 border-t-2 border-slate-200 dark:border-slate-800" />
 
-                    {/* Opsi 2: Ekspor CSV Excel */}
+                    {/* Opsi 2: Ekspor Excel (.XLSX) */}
                     <button
                       type="button"
-                      onClick={handleExportCSV}
+                      onClick={handleExportExcel}
                       className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors cursor-pointer border border-transparent hover:border-slate-900 dark:hover:border-slate-100"
                     >
                       <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 border border-slate-900 dark:border-slate-100 text-emerald-700 dark:text-emerald-300">
@@ -676,8 +677,8 @@ export default function AdminSalesReportPage() {
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Ekspor CSV (Excel)</div>
-                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Unduh lembar kerja mentah</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Ekspor Excel (.XLSX)</div>
+                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Format resmi ber-Rupiah & omset</div>
                       </div>
                     </button>
                   </div>
