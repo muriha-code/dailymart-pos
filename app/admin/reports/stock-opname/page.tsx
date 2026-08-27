@@ -6,6 +6,7 @@ import {
   StockOpnameAuditItem,
 } from "@/types/stockOpnameReport.types";
 import { stockOpnameReportService } from "@/services/stockOpnameReport.service";
+import { exportStockOpnameExcel } from "@/lib/utils/exportStockOpnameExcel";
 import Pagination from "@/components/common/Pagination";
 import {
   ResponsiveContainer,
@@ -202,11 +203,11 @@ export default function AdminStockOpnameReportPage() {
     window.print();
   };
 
-  // Handle Export CSV
-  const handleExportCSV = () => {
+  // Handle Export Excel (.xlsx)
+  const handleExportExcel = () => {
     setIsExportOpen(false);
     if (reportData?.audits) {
-      exportAuditsCSV(reportData.audits);
+      exportStockOpnameExcel(reportData.audits, periodText);
     }
   };
 
@@ -488,10 +489,10 @@ export default function AdminStockOpnameReportPage() {
 
                     <div className="my-1 border-t-2 border-slate-200 dark:border-slate-800" />
 
-                    {/* Opsi 2: Ekspor CSV Excel */}
+                    {/* Opsi 2: Ekspor Excel (.xlsx) */}
                     <button
                       type="button"
-                      onClick={handleExportCSV}
+                      onClick={handleExportExcel}
                       className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-left transition-colors cursor-pointer border border-transparent hover:border-slate-900 dark:hover:border-slate-100"
                     >
                       <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 border border-slate-900 dark:border-slate-100 text-emerald-700 dark:text-emerald-300">
@@ -500,8 +501,8 @@ export default function AdminStockOpnameReportPage() {
                         </svg>
                       </div>
                       <div>
-                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Ekspor CSV (Excel)</div>
-                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Unduh lembar kerja mentah (.csv)</div>
+                        <div className="text-xs font-black text-slate-900 dark:text-slate-100">Ekspor Excel (.xlsx)</div>
+                        <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Unduh Executive Dashboard (.xlsx)</div>
                       </div>
                     </button>
                   </div>
