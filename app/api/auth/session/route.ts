@@ -4,6 +4,7 @@ import { AppUser, UserRole } from '@/types/auth.types';
 
 // Duration: 5 days in milliseconds
 const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
+const FIVE_DAYS_SEC = 5 * 24 * 60 * 60;
 
 /**
  * POST /api/auth/session
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
     !process.env.FIREBASE_PRIVATE_KEY
   ) {
     console.error(
-      '[API /api/auth/session POST Error]: Environmental variables missing or incomplete on Vercel environment.',
+      '[Session API Error]: Environmental variables missing or incomplete on Vercel environment.',
       {
         hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
         hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
@@ -27,9 +28,9 @@ export async function POST(req: NextRequest) {
     );
     return NextResponse.json(
       {
-        success: false,
-        message:
-          'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
+        status: 'error',
+        error: 'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
+        message: 'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
       },
       { status: 500 }
     );
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     if (!idToken) {
       return NextResponse.json(
-        { success: false, message: 'Firebase ID Token (idToken) wajib disertakan' },
+        { success: false, error: 'Firebase ID Token (idToken) wajib disertakan', message: 'Firebase ID Token (idToken) wajib disertakan' },
         { status: 400 }
       );
     }
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
           return NextResponse.json(
             {
               success: false,
+              error: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
               message: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
             },
             { status: 403 }
@@ -110,6 +112,7 @@ export async function POST(req: NextRequest) {
     // 4. Siapkan NextResponse JSON dengan Cookie Store
     const response = NextResponse.json(
       {
+        status: 'success',
         success: true,
         message: 'Sesi login berhasil diverifikasi dan dibuat',
         redirectTo,
@@ -139,6 +142,7 @@ export async function POST(req: NextRequest) {
       secure: isProduction,
       path: '/',
       sameSite: 'lax',
+      maxAge: FIVE_DAYS_SEC,
     });
 
     // Set Cookie `user_role`
@@ -147,23 +151,20 @@ export async function POST(req: NextRequest) {
       secure: isProduction,
       path: '/',
       sameSite: 'lax',
+      maxAge: FIVE_DAYS_SEC,
     });
 
     return response;
   } catch (error: any) {
-    console.error('[API /api/auth/session POST Error]:', error);
-    const isServerError =
-      error?.code?.startsWith('app/') ||
-      error?.message?.includes('credential') ||
-      error?.message?.includes('environment') ||
-      error?.message?.includes('FIREBASE');
-
+    console.error('[Session API Error]:', error);
     return NextResponse.json(
       {
+        status: 'error',
         success: false,
+        error: error?.message || 'Gagal memproses sesi autentikasi',
         message: error?.message || 'Gagal memproses sesi autentikasi',
       },
-      { status: isServerError ? 500 : 401 }
+      { status: 500 }
     );
   }
 }
@@ -176,6 +177,7 @@ export async function DELETE() {
   try {
     const response = NextResponse.json(
       {
+        status: 'success',
         success: true,
         message: 'Logout berhasil',
       },
@@ -194,11 +196,12 @@ export async function DELETE() {
 
     return response;
   } catch (error: any) {
-    console.error('[API /api/auth/session DELETE Error]:', error);
+    console.error('[Session API Error]:', error);
     return NextResponse.json(
       {
-        success: false,
-        message: 'Gagal melakukan logout sesi.',
+        status: 'error',
+        error: error?.message || 'Gagal melakukan logout sesi.',
+        message: error?.message || 'Gagal melakukan logout sesi.',
       },
       { status: 500 }
     );
@@ -216,13 +219,13 @@ export async function GET(req: NextRequest) {
     !process.env.FIREBASE_PRIVATE_KEY
   ) {
     console.error(
-      '[API /api/auth/session GET Error]: Environmental variables missing or incomplete on Vercel environment.'
+      '[Session API Error]: Environmental variables missing or incomplete on Vercel environment.'
     );
     return NextResponse.json(
       {
-        success: false,
-        message:
-          'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
+        status: 'error',
+        error: 'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
+        message: 'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
       },
       { status: 500 }
     );
@@ -264,6 +267,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({
+      status: 'success',
       success: true,
       data: {
         uid: decodedClaims.uid,
