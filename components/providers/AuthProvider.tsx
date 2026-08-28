@@ -72,15 +72,18 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       const activeUid = user?.uid || clientAuth.currentUser?.uid;
 
       if (activeUid) {
-        // 3. Update Firestore Client SDK
+        // 3. Update Firestore Client SDK dengan fallback aman
         try {
           const userDocRef = doc(clientDb, 'users', activeUid);
           await updateDoc(userDocRef, {
             themePreference: newTheme,
             updatedAt: new Date().toISOString(),
           });
-        } catch (dbErr) {
-          console.warn('[Firestore Client] Update theme preference fallback to API:', dbErr);
+        } catch (dbErr: any) {
+          console.warn('[Firestore Client] Update theme preference error (using fallback):', dbErr?.message || dbErr);
+          if (dbErr?.code === 'permission-denied' || dbErr?.message?.includes('permission')) {
+            setTheme('dark');
+          }
         }
 
         // 4. Update via API Route (Server-side Firestore update)
@@ -101,7 +104,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   // Logout Handler
   const logout = useCallback(async () => {
     try {
-      // 1. Reset theme ke 'light' agar user berikutnya tidak mewarisi mode user sebelumnya
       setTheme('light');
       try {
         localStorage.removeItem('theme');
@@ -112,7 +114,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       clearTabActive();
       setUser(null);
 
-      // 2. Invalidate cookies & Firebase session
       await fetch('/api/auth/logout', { method: 'POST' });
       await fetch('/api/auth/session', { method: 'DELETE' });
       await signOut(clientAuth);
@@ -133,7 +134,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           const userData = json.data as AppUser;
           setUser(userData);
 
-          // Terapkan preferensi tema user dari Firestore (default: 'light')
           const userTheme = userData.themePreference || 'light';
           setTheme(userTheme);
           return;
@@ -155,8 +155,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           setTheme(userData.themePreference || 'light');
           return;
         }
-      } catch (fErr) {
-        console.warn('Failed fetching user doc from Firestore:', fErr);
+      } catch (fErr: any) {
+        console.warn('[AuthProvider] Firestore theme fetch error (fallback to dark theme):', fErr?.message || fErr);
+        if (fErr?.code === 'permission-denied' || fErr?.message?.includes('permission') || fErr?.message?.includes('insufficient')) {
+          setTheme('dark');
+        }
       }
 
       setUser((prev) =>
@@ -166,7 +169,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           displayName: currentUser.displayName || 'User',
           role: 'ADMIN',
           isActive: true,
-          themePreference: 'light',
+          themePreference: 'dark',
         }
       );
     }
@@ -180,13 +183,21 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       const userDocRef = doc(clientDb, 'users', activeUid);
       const userSnap = await getDoc(userDocRef);
       if (userSnap.exists()) {
-        const userData = userSnap.data() as AppUser;
-        setUser(userData);
+        const userData = snapshotData(userSnap);
+        if (userData) setUser(userData);
       }
-    } catch (err) {
-      console.warn('[AuthProvider] refreshUserData error:', err);
+    } catch (err: any) {
+      console.warn('[AuthProvider] refreshUserData error:', err?.message || err);
+      if (err?.code === 'permission-denied' || err?.message?.includes('permission')) {
+        setTheme('dark');
+      }
     }
-  }, [user?.uid]);
+  }, [user?.uid, setTheme]);
+
+  // Helper function to safely parse user snapshot data
+  const snapshotData = (snap: any): AppUser | null => {
+    return snap.exists() ? (snap.data() as AppUser) : null;
+  };
 
   // Listener real-time onSnapshot untuk dokumen Firestore users/{activeUid}
   useEffect(() => {
@@ -202,13 +213,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           setUser(userData);
         }
       },
-      (error) => {
+      (error: any) => {
         console.warn('[Firestore] Real-time listener suppressed:', error.message);
+        if (error?.code === 'permission-denied' || error?.message?.includes('permission') || error?.message?.includes('insufficient')) {
+          // Set fallback theme ke 'dark' tanpa merusak status autentikasi user
+          setTheme('dark');
+        }
       }
     );
 
     return () => unsubscribe();
-  }, [user?.uid]);
+  }, [user?.uid, setTheme]);
 
   // Listener onAuthStateChanged untuk sinkronisasi otomatis status autentikasi & tema
   useEffect(() => {
@@ -223,8 +238,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             const userTheme = userData.themePreference || 'light';
             setTheme(userTheme);
           }
-        } catch (e) {
-          console.warn('[onAuthStateChanged] Error fetching theme from Firestore:', e);
+        } catch (e: any) {
+          console.warn('[onAuthStateChanged] Error fetching theme from Firestore:', e?.message || e);
+          if (e?.code === 'permission-denied' || e?.message?.includes('permission') || e?.message?.includes('insufficient')) {
+            setTheme('dark');
+          }
         }
       }
     });
@@ -233,22 +251,18 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   }, [setTheme]);
 
   useEffect(() => {
-    // Rute login tidak perlu verifikasi penanda tab
     if (isLoginPage) {
       setIsVerifying(false);
       return;
     }
 
-    // Pengecekan Strict Single-Tab Session Guard
     const isTabActive = typeof window !== 'undefined' ? sessionStorage.getItem('pos_tab_active') : null;
 
     if (!isTabActive) {
-      // Tab tidak valid (misal: tab baru dibuka setelah tab lama ditutup tanpa logout)
       setIsVerifying(true);
 
       const handleUnauthorizedTab = async () => {
         try {
-          // Reset tema ke default saat sesi unauthorized
           setTheme('light');
           await fetch('/api/auth/logout', { method: 'POST' });
           await signOut(clientAuth);
@@ -263,7 +277,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
       handleUnauthorizedTab();
     } else {
-      // Tab valid dan aktif -> Muat sesi dan preferensi tema Firestore
       setIsVerifying(false);
       fetchSessionAndSyncTheme();
     }
@@ -289,4 +302,3 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     </AuthContext.Provider>
   );
 }
-
