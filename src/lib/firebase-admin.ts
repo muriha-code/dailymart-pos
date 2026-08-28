@@ -10,14 +10,14 @@ if (privateKey) {
   privateKey = privateKey.replace(/^"(.*)"$/, '$1').replace(/\\n/g, '\n');
 }
 
-const app = getApps().length === 0 
+const app = getApps().length === 0
   ? initializeApp({
-      credential: cert({
-        projectId,
-        clientEmail,
-        privateKey,
-      }),
-    })
+    credential: cert({
+      projectId,
+      clientEmail,
+      privateKey,
+    }),
+  })
   : getApps()[0];
 
 export const adminAuth = getAuth(app);
