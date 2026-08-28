@@ -154,10 +154,10 @@ export default function Sidebar() {
 
   // Listener real-time Firestore onSnapshot untuk dokumen user aktif
   useEffect(() => {
-    const currentFbUser = clientAuth.currentUser;
-    if (!currentFbUser || !currentFbUser.uid) return;
+    const activeUid = authUser?.uid || user?.uid || clientAuth.currentUser?.uid;
+    if (!activeUid) return;
 
-    const userDocRef = doc(clientDb, "users", currentFbUser.uid);
+    const userDocRef = doc(clientDb, "users", activeUid);
     const unsubscribe = onSnapshot(
       userDocRef,
       (snapshot) => {
@@ -167,8 +167,8 @@ export default function Sidebar() {
           setImageError(false);
         }
       },
-      (err) => {
-        console.warn("[Sidebar] Real-time onSnapshot listener error:", err);
+      (error) => {
+        console.warn("[Firestore] Real-time listener suppressed:", error.message);
       }
     );
 

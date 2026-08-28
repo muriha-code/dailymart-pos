@@ -190,10 +190,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   // Listener real-time onSnapshot untuk dokumen Firestore users/{activeUid}
   useEffect(() => {
-    const currentFbUser = clientAuth.currentUser;
-    if (!currentFbUser || !currentFbUser.uid) return;
+    const activeUid = user?.uid || clientAuth.currentUser?.uid;
+    if (!activeUid) return;
 
-    const userDocRef = doc(clientDb, 'users', currentFbUser.uid);
+    const userDocRef = doc(clientDb, 'users', activeUid);
     const unsubscribe = onSnapshot(
       userDocRef,
       (snapshot) => {
@@ -202,8 +202,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           setUser(userData);
         }
       },
-      (err) => {
-        console.warn('[AuthProvider] Real-time onSnapshot listener error:', err);
+      (error) => {
+        console.warn('[Firestore] Real-time listener suppressed:', error.message);
       }
     );
 
