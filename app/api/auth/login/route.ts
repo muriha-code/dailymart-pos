@@ -22,38 +22,37 @@ const ROLE_REDIRECT_MAP: Record<string, string> = {
  * Memanfaatkan Firebase Custom Claims untuk bypass Firestore read pada login berikutnya.
  */
 export async function POST(req: NextRequest) {
-  // Pengecekan awal kelengkapan variabel lingkungan Firebase Admin
-  if (
-    !process.env.FIREBASE_PROJECT_ID ||
-    !process.env.FIREBASE_CLIENT_EMAIL ||
-    !process.env.FIREBASE_PRIVATE_KEY
-  ) {
-    console.error(
-      '[API /api/auth/login POST Error]: Environmental variables missing or incomplete on Vercel environment.',
-      {
-        hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
-        hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
-        hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
-      }
-    );
-    return NextResponse.json(
-      {
-        success: false,
-        message:
-          'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
-      },
-      { status: 500 }
-    );
-  }
-
   try {
-    const body = await req.json();
-    const { idToken } = body;
+    const body = await req.json().catch(() => ({}));
+    const { idToken } = body || {};
 
-    if (!idToken) {
+    if (!idToken || typeof idToken !== 'string') {
       return NextResponse.json(
-        { success: false, message: 'Firebase ID Token (idToken) wajib disertakan' },
+        {
+          success: false,
+          error: 'Firebase ID Token (idToken) wajib disertakan',
+          message: 'Firebase ID Token (idToken) wajib disertakan',
+        },
         { status: 400 }
+      );
+    }
+
+    // Pengecekan kelengkapan variabel lingkungan Firebase Admin
+    if (
+      !process.env.FIREBASE_PROJECT_ID ||
+      !process.env.FIREBASE_CLIENT_EMAIL ||
+      !process.env.FIREBASE_PRIVATE_KEY
+    ) {
+      console.error(
+        '[API /api/auth/login POST Error]: Environmental variables missing or incomplete on Vercel environment.'
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing).',
+          message: 'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing).',
+        },
+        { status: 500 }
       );
     }
 
@@ -76,6 +75,7 @@ export async function POST(req: NextRequest) {
           return NextResponse.json(
             {
               success: false,
+              error: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
               message: 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
             },
             { status: 403 }
@@ -151,18 +151,13 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error: any) {
     console.error('[API /api/auth/login POST Error]:', error);
-    const isServerError =
-      error?.code?.startsWith('app/') ||
-      error?.message?.includes('credential') ||
-      error?.message?.includes('environment') ||
-      error?.message?.includes('FIREBASE');
-
     return NextResponse.json(
       {
         success: false,
+        error: error?.message || 'Gagal memproses sesi autentikasi login',
         message: error?.message || 'Gagal memproses sesi autentikasi login',
       },
-      { status: isServerError ? 500 : 401 }
+      { status: 500 }
     );
   }
 }
