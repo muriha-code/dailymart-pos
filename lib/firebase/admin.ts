@@ -20,10 +20,10 @@ const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 
 let app: App;
 
-if (!getApps().length) {
+if (getApps().length === 0) {
   if (!projectId || !clientEmail || !privateKey) {
     console.error(
-      '[Firebase Admin Initialization Error]: Environmental variables missing or incomplete.',
+      '[Firebase Admin Initialization Error]: Environmental variables missing or incomplete on server environment.',
       {
         hasProjectId: !!projectId,
         hasClientEmail: !!clientEmail,
@@ -32,16 +32,21 @@ if (!getApps().length) {
     );
   }
 
-  app = initializeApp({
-    credential: cert({
-      projectId,
-      clientEmail,
-      privateKey,
-    }),
-  });
+  try {
+    app = initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+    });
+  } catch (error) {
+    console.error('[Firebase Admin initializeApp Exception]:', error);
+    app = getApps().length > 0 ? getApps()[0] : ({} as App);
+  }
 } else {
   app = getApps()[0];
 }
 
 export const adminDb = getFirestore(app);
-export const adminAuth = getAuth(app);
+export const adminAuth = getAuth(app);

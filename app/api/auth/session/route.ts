@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { AppUser, UserRole } from '@/types/auth.types';
 
-// Duration: 5 days in milliseconds & seconds
+// Duration: 5 days in milliseconds
 const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
-const FIVE_DAYS_SEC = 5 * 24 * 60 * 60;
 
 /**
  * POST /api/auth/session
@@ -12,6 +11,30 @@ const FIVE_DAYS_SEC = 5 * 24 * 60 * 60;
  * lalu membuat HTTP-only session cookie (5 hari) dan cookie user_role.
  */
 export async function POST(req: NextRequest) {
+  // Pengecekan awal kelengkapan variabel lingkungan Firebase Admin
+  if (
+    !process.env.FIREBASE_PROJECT_ID ||
+    !process.env.FIREBASE_CLIENT_EMAIL ||
+    !process.env.FIREBASE_PRIVATE_KEY
+  ) {
+    console.error(
+      '[API /api/auth/session POST Error]: Environmental variables missing or incomplete on Vercel environment.',
+      {
+        hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
+        hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
+        hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+      }
+    );
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
+      },
+      { status: 500 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { idToken } = body;
@@ -110,7 +133,7 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-    // Set Cookie HTTP-Only `session` (Session-Only: Purged on browser/tab close)
+    // Set Cookie HTTP-Only `session`
     response.cookies.set('session', sessionCookie, {
       httpOnly: true,
       secure: isProduction,
@@ -118,7 +141,7 @@ export async function POST(req: NextRequest) {
       sameSite: 'lax',
     });
 
-    // Set Cookie `user_role` (Session-Only: Purged on browser/tab close)
+    // Set Cookie `user_role`
     response.cookies.set('user_role', role, {
       httpOnly: false,
       secure: isProduction,
@@ -129,12 +152,18 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error: any) {
     console.error('[API /api/auth/session POST Error]:', error);
+    const isServerError =
+      error?.code?.startsWith('app/') ||
+      error?.message?.includes('credential') ||
+      error?.message?.includes('environment') ||
+      error?.message?.includes('FIREBASE');
+
     return NextResponse.json(
       {
         success: false,
         message: error?.message || 'Gagal memproses sesi autentikasi',
       },
-      { status: 401 }
+      { status: isServerError ? 500 : 401 }
     );
   }
 }
@@ -181,6 +210,24 @@ export async function DELETE() {
  * Mengembalikan informasi user aktif berdasarkan cookie session.
  */
 export async function GET(req: NextRequest) {
+  if (
+    !process.env.FIREBASE_PROJECT_ID ||
+    !process.env.FIREBASE_CLIENT_EMAIL ||
+    !process.env.FIREBASE_PRIVATE_KEY
+  ) {
+    console.error(
+      '[API /api/auth/session GET Error]: Environmental variables missing or incomplete on Vercel environment.'
+    );
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
+      },
+      { status: 500 }
+    );
+  }
+
   try {
     const sessionCookie = req.cookies.get('session')?.value;
 
@@ -235,7 +282,7 @@ export async function GET(req: NextRequest) {
         themePreference,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json(
       { success: false, message: 'Sesi tidak valid atau telah kedaluwarsa' },
       { status: 401 }

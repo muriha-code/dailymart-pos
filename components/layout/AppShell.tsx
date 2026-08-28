@@ -12,10 +12,10 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { isCollapsed } = useSidebarContext();
 
-  // Hide sidebar on /login route
-  const isLoginPage = pathname === "/login";
+  // Hide sidebar on standalone pages like /login & /access-denied
+  const isStandalonePage = pathname === "/login" || pathname?.startsWith("/access-denied");
 
-  if (isLoginPage) {
+  if (isStandalonePage) {
     return <>{children}</>;
   }
 

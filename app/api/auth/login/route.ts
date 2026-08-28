@@ -22,6 +22,30 @@ const ROLE_REDIRECT_MAP: Record<string, string> = {
  * Memanfaatkan Firebase Custom Claims untuk bypass Firestore read pada login berikutnya.
  */
 export async function POST(req: NextRequest) {
+  // Pengecekan awal kelengkapan variabel lingkungan Firebase Admin
+  if (
+    !process.env.FIREBASE_PROJECT_ID ||
+    !process.env.FIREBASE_CLIENT_EMAIL ||
+    !process.env.FIREBASE_PRIVATE_KEY
+  ) {
+    console.error(
+      '[API /api/auth/login POST Error]: Environmental variables missing or incomplete on Vercel environment.',
+      {
+        hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
+        hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
+        hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+      }
+    );
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          'Konfigurasi server Firebase Admin belum lengkap (Environment variables missing). Silakan periksa konfigurasi Vercel.',
+      },
+      { status: 500 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { idToken } = body;
@@ -127,12 +151,18 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error: any) {
     console.error('[API /api/auth/login POST Error]:', error);
+    const isServerError =
+      error?.code?.startsWith('app/') ||
+      error?.message?.includes('credential') ||
+      error?.message?.includes('environment') ||
+      error?.message?.includes('FIREBASE');
+
     return NextResponse.json(
       {
         success: false,
         message: error?.message || 'Gagal memproses sesi autentikasi login',
       },
-      { status: 401 }
+      { status: isServerError ? 500 : 401 }
     );
   }
 }
