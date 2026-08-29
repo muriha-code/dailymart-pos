@@ -682,17 +682,6 @@ export default function AdminSchedulesPage() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]">
         {/* Left: Filter Buttons */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Date Picker */}
-          <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-xl text-xs font-bold shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-            <span className="text-slate-500">📅</span>
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-transparent text-slate-900 dark:text-slate-100 font-mono font-bold focus:outline-none cursor-pointer"
-            />
-          </div>
-
           {/* Cashier Filter Dropdown */}
           <select
             value={selectedCashierFilter}
@@ -750,11 +739,11 @@ export default function AdminSchedulesPage() {
             const isToday = day.dateStr === getTodayStr();
             const { pagi: pagiSched, sore: soreSched } = resolveDaySchedules(day.dateStr);
 
-            // Terapkan filter kasir jika dipilih
-            const showPagi =
-              selectedCashierFilter === "ALL" || pagiSched?.userId === selectedCashierFilter;
-            const showSore =
-              selectedCashierFilter === "ALL" || soreSched?.userId === selectedCashierFilter;
+            // Filter status untuk kasir spesifik
+            const isFiltered = selectedCashierFilter !== "ALL";
+            const hasPagiForCashier = pagiSched?.userId === selectedCashierFilter;
+            const hasSoreForCashier = soreSched?.userId === selectedCashierFilter;
+            const isCashierFreeToday = isFiltered && !hasPagiForCashier && !hasSoreForCashier;
 
             return (
               <div
@@ -782,185 +771,329 @@ export default function AdminSchedulesPage() {
 
                 {/* Shift Cards in Day */}
                 <div className="space-y-3 flex-1">
-                  {/* SHIFT PAGI CARD */}
-                  <div className="p-2.5 bg-amber-50/80 dark:bg-amber-950/30 rounded-xl border-2 border-amber-300 dark:border-amber-800 space-y-1.5">
-                    <div className="flex items-center justify-between gap-1 text-[10px] font-black text-amber-900 dark:text-amber-300">
-                      <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
-                        <span>☀️</span>
-                        <span>Pagi</span>
-                      </div>
-                      {pagiSched && (
-                        <span
-                          className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border shrink-0 whitespace-nowrap ${
-                            pagiSched.isOverride
-                              ? "bg-rose-100 text-rose-800 border-rose-400 dark:bg-rose-950 dark:text-rose-300"
-                              : "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
-                          }`}
-                        >
-                          {pagiSched.isOverride ? "Override" : "Tetap"}
+                  {isFiltered ? (
+                    isCashierFreeToday ? (
+                      <div className="p-3 bg-slate-50/60 dark:bg-slate-800/40 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-center py-8 my-auto">
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block">
+                          Off / Tidak Ada Shift
                         </span>
-                      )}
-                    </div>
-
-                    {showPagi && pagiSched ? (
-                      <div className="space-y-1">
-                        <div className="font-black text-xs text-slate-900 dark:text-slate-100 truncate">
-                          {pagiSched.userName}
-                        </div>
-                        {pagiSched.notes && (
-                          <p className="text-[9px] text-amber-800 dark:text-amber-300 truncate">
-                            {pagiSched.notes}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-1 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenQuickSwap(pagiSched)}
-                            title="Tukar Shift Hari Ini"
-                            className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
-                          >
-                            🔄 Tukar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEdit(pagiSched)}
-                            title={
-                              pagiSched.isOverride ? "Edit Pengecualian" : "Buat Pengecualian Tanggal"
-                            }
-                            className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
-                          >
-                            ✏️ Edit
-                          </button>
-                          {pagiSched.isOverride && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedSchedule(pagiSched);
-                                setIsDeleteModalOpen(true);
-                              }}
-                              title="Hapus Override (Kembali ke Jadwal Tetap)"
-                              className="px-1.5 py-0.5 bg-rose-100 text-rose-700 border border-slate-900 rounded text-[9px] font-black hover:bg-rose-200 cursor-pointer"
-                            >
-                              🗑️
-                            </button>
-                          )}
-                        </div>
                       </div>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAddForm({
-                            date: day.dateStr,
-                            shiftType: "SHIFT_PAGI",
-                            startTime: "07:00",
-                            endTime: "15:00",
-                            userId: cashierUsers[0]?.uid || "",
-                            userName: cashierUsers[0]?.displayName || "",
-                            userEmail: cashierUsers[0]?.email || "",
-                            notes: "",
-                          });
-                          setIsAddModalOpen(true);
-                        }}
-                        className="w-full text-center py-1 bg-white/70 dark:bg-slate-900/70 rounded-lg border border-dashed border-amber-400 text-[10px] font-bold text-amber-900 dark:text-amber-300 hover:bg-amber-100 cursor-pointer transition-all"
-                      >
-                        + Assign Pagi
-                      </button>
-                    )}
-                  </div>
+                      <>
+                        {hasPagiForCashier && pagiSched && (
+                          <div className="p-2.5 bg-amber-50/80 dark:bg-amber-950/30 rounded-xl border-2 border-amber-300 dark:border-amber-800 space-y-1.5">
+                            <div className="flex items-center justify-between gap-1 text-[10px] font-black text-amber-900 dark:text-amber-300">
+                              <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
+                                <span>☀️</span>
+                                <span>Pagi</span>
+                              </div>
+                              <span
+                                className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border shrink-0 whitespace-nowrap ${
+                                  pagiSched.isOverride
+                                    ? "bg-rose-100 text-rose-800 border-rose-400 dark:bg-rose-950 dark:text-rose-300"
+                                    : "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
+                                }`}
+                              >
+                                {pagiSched.isOverride ? "Override" : "Tetap"}
+                              </span>
+                            </div>
 
-                  {/* SHIFT SORE CARD */}
-                  <div className="p-2.5 bg-indigo-50/80 dark:bg-indigo-950/30 rounded-xl border-2 border-indigo-300 dark:border-indigo-800 space-y-1.5">
-                    <div className="flex items-center justify-between gap-1 text-[10px] font-black text-indigo-900 dark:text-indigo-300">
-                      <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
-                        <span>🌙</span>
-                        <span>Sore</span>
-                      </div>
-                      {soreSched && (
-                        <span
-                          className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border shrink-0 whitespace-nowrap ${
-                            soreSched.isOverride
-                              ? "bg-rose-100 text-rose-800 border-rose-400 dark:bg-rose-950 dark:text-rose-300"
-                              : "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
-                          }`}
-                        >
-                          {soreSched.isOverride ? "Override" : "Tetap"}
-                        </span>
-                      )}
-                    </div>
-
-                    {showSore && soreSched ? (
-                      <div className="space-y-1">
-                        <div className="font-black text-xs text-slate-900 dark:text-slate-100 truncate">
-                          {soreSched.userName}
-                        </div>
-                        {soreSched.notes && (
-                          <p className="text-[9px] text-indigo-800 dark:text-indigo-300 truncate">
-                            {soreSched.notes}
-                          </p>
+                            <div className="space-y-1">
+                              <div className="font-black text-xs text-slate-900 dark:text-slate-100 truncate">
+                                {pagiSched.userName}
+                              </div>
+                              {pagiSched.notes && (
+                                <p className="text-[9px] text-amber-800 dark:text-amber-300 truncate">
+                                  {pagiSched.notes}
+                                </p>
+                              )}
+                              <div className="flex items-center gap-1 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenQuickSwap(pagiSched)}
+                                  title="Tukar Shift Hari Ini"
+                                  className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
+                                >
+                                  🔄 Tukar
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEdit(pagiSched)}
+                                  title={
+                                    pagiSched.isOverride ? "Edit Pengecualian" : "Buat Pengecualian Tanggal"
+                                  }
+                                  className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
+                                >
+                                  ✏️ Edit
+                                </button>
+                                {pagiSched.isOverride && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedSchedule(pagiSched);
+                                      setIsDeleteModalOpen(true);
+                                    }}
+                                    title="Hapus Override (Kembali ke Jadwal Tetap)"
+                                    className="px-1.5 py-0.5 bg-rose-100 text-rose-700 border border-slate-900 rounded text-[9px] font-black hover:bg-rose-200 cursor-pointer"
+                                  >
+                                    🗑️
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         )}
-                        <div className="flex items-center gap-1 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenQuickSwap(soreSched)}
-                            title="Tukar Shift Hari Ini"
-                            className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
-                          >
-                            🔄 Tukar
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEdit(soreSched)}
-                            title={
-                              soreSched.isOverride ? "Edit Pengecualian" : "Buat Pengecualian Tanggal"
-                            }
-                            className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
-                          >
-                            ✏️ Edit
-                          </button>
-                          {soreSched.isOverride && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedSchedule(soreSched);
-                                setIsDeleteModalOpen(true);
-                              }}
-                              title="Hapus Override (Kembali ke Jadwal Tetap)"
-                              className="px-1.5 py-0.5 bg-rose-100 text-rose-700 border border-slate-900 rounded text-[9px] font-black hover:bg-rose-200 cursor-pointer"
+
+                        {hasSoreForCashier && soreSched && (
+                          <div className="p-2.5 bg-indigo-50/80 dark:bg-indigo-950/30 rounded-xl border-2 border-indigo-300 dark:border-indigo-800 space-y-1.5">
+                            <div className="flex items-center justify-between gap-1 text-[10px] font-black text-indigo-900 dark:text-indigo-300">
+                              <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
+                                <span>🌙</span>
+                                <span>Sore</span>
+                              </div>
+                              <span
+                                className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border shrink-0 whitespace-nowrap ${
+                                  soreSched.isOverride
+                                    ? "bg-rose-100 text-rose-800 border-rose-400 dark:bg-rose-950 dark:text-rose-300"
+                                    : "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
+                                }`}
+                              >
+                                {soreSched.isOverride ? "Override" : "Tetap"}
+                              </span>
+                            </div>
+
+                            <div className="space-y-1">
+                              <div className="font-black text-xs text-slate-900 dark:text-slate-100 truncate">
+                                {soreSched.userName}
+                              </div>
+                              {soreSched.notes && (
+                                <p className="text-[9px] text-indigo-800 dark:text-indigo-300 truncate">
+                                  {soreSched.notes}
+                                </p>
+                              )}
+                              <div className="flex items-center gap-1 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenQuickSwap(soreSched)}
+                                  title="Tukar Shift Hari Ini"
+                                  className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
+                                >
+                                  🔄 Tukar
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEdit(soreSched)}
+                                  title={
+                                    soreSched.isOverride ? "Edit Pengecualian" : "Buat Pengecualian Tanggal"
+                                  }
+                                  className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
+                                >
+                                  ✏️ Edit
+                                </button>
+                                {soreSched.isOverride && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedSchedule(soreSched);
+                                      setIsDeleteModalOpen(true);
+                                    }}
+                                    title="Hapus Override (Kembali ke Jadwal Tetap)"
+                                    className="px-1.5 py-0.5 bg-rose-100 text-rose-700 border border-slate-900 rounded text-[9px] font-black hover:bg-rose-200 cursor-pointer"
+                                  >
+                                    🗑️
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )
+                  ) : (
+                    <>
+                      {/* SHIFT PAGI CARD (Semua Kasir) */}
+                      <div className="p-2.5 bg-amber-50/80 dark:bg-amber-950/30 rounded-xl border-2 border-amber-300 dark:border-amber-800 space-y-1.5">
+                        <div className="flex items-center justify-between gap-1 text-[10px] font-black text-amber-900 dark:text-amber-300">
+                          <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
+                            <span>☀️</span>
+                            <span>Pagi</span>
+                          </div>
+                          {pagiSched && (
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border shrink-0 whitespace-nowrap ${
+                                pagiSched.isOverride
+                                  ? "bg-rose-100 text-rose-800 border-rose-400 dark:bg-rose-950 dark:text-rose-300"
+                                  : "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
+                              }`}
                             >
-                              🗑️
-                            </button>
+                              {pagiSched.isOverride ? "Override" : "Tetap"}
+                            </span>
                           )}
                         </div>
+
+                        {pagiSched ? (
+                          <div className="space-y-1">
+                            <div className="font-black text-xs text-slate-900 dark:text-slate-100 truncate">
+                              {pagiSched.userName}
+                            </div>
+                            {pagiSched.notes && (
+                              <p className="text-[9px] text-amber-800 dark:text-amber-300 truncate">
+                                {pagiSched.notes}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-1 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenQuickSwap(pagiSched)}
+                                title="Tukar Shift Hari Ini"
+                                className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
+                              >
+                                🔄 Tukar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEdit(pagiSched)}
+                                title={
+                                  pagiSched.isOverride ? "Edit Pengecualian" : "Buat Pengecualian Tanggal"
+                                }
+                                className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
+                              >
+                                ✏️ Edit
+                              </button>
+                              {pagiSched.isOverride && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedSchedule(pagiSched);
+                                    setIsDeleteModalOpen(true);
+                                  }}
+                                  title="Hapus Override (Kembali ke Jadwal Tetap)"
+                                  className="px-1.5 py-0.5 bg-rose-100 text-rose-700 border border-slate-900 rounded text-[9px] font-black hover:bg-rose-200 cursor-pointer"
+                                >
+                                  🗑️
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAddForm({
+                                date: day.dateStr,
+                                shiftType: "SHIFT_PAGI",
+                                startTime: "07:00",
+                                endTime: "15:00",
+                                userId: cashierUsers[0]?.uid || "",
+                                userName: cashierUsers[0]?.displayName || "",
+                                userEmail: cashierUsers[0]?.email || "",
+                                notes: "",
+                              });
+                              setIsAddModalOpen(true);
+                            }}
+                            className="w-full text-center py-1 bg-white/70 dark:bg-slate-900/70 rounded-lg border border-dashed border-amber-400 text-[10px] font-bold text-amber-900 dark:text-amber-300 hover:bg-amber-100 cursor-pointer transition-all"
+                          >
+                            + Assign Pagi
+                          </button>
+                        )}
                       </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAddForm({
-                            date: day.dateStr,
-                            shiftType: "SHIFT_SORE",
-                            startTime: "15:00",
-                            endTime: "23:00",
-                            userId: cashierUsers[0]?.uid || "",
-                            userName: cashierUsers[0]?.displayName || "",
-                            userEmail: cashierUsers[0]?.email || "",
-                            notes: "",
-                          });
-                          setIsAddModalOpen(true);
-                        }}
-                        className="w-full text-center py-1 bg-white/70 dark:bg-slate-900/70 rounded-lg border border-dashed border-indigo-400 text-[10px] font-bold text-indigo-900 dark:text-indigo-300 hover:bg-indigo-100 cursor-pointer transition-all"
-                      >
-                        + Assign Sore
-                      </button>
-                    )}
-                  </div>
+
+                      {/* SHIFT SORE CARD (Semua Kasir) */}
+                      <div className="p-2.5 bg-indigo-50/80 dark:bg-indigo-950/30 rounded-xl border-2 border-indigo-300 dark:border-indigo-800 space-y-1.5">
+                        <div className="flex items-center justify-between gap-1 text-[10px] font-black text-indigo-900 dark:text-indigo-300">
+                          <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
+                            <span>🌙</span>
+                            <span>Sore</span>
+                          </div>
+                          {soreSched && (
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border shrink-0 whitespace-nowrap ${
+                                soreSched.isOverride
+                                  ? "bg-rose-100 text-rose-800 border-rose-400 dark:bg-rose-950 dark:text-rose-300"
+                                  : "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
+                              }`}
+                            >
+                              {soreSched.isOverride ? "Override" : "Tetap"}
+                            </span>
+                          )}
+                        </div>
+
+                        {soreSched ? (
+                          <div className="space-y-1">
+                            <div className="font-black text-xs text-slate-900 dark:text-slate-100 truncate">
+                              {soreSched.userName}
+                            </div>
+                            {soreSched.notes && (
+                              <p className="text-[9px] text-indigo-800 dark:text-indigo-300 truncate">
+                                {soreSched.notes}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-1 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => handleOpenQuickSwap(soreSched)}
+                                title="Tukar Shift Hari Ini"
+                                className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
+                              >
+                                🔄 Tukar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEdit(soreSched)}
+                                title={
+                                  soreSched.isOverride ? "Edit Pengecualian" : "Buat Pengecualian Tanggal"
+                                }
+                                className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-900 rounded text-[9px] font-black hover:bg-slate-100 cursor-pointer"
+                              >
+                                ✏️ Edit
+                              </button>
+                              {soreSched.isOverride && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedSchedule(soreSched);
+                                    setIsDeleteModalOpen(true);
+                                  }}
+                                  title="Hapus Override (Kembali ke Jadwal Tetap)"
+                                  className="px-1.5 py-0.5 bg-rose-100 text-rose-700 border border-slate-900 rounded text-[9px] font-black hover:bg-rose-200 cursor-pointer"
+                                >
+                                  🗑️
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAddForm({
+                                date: day.dateStr,
+                                shiftType: "SHIFT_SORE",
+                                startTime: "15:00",
+                                endTime: "23:00",
+                                userId: cashierUsers[0]?.uid || "",
+                                userName: cashierUsers[0]?.displayName || "",
+                                userEmail: cashierUsers[0]?.email || "",
+                                notes: "",
+                              });
+                              setIsAddModalOpen(true);
+                            }}
+                            className="w-full text-center py-1 bg-white/70 dark:bg-slate-900/70 rounded-lg border border-dashed border-indigo-400 text-[10px] font-bold text-indigo-900 dark:text-indigo-300 hover:bg-indigo-100 cursor-pointer transition-all"
+                          >
+                            + Assign Sore
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* Footer action */}
                 <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-[10px]">
                   <span className="font-mono text-slate-500">
-                    {[pagiSched, soreSched].filter(Boolean).length}/2 Shift
+                    {isFiltered
+                      ? `${[hasPagiForCashier, hasSoreForCashier].filter(Boolean).length} Shift`
+                      : `${[pagiSched, soreSched].filter(Boolean).length}/2 Shift`}
                   </span>
                   <button
                     type="button"
@@ -973,7 +1106,6 @@ export default function AdminSchedulesPage() {
                     + Override
                   </button>
                 </div>
-              </div>
             );
           })}
         </div>
