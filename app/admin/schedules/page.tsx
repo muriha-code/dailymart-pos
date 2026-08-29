@@ -805,9 +805,6 @@ export default function AdminSchedulesPage() {
                       <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
                         <span>☀️</span>
                         <span>Pagi</span>
-                        <span className="font-mono text-[9px] text-amber-700 dark:text-amber-400 font-bold whitespace-nowrap">
-                          07:00 - 15:00
-                        </span>
                       </div>
                       {pagiSched && (
                         <span
@@ -895,9 +892,6 @@ export default function AdminSchedulesPage() {
                       <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
                         <span>🌙</span>
                         <span>Sore</span>
-                        <span className="font-mono text-[9px] text-indigo-700 dark:text-indigo-400 font-bold whitespace-nowrap">
-                          15:00 - 23:00
-                        </span>
                       </div>
                       {soreSched && (
                         <span
@@ -1323,8 +1317,8 @@ export default function AdminSchedulesPage() {
                       }`}
                     >
                       {st === "SHIFT_PAGI"
-                        ? "☀️ Pagi (07:00 - 15:00)"
-                        : "🌙 Sore (15:00 - 23:00)"}
+                        ? "☀️ Pagi"
+                        : "🌙 Sore"}
                     </button>
                   ))}
                 </div>
@@ -1449,8 +1443,8 @@ export default function AdminSchedulesPage() {
                       }`}
                     >
                       {st === "SHIFT_PAGI"
-                        ? "☀️ Pagi (07:00 - 15:00)"
-                        : "🌙 Sore (15:00 - 23:00)"}
+                        ? "☀️ Pagi"
+                        : "🌙 Sore"}
                     </button>
                   ))}
                 </div>

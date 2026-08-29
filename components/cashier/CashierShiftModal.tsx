@@ -110,7 +110,7 @@ export function OpenShiftModal({
             <div className="flex justify-between items-center">
               <span className="font-bold text-slate-500 dark:text-slate-400">Jadwal Shift:</span>
               <span className="font-black font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800">
-                {selectedShiftType === "SHIFT_PAGI" ? "PAGI (07:00 - 15:00)" : "SORE (15:00 - 23:00)"}
+                {selectedShiftType === "SHIFT_PAGI" ? "PAGI" : "SORE"}
               </span>
             </div>
             {todaySchedule?.notes && (
@@ -546,7 +546,7 @@ export function BlockedShiftScreen({
             <div className="flex justify-between text-slate-700 dark:text-slate-300">
               <span>Shift:</span>
               <span className="font-bold font-mono">
-                {todaySchedule.shiftType === "SHIFT_PAGI" ? "PAGI" : "SORE"} ({todaySchedule.startTime} - {todaySchedule.endTime})
+                {todaySchedule.shiftType === "SHIFT_PAGI" ? "PAGI" : "SORE"}
               </span>
             </div>
             {toleranceMessage && (
