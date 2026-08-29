@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { adminAuth, adminDb } from '@/src/lib/firebase-admin';
 import { AppUser, UserRole } from '@/types/auth.types';
 
 // Duration: 5 days in milliseconds
@@ -266,7 +266,7 @@ export async function GET(req: NextRequest) {
       console.warn('Gagal mengambil data user dari Firestore pada GET session:', e);
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       status: 'success',
       success: true,
       data: {
@@ -286,6 +286,10 @@ export async function GET(req: NextRequest) {
         themePreference,
       },
     });
+
+    response.headers.set('Cache-Control', 'private, max-age=60, s-maxage=60, stale-while-revalidate=30');
+
+    return response;
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: 'Sesi tidak valid atau telah kedaluwarsa' },

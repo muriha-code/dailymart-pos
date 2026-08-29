@@ -33,7 +33,6 @@ export default function SuperAdminNetworkSettingsPage() {
       ]);
       setSettings(netData);
       setCurrentClientIp(myIp);
-      setNewIpInput((prev) => (prev ? prev : myIp !== "127.0.0.1" ? myIp : ""));
     } catch (err: any) {
       toast.error(err.message || "Gagal memuat konfigurasi jaringan.");
     } finally {
@@ -329,7 +328,7 @@ export default function SuperAdminNetworkSettingsPage() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
                     </svg>
-                    <span>+ Tambah IP</span>
+                    <span>Tambah IP</span>
                   </button>
                 </form>
               </div>

@@ -154,7 +154,8 @@ export default function Sidebar() {
 
   // Listener real-time Firestore onSnapshot untuk dokumen user aktif
   useEffect(() => {
-    const activeUid = authUser?.uid || user?.uid || clientAuth.currentUser?.uid;
+    const activeUid = user?.uid || authUser?.uid;
+    if (!user?.uid && !authUser?.uid) return;
     if (!activeUid) return;
 
     const userDocRef = doc(clientDb, "users", activeUid);
@@ -168,7 +169,7 @@ export default function Sidebar() {
         }
       },
       (error) => {
-        console.warn("[Firestore] Real-time listener suppressed:", error.message);
+        console.warn("[Sidebar Firestore Listener] Real-time listener suppressed:", error?.message || error);
       }
     );
 

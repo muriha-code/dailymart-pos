@@ -180,10 +180,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   // Listener real-time onSnapshot untuk profil user
   useEffect(() => {
-    const activeUid = user?.uid || clientAuth.currentUser?.uid;
-    if (!activeUid) return;
+    if (!user?.uid) return;
 
-    const userDocRef = doc(clientDb, 'users', activeUid);
+    const userDocRef = doc(clientDb, 'users', user.uid);
     const unsubscribe = onSnapshot(
       userDocRef,
       (snapshot) => {
@@ -193,7 +192,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         }
       },
       (error: any) => {
-        console.warn('[Firestore] Real-time listener suppressed:', error.message);
+        console.warn('[AuthProvider Firestore Listener] Real-time listener suppressed:', error?.message || error);
       }
     );
 
