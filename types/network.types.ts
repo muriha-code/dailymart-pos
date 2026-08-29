@@ -4,3 +4,4 @@ export interface NetworkSettings {
   updatedAt?: string | Date;
   updatedBy?: string;
 }
+
