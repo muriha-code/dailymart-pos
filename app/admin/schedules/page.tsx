@@ -682,23 +682,6 @@ export default function AdminSchedulesPage() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]">
         {/* Left: Filter Buttons */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-300 dark:border-slate-700">
-            {(["WEEK", "TODAY", "ALL"] as const).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => setFilterMode(mode)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                  filterMode === mode
-                    ? "bg-[#6366F1] text-white shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] border border-slate-900"
-                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-                }`}
-              >
-                {mode === "WEEK" ? "Minggu Ini" : mode === "TODAY" ? "Hari Ini" : "Semua"}
-              </button>
-            ))}
-          </div>
-
           {/* Date Picker */}
           <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 px-3 py-1.5 rounded-xl text-xs font-bold shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
             <span className="text-slate-500">📅</span>
