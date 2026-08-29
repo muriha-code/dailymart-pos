@@ -27,6 +27,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Halaman /login HARUS selalu tampil dalam mode Light (default)
+  React.useEffect(() => {
+    setTheme('light');
+  }, [setTheme]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -76,10 +81,15 @@ export default function LoginPage() {
         throw new Error(result.message || result.error || 'Gagal membuat sesi login.');
       }
 
-      // 4. Sinkronkan preferensi tema user dari Firestore
-      const userTheme: 'light' | 'dark' =
-        result.data?.themePreference || result.user?.themePreference || 'light';
-      setTheme(userTheme);
+      // 4. Sinkronkan preferensi tema lokal dari localStorage jika ada
+      try {
+        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+        if (savedTheme) {
+          setTheme(savedTheme);
+        }
+      } catch (tErr) {
+        console.warn('Gagal membaca tema dari localStorage:', tErr);
+      }
 
       // 5. Tandai tab aktif untuk Strict Single-Tab Session Guard secara non-blocking
       setTimeout(() => {

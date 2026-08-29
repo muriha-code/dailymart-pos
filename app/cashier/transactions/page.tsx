@@ -6,6 +6,16 @@ import { Product } from "@/types/product.types";
 import { productService } from "@/services/product.service";
 import { transactionService } from "@/services/transaction.service";
 import { CreateTransactionPayload } from "@/types/transaction.types";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { shiftService } from "@/services/shift.service";
+import { CashierShift, ShiftValidationResult } from "@/types/shift.types";
+import { ShiftType } from "@/types/schedule.types";
+import {
+  OpenShiftModal,
+  CloseShiftModal,
+  BlockedShiftScreen,
+  ShiftReceiptModal,
+} from "@/components/cashier/CashierShiftModal";
 
 // ==========================================
 // TYPES & INTERFACES
@@ -90,12 +100,94 @@ export default function CashierTransactionsPage() {
   };
 
   // State Kasir Aktif dari Autentikasi Sesi
+  const { user: authUser, logout } = useAuth();
   const [cashierUser, setCashierUser] = useState<{
     uid: string;
     displayName: string;
     role: string;
     initials: string;
   } | null>(null);
+
+  // Shift Management States
+  const [shiftValidation, setShiftValidation] = useState<ShiftValidationResult | null>(null);
+  const [isCheckingShift, setIsCheckingShift] = useState<boolean>(true);
+  const [activeShift, setActiveShift] = useState<CashierShift | null>(null);
+  const [isOpenShiftModalOpen, setIsOpenShiftModalOpen] = useState<boolean>(false);
+  const [isCloseShiftModalOpen, setIsCloseShiftModalOpen] = useState<boolean>(false);
+  const [completedShiftForReceipt, setCompletedShiftForReceipt] = useState<CashierShift | null>(null);
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false);
+
+  // Check shift status from server
+  const checkCashierShift = useCallback(async () => {
+    setIsCheckingShift(true);
+    try {
+      const result = await shiftService.checkShiftStatus();
+      setShiftValidation(result);
+
+      if (result.hasActiveShift && result.activeShift) {
+        setActiveShift(result.activeShift);
+        setIsOpenShiftModalOpen(false);
+      } else {
+        setActiveShift(null);
+        if (result.hasScheduleToday && result.isWithinShiftTolerance) {
+          setIsOpenShiftModalOpen(true);
+        }
+      }
+    } catch (err: any) {
+      console.warn("Gagal mengecek status shift kasir:", err);
+    } finally {
+      setIsCheckingShift(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkCashierShift();
+  }, [checkCashierShift]);
+
+  const handleOpenShift = async (startingCash: number, shiftType: ShiftType) => {
+    try {
+      const newShift = await shiftService.openShift({
+        startingCash,
+        shiftType,
+        scheduleId: shiftValidation?.todaySchedule?.id,
+        userId: cashierUser?.uid,
+        userName: cashierUser?.displayName,
+      });
+      setActiveShift(newShift);
+      setIsOpenShiftModalOpen(false);
+      toast.success(`Shift ${shiftType === 'SHIFT_PAGI' ? 'Pagi' : 'Sore'} berhasil dibuka! Selamat bertugas.`);
+    } catch (err: any) {
+      toast.error(err.message || "Gagal membuka shift kasir.");
+      throw err;
+    }
+  };
+
+  const handleCloseShift = async (actualCash: number, notes: string) => {
+    if (!activeShift) return;
+    try {
+      const closedShift = await shiftService.closeShift({
+        shiftId: activeShift.id,
+        actualCash,
+        reconciliationNotes: notes,
+      });
+      setIsCloseShiftModalOpen(false);
+      setCompletedShiftForReceipt(closedShift);
+      setIsReceiptModalOpen(true);
+      toast.success("Shift kasir berhasil ditutup dan direkonsiliasi.");
+    } catch (err: any) {
+      toast.error(err.message || "Gagal menutup shift.");
+      throw err;
+    }
+  };
+
+  const handleDoneReceipt = async () => {
+    setIsReceiptModalOpen(false);
+    if (logout) {
+      await logout();
+    } else {
+      window.location.href = "/login";
+    }
+  };
 
   // State Cart & Filter
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -431,6 +523,7 @@ export default function CashierTransactionsPage() {
       setIsSuccessModalOpen(true);
       setCart([]);
       loadProducts(); // Refresh katalog stok produk terkini
+      checkCashierShift(); // Sinkronisasi target kas shift kasir
     } catch (err: any) {
       console.error("Gagal memproses transaksi checkout:", err);
       toast.error(err.message || "Gagal memproses transaksi. Silakan periksa stok.");
@@ -539,12 +632,111 @@ export default function CashierTransactionsPage() {
     return Array.from(new Set(options)).slice(0, 5);
   }, [grandTotal]);
 
+  const userRoleNormalized = (cashierUser?.role || authUser?.role || "").toUpperCase();
+  const isRoleAdmin = userRoleNormalized === "ADMIN" || userRoleNormalized === "SUPER_ADMIN";
+
+  // Blocked shift view HANYA untuk role CASHIER yang tidak memiliki jadwal atau di luar toleransi
+  if (
+    !isCheckingShift &&
+    !activeShift &&
+    !isRoleAdmin &&
+    shiftValidation &&
+    (!shiftValidation.hasScheduleToday || !shiftValidation.isWithinShiftTolerance)
+  ) {
+    return (
+      <BlockedShiftScreen
+        cashierName={cashierUser?.displayName || "Kasir"}
+        validationResult={shiftValidation}
+        onRefresh={checkCashierShift}
+        onLogout={logout}
+      />
+    );
+  }
+
   return (
-    <div className="h-screen w-full overflow-hidden p-3 bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 select-none font-sans flex flex-col transition-colors duration-200">
+    <div className="h-screen w-full overflow-hidden p-3 bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 select-none font-sans flex flex-col gap-2.5 transition-colors duration-200">
+      {/* ========================================================================= */}
+      {/* TOP SHIFT STATUS BAR & QUICK CONTROLS                                     */}
+      {/* ========================================================================= */}
+      <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl px-3 py-2 shadow-[2.5px_2.5px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2.5px_2.5px_0px_0px_rgba(255,255,255,1)] flex items-center justify-between gap-2 shrink-0 transition-colors">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2">
+            <span
+              className={`w-2.5 h-2.5 rounded-full ${
+                activeShift ? "bg-emerald-500 animate-pulse" : "bg-amber-400"
+              }`}
+            />
+            <span className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide">
+              {activeShift
+                ? activeShift.shiftType === "SHIFT_PAGI"
+                  ? "SHIFT PAGI"
+                  : "SHIFT SORE"
+                : "SHIFT POS"}
+            </span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 truncate">
+              Kasir: <strong>{cashierUser?.displayName || "Kasir POS"}</strong>
+            </span>
+          </div>
+
+          {activeShift && (
+            <div className="hidden md:flex items-center gap-3 text-[11px] font-bold text-slate-600 dark:text-slate-400">
+              <span>
+                Clock In:{" "}
+                <strong className="font-mono text-slate-900 dark:text-slate-100">
+                  {new Date(activeShift.openedAt).toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </strong>
+              </span>
+              <span>
+                Modal Awal:{" "}
+                <strong className="font-mono text-slate-900 dark:text-slate-100">
+                  {formatRupiah(activeShift.startingCash)}
+                </strong>
+              </span>
+              <span>
+                Est. Kas di Laci:{" "}
+                <strong className="font-mono text-emerald-600 dark:text-emerald-400">
+                  {formatRupiah(
+                    activeShift.expectedCash ||
+                      activeShift.startingCash +
+                        (activeShift.totalCashTransactions || 0)
+                  )}
+                </strong>
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 hidden lg:inline">
+            {currentDateTime}
+          </span>
+          {activeShift ? (
+            <button
+              type="button"
+              onClick={() => setIsCloseShiftModalOpen(true)}
+              className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg border-2 border-slate-900 dark:border-slate-100 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer transition-all flex items-center gap-1.5"
+            >
+              <span>🚪 Tutup Kasir / End Shift</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsOpenShiftModalOpen(true)}
+              className="px-3 py-1.5 bg-[#6366F1] hover:bg-[#4F46E5] text-white rounded-lg border-2 border-slate-900 dark:border-slate-100 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer transition-all flex items-center gap-1.5"
+            >
+              <span>⏱️ Buka Shift Kasir</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* ========================================================================= */}
       {/* MAIN FULL-HEIGHT GRID LAYOUT (Col 8 Catalog | Col 4 Cart)                  */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-12 gap-3 h-full min-h-0">
+      <div className="grid grid-cols-12 gap-3 flex-1 min-h-0">
         {/* ========================================================================= */}
         {/* 1. KATALOG PRODUK (col-span-12 lg:col-span-8)                             */}
         {/* ========================================================================= */}
@@ -1526,6 +1718,37 @@ export default function CashierTransactionsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 7. SHIFT MANAGEMENT MODALS (OPEN SHIFT, CLOSE SHIFT, THERMAL RECEIPT)      */}
+      {/* ========================================================================= */}
+      {/* A. Open Shift Modal (Clock In) */}
+      <OpenShiftModal
+        isOpen={isOpenShiftModalOpen}
+        cashierName={cashierUser?.displayName || "Kasir"}
+        todaySchedule={shiftValidation?.todaySchedule}
+        onOpenShift={handleOpenShift}
+        onLogout={logout}
+      />
+
+      {/* B. Close Shift Modal (Reconciliation & Clock Out) */}
+      {activeShift && (
+        <CloseShiftModal
+          isOpen={isCloseShiftModalOpen}
+          shift={activeShift}
+          onCloseShift={handleCloseShift}
+          onCancel={() => setIsCloseShiftModalOpen(false)}
+        />
+      )}
+
+      {/* C. Thermal Receipt Modal for Closed Shift */}
+      {completedShiftForReceipt && (
+        <ShiftReceiptModal
+          isOpen={isReceiptModalOpen}
+          shift={completedShiftForReceipt}
+          onDone={handleDoneReceipt}
+        />
       )}
     </div>
   );

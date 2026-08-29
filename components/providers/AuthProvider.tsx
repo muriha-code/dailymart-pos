@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { clientAuth, clientDb } from '@/lib/firebase/client';
 import { AppUser } from '@/types/auth.types';
 import { useTheme } from 'next-themes';
@@ -44,6 +44,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   const isLoginPage = pathname === '/login';
 
+  // Halaman /login HARUS selalu tampil dalam mode Light
+  useEffect(() => {
+    if (isLoginPage) {
+      setTheme('light');
+    }
+  }, [isLoginPage, setTheme]);
+
   const markTabActive = useCallback(() => {
     try {
       sessionStorage.setItem('pos_tab_active', 'true');
@@ -60,48 +67,26 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }
   }, []);
 
-  // Update Theme Preference in Firestore and Next-Themes
+  // Update Theme Preference (Local State & localStorage ONLY - No Firestore DB calls)
   const updateThemePreference = useCallback(
     async (newTheme: 'light' | 'dark') => {
       // 1. Terapkan ke Next-Themes secara instan
       setTheme(newTheme);
 
-      // 2. Update state user lokal
-      setUser((prev) => (prev ? { ...prev, themePreference: newTheme } : null));
-
-      const activeUid = user?.uid || clientAuth.currentUser?.uid;
-
-      if (activeUid) {
-        // 3. Update Firestore Client SDK dengan fallback aman
-        try {
-          const userDocRef = doc(clientDb, 'users', activeUid);
-          await updateDoc(userDocRef, {
-            themePreference: newTheme,
-            updatedAt: new Date().toISOString(),
-          });
-        } catch (dbErr: any) {
-          console.warn('[Firestore Client] Update theme preference error (using fallback):', dbErr?.message || dbErr);
-          if (dbErr?.code === 'permission-denied' || dbErr?.message?.includes('permission')) {
-            setTheme('dark');
-          }
-        }
-
-        // 4. Update via API Route (Server-side Firestore update)
-        try {
-          await fetch('/api/user/theme', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ themePreference: newTheme }),
-          });
-        } catch (apiErr) {
-          console.warn('[API /api/user/theme] Failed syncing theme to server:', apiErr);
-        }
+      // 2. Simpan preferensi ke localStorage
+      try {
+        localStorage.setItem('theme', newTheme);
+      } catch (e) {
+        console.warn('Failed saving theme to localStorage:', e);
       }
+
+      // 3. Update state user lokal (in-memory)
+      setUser((prev) => (prev ? { ...prev, themePreference: newTheme } : null));
     },
-    [user?.uid, setTheme]
+    [setTheme]
   );
 
-  // Logout Handler
+  // Logout Handler (Reset theme ke light & bersihkan state)
   const logout = useCallback(async () => {
     try {
       setTheme('light');
@@ -124,8 +109,18 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }
   }, [clearTabActive, router, setTheme]);
 
-  // Fetch session & synchronize user's theme preference from Firestore
+  // Fetch session & synchronize local theme
   const fetchSessionAndSyncTheme = useCallback(async () => {
+    // Terapkan preferensi tema lokal dari localStorage jika ada
+    try {
+      const localTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+      if (localTheme) {
+        setTheme(localTheme);
+      }
+    } catch (e) {
+      console.warn('Failed reading theme from localStorage:', e);
+    }
+
     try {
       const res = await fetch('/api/auth/session', { cache: 'no-store' });
       if (res.ok) {
@@ -133,9 +128,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         if (json.success && json.data) {
           const userData = json.data as AppUser;
           setUser(userData);
-
-          const userTheme = userData.themePreference || 'light';
-          setTheme(userTheme);
           return;
         }
       }
@@ -152,14 +144,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         if (userSnap.exists()) {
           const userData = userSnap.data() as AppUser;
           setUser(userData);
-          setTheme(userData.themePreference || 'light');
           return;
         }
       } catch (fErr: any) {
-        console.warn('[AuthProvider] Firestore theme fetch error (fallback to dark theme):', fErr?.message || fErr);
-        if (fErr?.code === 'permission-denied' || fErr?.message?.includes('permission') || fErr?.message?.includes('insufficient')) {
-          setTheme('dark');
-        }
+        console.warn('[AuthProvider] Firestore user fetch error:', fErr?.message || fErr);
       }
 
       setUser((prev) =>
@@ -169,7 +157,6 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           displayName: currentUser.displayName || 'User',
           role: 'ADMIN',
           isActive: true,
-          themePreference: 'dark',
         }
       );
     }
@@ -183,23 +170,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       const userDocRef = doc(clientDb, 'users', activeUid);
       const userSnap = await getDoc(userDocRef);
       if (userSnap.exists()) {
-        const userData = snapshotData(userSnap);
+        const userData = userSnap.data() as AppUser;
         if (userData) setUser(userData);
       }
     } catch (err: any) {
       console.warn('[AuthProvider] refreshUserData error:', err?.message || err);
-      if (err?.code === 'permission-denied' || err?.message?.includes('permission')) {
-        setTheme('dark');
-      }
     }
-  }, [user?.uid, setTheme]);
+  }, [user?.uid]);
 
-  // Helper function to safely parse user snapshot data
-  const snapshotData = (snap: any): AppUser | null => {
-    return snap.exists() ? (snap.data() as AppUser) : null;
-  };
-
-  // Listener real-time onSnapshot untuk dokumen Firestore users/{activeUid}
+  // Listener real-time onSnapshot untuk profil user
   useEffect(() => {
     const activeUid = user?.uid || clientAuth.currentUser?.uid;
     if (!activeUid) return;
@@ -215,17 +194,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       },
       (error: any) => {
         console.warn('[Firestore] Real-time listener suppressed:', error.message);
-        if (error?.code === 'permission-denied' || error?.message?.includes('permission') || error?.message?.includes('insufficient')) {
-          // Set fallback theme ke 'dark' tanpa merusak status autentikasi user
-          setTheme('dark');
-        }
       }
     );
 
     return () => unsubscribe();
-  }, [user?.uid, setTheme]);
+  }, [user?.uid]);
 
-  // Listener onAuthStateChanged untuk sinkronisasi otomatis status autentikasi & tema
+  // Listener onAuthStateChanged untuk sinkronisasi profil user
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(clientAuth, async (fbUser) => {
       if (fbUser && fbUser.uid) {
@@ -235,20 +210,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           if (userSnap.exists()) {
             const userData = userSnap.data() as AppUser;
             setUser(userData);
-            const userTheme = userData.themePreference || 'light';
-            setTheme(userTheme);
           }
         } catch (e: any) {
-          console.warn('[onAuthStateChanged] Error fetching theme from Firestore:', e?.message || e);
-          if (e?.code === 'permission-denied' || e?.message?.includes('permission') || e?.message?.includes('insufficient')) {
-            setTheme('dark');
-          }
+          console.warn('[onAuthStateChanged] Error fetching user profile:', e?.message || e);
         }
       }
     });
 
     return () => unsubscribe();
-  }, [setTheme]);
+  }, []);
 
   useEffect(() => {
     if (isLoginPage) {
