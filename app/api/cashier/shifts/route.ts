@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase/admin';
+import { adminAuth, adminDb } from '@/src/lib/firebase-admin';
 import { OpenShiftPayload, CloseShiftPayload } from '@/types/shift.types';
+import { processAutoCloseStaleShifts } from '@/app/api/cron/auto-close-shifts/route';
 
 // Helper to get today's date formatted as YYYY-MM-DD
 function getTodayDateString(): string {
@@ -42,40 +43,30 @@ async function resolveCashier(req: NextRequest, fallbackUid?: string, fallbackNa
   return null;
 }
 
-// Helper to check shift time tolerance (30 mins before startTime until endTime)
+// Helper to check shift time tolerance (30 mins before startTime, 60 mins after startTime)
 function checkTimeTolerance(startTimeStr: string, endTimeStr: string): { isWithin: boolean; message?: string } {
   try {
     const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
     const [startH, startM] = startTimeStr.split(':').map(Number);
-    const [endH, endM] = endTimeStr.split(':').map(Number);
-
     const shiftStartMinutes = startH * 60 + startM;
-    let shiftEndMinutes = endH * 60 + endM;
 
-    // Handle shift crossing midnight (e.g. 15:00 - 23:00 or 16:00 - 00:00)
-    if (shiftEndMinutes <= shiftStartMinutes) {
-      shiftEndMinutes += 24 * 60;
-    }
-
-    // 30-minute early clock-in tolerance
+    // Toleransi: 30 menit sebelum startTime s/d 60 menit setelah startTime
     const earlyToleranceMinutes = shiftStartMinutes - 30;
+    const lateToleranceMinutes = shiftStartMinutes + 60;
 
-    // If current time is earlier than 30 mins before shift
     if (currentMinutes < earlyToleranceMinutes) {
-      const diff = earlyToleranceMinutes - currentMinutes;
       return {
         isWithin: false,
-        message: `Shift Anda dimulai pukul ${startTimeStr}. Clock In baru dibuka 30 menit sebelumnya (pukul ${String(Math.floor(earlyToleranceMinutes / 60)).padStart(2, '0')}:${String(earlyToleranceMinutes % 60).padStart(2, '0')}).`,
+        message: `Belum memasuki jam shift Anda (Toleransi 30 menit sebelum jadwal pukul ${startTimeStr}).`,
       };
     }
 
-    // If current time is past shift end time (+ 120 mins grace period to close shift)
-    if (currentMinutes > shiftEndMinutes + 120) {
+    if (currentMinutes > lateToleranceMinutes) {
       return {
-        isWithin: true, // Allow cashier to still open/finish or prompt
-        message: `Waktu kerja telah melampaui jam selesai shift (${endTimeStr}). Harap segera lakukan penutupan kasir.`,
+        isWithin: false,
+        message: `Waktu buka shift telah melampaui batas toleransi (Maksimal 60 menit setelah jam jadwal ${startTimeStr}). Harap hubungi Admin.`,
       };
     }
 
@@ -101,6 +92,34 @@ export async function GET(req: NextRequest) {
     }
 
     const isAdmin = cashier.role === 'ADMIN' || cashier.role === 'SUPER_ADMIN';
+
+    // Auto-close any stale shifts from previous days asynchronously
+    processAutoCloseStaleShifts().catch((cErr) => {
+      console.warn('[Auto-Close Stale Shift Background Warning]:', cErr);
+    });
+
+    // Query last completed shift for relay cash option
+    let lastCompletedShift: any = null;
+    try {
+      const lastCompletedSnap = await adminDb
+        .collection('cashier_shifts')
+        .where('status', '==', 'COMPLETED')
+        .orderBy('closedAt', 'desc')
+        .limit(1)
+        .get();
+
+      if (!lastCompletedSnap.empty) {
+        const lastDoc = lastCompletedSnap.docs[0].data();
+        lastCompletedShift = {
+          actualCash: Number(lastDoc.actualCash || 0),
+          closedAt: lastDoc.closedAt?.toDate ? lastDoc.closedAt.toDate().toISOString() : lastDoc.closedAt,
+          userName: lastDoc.userName || 'Kasir Sebelumnya',
+          shiftType: lastDoc.shiftType || 'SHIFT_PAGI',
+        };
+      }
+    } catch (lcErr) {
+      console.warn('Gagal mengambil data lastCompletedShift:', lcErr);
+    }
 
     // 1. Cek apakah ada shift berstatus OPEN untuk kasir ini
     const activeShiftSnapshot = await adminDb
@@ -164,11 +183,12 @@ export async function GET(req: NextRequest) {
           currentCashSales: totalCashSales,
           currentNonCashSales: totalNonCashSales,
           currentTransactionsCount: totalTransactionsCount,
+          lastCompletedShift,
         },
       });
     }
 
-    // 2. Jika user adalah ADMIN / SUPER_ADMIN -> Bypass jadwal secara penuh (Bisa Open Shift kapan saja untuk kondisi emergency)
+    // 2. Jika user adalah ADMIN / SUPER_ADMIN -> Bypass jadwal secara penuh
     if (isAdmin) {
       return NextResponse.json({
         success: true,
@@ -188,11 +208,12 @@ export async function GET(req: NextRequest) {
           },
           isWithinShiftTolerance: true,
           toleranceMessage: '',
+          lastCompletedShift,
         },
       });
     }
 
-    // 3. Untuk role CASHIER -> Jalankan pengecekan Pengecualian Harian (/schedules) + Fallback ke Template Tetap (/schedule_templates/default)
+    // 3. Untuk role CASHIER -> Pengecekan Jadwal
     const DAY_INDEX_MAP: ('sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday')[] = [
       'sunday',
       'monday',
@@ -207,7 +228,6 @@ export async function GET(req: NextRequest) {
     const dateObj = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
     const dayOfWeekName = DAY_INDEX_MAP[dateObj.getUTCDay()];
 
-    // A. Cari semua dokumen pengecualian di /schedules untuk tanggal hari ini
     const scheduleSnapshot = await adminDb
       .collection('schedules')
       .where('date', '==', dateParam)
@@ -223,7 +243,6 @@ export async function GET(req: NextRequest) {
     let isWithinShiftTolerance = true;
     let toleranceMessage = '';
 
-    // 1. Cek apakah ada Override langsung untuk user ini pada tanggal hari ini
     const directUserOverride = todayOverrides.find((s) => s.userId === cashier.uid);
 
     if (directUserOverride) {
@@ -242,7 +261,6 @@ export async function GET(req: NextRequest) {
         createdAt: directUserOverride.createdAt?.toDate ? directUserOverride.createdAt.toDate().toISOString() : directUserOverride.createdAt,
       };
     } else {
-      // 2. Fallback ke Master Default Template (/schedule_templates/default)
       try {
         const templateDoc = await adminDb.collection('schedule_templates').doc('default').get();
         if (templateDoc.exists) {
@@ -250,14 +268,10 @@ export async function GET(req: NextRequest) {
           const dayTemplate = templateData?.days?.[dayOfWeekName];
 
           if (dayTemplate) {
-            // Cek apakah kasir terdaftar di Shift Pagi pada template
             const isAssignedPagi = dayTemplate.pagi?.userId === cashier.uid;
-            // Cek apakah shift pagi tanggal ini sudah diganti/dioverride oleh kasir lain
             const isPagiOverriddenByOther = todayOverrides.some((s) => s.shiftType === 'SHIFT_PAGI' && s.userId !== cashier.uid);
 
-            // Cek apakah kasir terdaftar di Shift Sore pada template
             const isAssignedSore = dayTemplate.sore?.userId === cashier.uid;
-            // Cek apakah shift sore tanggal ini sudah diganti/dioverride oleh kasir lain
             const isSoreOverriddenByOther = todayOverrides.some((s) => s.shiftType === 'SHIFT_SORE' && s.userId !== cashier.uid);
 
             if (isAssignedPagi && !isPagiOverriddenByOther) {
@@ -299,7 +313,6 @@ export async function GET(req: NextRequest) {
     }
 
     if (hasScheduleToday && todaySchedule) {
-      // Validasi toleransi waktu jam shift (30 menit sebelum shift)
       const tolerance = checkTimeTolerance(todaySchedule.startTime || '07:00', todaySchedule.endTime || '15:00');
       isWithinShiftTolerance = tolerance.isWithin;
       toleranceMessage = tolerance.message || '';
@@ -314,6 +327,7 @@ export async function GET(req: NextRequest) {
         todaySchedule,
         isWithinShiftTolerance,
         toleranceMessage,
+        lastCompletedShift,
       },
     });
   } catch (error: any) {
@@ -475,7 +489,7 @@ export async function PATCH(req: NextRequest) {
     const startingCash = Number(shiftData.startingCash || 0);
     const expectedCash = startingCash + totalCashSales;
     const finalActualCash = Number(actualCash);
-    const cashVariance = finalActualCash - expectedCash; // 0 = Pas, >0 = Lebih, <0 = Kurang
+    const cashVariance = finalActualCash - expectedCash;
     const now = new Date();
 
     const updatePayload = {

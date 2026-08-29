@@ -26,10 +26,20 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [infoBanner, setInfoBanner] = useState<string | null>(null);
 
   // Halaman /login HARUS selalu tampil dalam mode Light (default)
   React.useEffect(() => {
     setTheme('light');
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const reason = params.get('reason');
+      if (reason === 'shift_completed') {
+        setInfoBanner('Shift kasir sebelumnya berhasil ditutup. Silakan Kasir berikutnya melakukan login untuk memulai shift baru.');
+      } else if (reason === 'auto_closed') {
+        setInfoBanner('Shift sebelumnya telah ditutup otomatis oleh sistem karena melewati pukul 23:59.');
+      }
+    }
   }, [setTheme]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -276,6 +286,16 @@ export default function LoginPage() {
               Masukkan akun staf yang terdaftar untuk memulai sesi kerja.
             </p>
           </div>
+
+          {infoBanner && (
+            <div className="mb-4 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border-2 border-slate-900 dark:border-slate-100 text-emerald-900 dark:text-emerald-200 text-xs font-bold flex items-start gap-2.5 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+              <span className="text-base">✓</span>
+              <div className="min-w-0">
+                <p className="font-black text-emerald-900 dark:text-emerald-100">Status Shift Selesai</p>
+                <p className="mt-0.5 text-emerald-800 dark:text-emerald-200 leading-snug font-medium">{infoBanner}</p>
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 p-3.5 rounded-xl bg-red-50 dark:bg-red-950/60 border-2 border-slate-900 dark:border-slate-100 text-red-900 dark:text-red-300 text-xs font-bold flex items-start gap-2.5 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] animate-shake">

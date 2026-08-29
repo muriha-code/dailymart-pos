@@ -51,6 +51,12 @@ export interface ShiftValidationResult {
   currentCashSales?: number;
   currentNonCashSales?: number;
   currentTransactionsCount?: number;
+  lastCompletedShift?: {
+    actualCash: number;
+    closedAt: string;
+    userName: string;
+    shiftType: ShiftType;
+  } | null;
 }
 
 export interface CashierShiftApiResponse<T = any> {

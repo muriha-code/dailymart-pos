@@ -18,7 +18,7 @@ interface AuthContextType {
   clearTabActive: () => void;
   updateThemePreference: (newTheme: 'light' | 'dark') => Promise<void>;
   refreshUserData: () => Promise<void>;
-  logout: () => Promise<void>;
+  logout: (reason?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -87,7 +87,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   );
 
   // Logout Handler (Reset theme ke light & bersihkan state)
-  const logout = useCallback(async () => {
+  const logout = useCallback(async (reason?: string) => {
     try {
       setTheme('light');
       try {
@@ -105,7 +105,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     } catch (err) {
       console.error('[Logout Error]:', err);
     } finally {
-      router.replace('/login');
+      const redirectUrl = reason ? `/login?reason=${reason}` : '/login';
+      router.replace(redirectUrl);
     }
   }, [clearTabActive, router, setTheme]);
 

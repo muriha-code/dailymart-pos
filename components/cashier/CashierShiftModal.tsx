@@ -21,6 +21,12 @@ interface OpenShiftModalProps {
     endTime: string;
     notes?: string;
   } | null;
+  lastCompletedShift?: {
+    actualCash: number;
+    closedAt: string;
+    userName: string;
+    shiftType: ShiftType;
+  } | null;
   onOpenShift: (startingCash: number, shiftType: ShiftType) => Promise<void>;
   onLogout: () => void;
 }
@@ -29,6 +35,7 @@ export function OpenShiftModal({
   isOpen,
   cashierName,
   todaySchedule,
+  lastCompletedShift,
   onOpenShift,
   onLogout,
 }: OpenShiftModalProps) {
@@ -36,6 +43,7 @@ export function OpenShiftModal({
   const [selectedShiftType, setSelectedShiftType] = useState<ShiftType>(
     todaySchedule?.shiftType || "SHIFT_PAGI"
   );
+  const [useCarryOverCash, setUseCarryOverCash] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
@@ -43,6 +51,13 @@ export function OpenShiftModal({
       setSelectedShiftType(todaySchedule.shiftType);
     }
   }, [todaySchedule]);
+
+  const handleToggleCarryOver = (checked: boolean) => {
+    setUseCarryOverCash(checked);
+    if (checked && lastCompletedShift?.actualCash !== undefined) {
+      setStartingCashInput(lastCompletedShift.actualCash.toString());
+    }
+  };
 
   const numericCash = useMemo(() => {
     const clean = startingCashInput.replace(/\D/g, "");
@@ -104,6 +119,31 @@ export function OpenShiftModal({
               </div>
             )}
           </div>
+
+          {/* Opsi Carry Over Cash (Serah Terima Modal Kas Kasir Sebelumnya) */}
+          {lastCompletedShift && (
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border-2 border-slate-900 dark:border-slate-100 flex items-center justify-between shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-slate-900 dark:text-slate-100 min-w-0">
+                <input
+                  type="checkbox"
+                  checked={useCarryOverCash}
+                  onChange={(e) => handleToggleCarryOver(e.target.checked)}
+                  className="w-4 h-4 text-[#6366F1] rounded focus:ring-0 border-2 border-slate-900 shrink-0 cursor-pointer"
+                />
+                <div className="min-w-0">
+                  <span className="font-black text-slate-900 dark:text-slate-100 block truncate">
+                    Gunakan Sisa Kas Kasir Sebelumnya
+                  </span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block truncate">
+                    Dari {lastCompletedShift.userName} ({lastCompletedShift.shiftType === "SHIFT_PAGI" ? "Pagi" : "Sore"})
+                  </span>
+                </div>
+              </label>
+              <span className="font-mono font-black text-xs text-amber-900 dark:text-amber-300 shrink-0 ml-2">
+                {formatRupiah(lastCompletedShift.actualCash)}
+              </span>
+            </div>
+          )}
 
           {/* Input Modal Awal */}
           <div>

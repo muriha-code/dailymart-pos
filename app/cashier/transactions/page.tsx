@@ -183,9 +183,9 @@ export default function CashierTransactionsPage() {
   const handleDoneReceipt = async () => {
     setIsReceiptModalOpen(false);
     if (logout) {
-      await logout();
+      await logout("shift_completed");
     } else {
-      window.location.href = "/login";
+      window.location.href = "/login?reason=shift_completed";
     }
   };
 
@@ -1728,6 +1728,7 @@ export default function CashierTransactionsPage() {
         isOpen={isOpenShiftModalOpen}
         cashierName={cashierUser?.displayName || "Kasir"}
         todaySchedule={shiftValidation?.todaySchedule}
+        lastCompletedShift={shiftValidation?.lastCompletedShift}
         onOpenShift={handleOpenShift}
         onLogout={logout}
       />
