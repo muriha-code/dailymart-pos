@@ -233,7 +233,7 @@ export default function AdminSchedulesPage() {
           userId: dayTmpl.pagi.userId,
           userName: dayTmpl.pagi.userName,
           userEmail: dayTmpl.pagi.userEmail,
-          notes: dayTmpl.pagi.notes || "Jadwal Tetap (Default Template)",
+          notes: dayTmpl.pagi.notes || "Jadwal Tetap",
           isOverride: false,
           source: "TEMPLATE",
         };
@@ -257,7 +257,7 @@ export default function AdminSchedulesPage() {
           userId: dayTmpl.sore.userId,
           userName: dayTmpl.sore.userName,
           userEmail: dayTmpl.sore.userEmail,
-          notes: dayTmpl.sore.notes || "Jadwal Tetap (Default Template)",
+          notes: dayTmpl.sore.notes || "Jadwal Tetap",
           isOverride: false,
           source: "TEMPLATE",
         };
@@ -801,16 +801,17 @@ export default function AdminSchedulesPage() {
                 <div className="space-y-3 flex-1">
                   {/* SHIFT PAGI CARD */}
                   <div className="p-2.5 bg-amber-50/80 dark:bg-amber-950/30 rounded-xl border-2 border-amber-300 dark:border-amber-800 space-y-1.5">
-                    <div className="flex items-center justify-between text-[10px] font-black text-amber-900 dark:text-amber-300">
-                      <span className="flex items-center gap-1">
-                        <span>☀️ PAGI</span>
-                        <span className="font-mono text-[9px] text-amber-700 dark:text-amber-400">
-                          (07-15)
+                    <div className="flex items-center justify-between gap-1 text-[10px] font-black text-amber-900 dark:text-amber-300">
+                      <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
+                        <span>☀️</span>
+                        <span>Pagi</span>
+                        <span className="font-mono text-[9px] text-amber-700 dark:text-amber-400 font-bold whitespace-nowrap">
+                          07:00 - 15:00
                         </span>
-                      </span>
+                      </div>
                       {pagiSched && (
                         <span
-                          className={`px-1.5 py-0.2 rounded text-[8px] font-black uppercase border ${
+                          className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border shrink-0 whitespace-nowrap ${
                             pagiSched.isOverride
                               ? "bg-rose-100 text-rose-800 border-rose-400 dark:bg-rose-950 dark:text-rose-300"
                               : "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
@@ -890,16 +891,17 @@ export default function AdminSchedulesPage() {
 
                   {/* SHIFT SORE CARD */}
                   <div className="p-2.5 bg-indigo-50/80 dark:bg-indigo-950/30 rounded-xl border-2 border-indigo-300 dark:border-indigo-800 space-y-1.5">
-                    <div className="flex items-center justify-between text-[10px] font-black text-indigo-900 dark:text-indigo-300">
-                      <span className="flex items-center gap-1">
-                        <span>🌙 SORE</span>
-                        <span className="font-mono text-[9px] text-indigo-700 dark:text-indigo-400">
-                          (15-23)
+                    <div className="flex items-center justify-between gap-1 text-[10px] font-black text-indigo-900 dark:text-indigo-300">
+                      <div className="flex items-center gap-1 whitespace-nowrap min-w-0">
+                        <span>🌙</span>
+                        <span>Sore</span>
+                        <span className="font-mono text-[9px] text-indigo-700 dark:text-indigo-400 font-bold whitespace-nowrap">
+                          15:00 - 23:00
                         </span>
-                      </span>
+                      </div>
                       {soreSched && (
                         <span
-                          className={`px-1.5 py-0.2 rounded text-[8px] font-black uppercase border ${
+                          className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase border shrink-0 whitespace-nowrap ${
                             soreSched.isOverride
                               ? "bg-rose-100 text-rose-800 border-rose-400 dark:bg-rose-950 dark:text-rose-300"
                               : "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300"
@@ -1046,7 +1048,7 @@ export default function AdminSchedulesPage() {
                           className={`px-2.5 py-1 rounded-md border font-black text-[10px] ${
                             s.shiftType === "SHIFT_PAGI"
                               ? "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800"
-                              : "bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800"
+                              : "bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-300 dark:border-indigo-800"
                           }`}
                         >
                           {s.shiftType === "SHIFT_PAGI" ? "PAGI" : "SORE"}
