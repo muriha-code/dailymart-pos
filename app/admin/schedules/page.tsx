@@ -1106,6 +1106,7 @@ export default function AdminSchedulesPage() {
                     + Override
                   </button>
                 </div>
+              </div>
             );
           })}
         </div>
