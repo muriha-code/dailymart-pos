@@ -4,11 +4,12 @@ import {
   UpdateSchedulePayload,
   SwapShiftPayload,
   ScheduleApiResponse,
+  ScheduleTemplate,
 } from '@/types/schedule.types';
 
 export const scheduleService = {
   /**
-   * Mengambil daftar jadwal kasir berdasarkan rentang tanggal atau tanggal spesifik
+   * Mengambil daftar jadwal kasir berdasarkan rentang tanggal atau tanggal spesifik (Data Overrides)
    */
   async getSchedules(params?: {
     date?: string;
@@ -36,7 +37,41 @@ export const scheduleService = {
   },
 
   /**
-   * Menambahkan jadwal baru untuk kasir
+   * Mengambil template jadwal tetap (Senin - Minggu)
+   */
+  async getScheduleTemplate(): Promise<ScheduleTemplate> {
+    const res = await fetch('/api/admin/schedules/template', {
+      cache: 'no-store',
+    });
+    const json: ScheduleApiResponse<ScheduleTemplate> = await res.json();
+
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Gagal memuat template jadwal tetap.');
+    }
+
+    return json.data!;
+  },
+
+  /**
+   * Menyimpan / memperbarui template jadwal tetap (Senin - Minggu)
+   */
+  async saveScheduleTemplate(template: Partial<ScheduleTemplate>): Promise<ScheduleTemplate> {
+    const res = await fetch('/api/admin/schedules/template', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(template),
+    });
+    const json: ScheduleApiResponse<ScheduleTemplate> = await res.json();
+
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Gagal menyimpan template jadwal tetap.');
+    }
+
+    return json.data!;
+  },
+
+  /**
+   * Menambahkan jadwal baru untuk kasir (Override Pengecualian Tanggal)
    */
   async createSchedule(payload: CreateSchedulePayload): Promise<Schedule> {
     const res = await fetch('/api/admin/schedules', {
@@ -101,3 +136,4 @@ export const scheduleService = {
     }
   },
 };
+

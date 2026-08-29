@@ -192,31 +192,115 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // 3. Untuk role CASHIER -> Jalankan pengecekan dokumen /schedules sesuai tanggal dan jam shift
+    // 3. Untuk role CASHIER -> Jalankan pengecekan Pengecualian Harian (/schedules) + Fallback ke Template Tetap (/schedule_templates/default)
+    const DAY_INDEX_MAP: ('sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday')[] = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ];
+
+    const [y, m, d] = dateParam.split('-').map(Number);
+    const dateObj = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+    const dayOfWeekName = DAY_INDEX_MAP[dateObj.getUTCDay()];
+
+    // A. Cari semua dokumen pengecualian di /schedules untuk tanggal hari ini
     const scheduleSnapshot = await adminDb
       .collection('schedules')
       .where('date', '==', dateParam)
-      .where('userId', '==', cashier.uid)
-      .limit(1)
       .get();
+
+    const todayOverrides = scheduleSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as any[];
 
     let hasScheduleToday = false;
     let todaySchedule: any = null;
     let isWithinShiftTolerance = true;
     let toleranceMessage = '';
 
-    if (!scheduleSnapshot.empty) {
-      hasScheduleToday = true;
-      const schedDoc = scheduleSnapshot.docs[0];
-      const schedData = schedDoc.data();
-      todaySchedule = {
-        id: schedDoc.id,
-        ...schedData,
-        createdAt: schedData.createdAt?.toDate ? schedData.createdAt.toDate().toISOString() : schedData.createdAt,
-      };
+    // 1. Cek apakah ada Override langsung untuk user ini pada tanggal hari ini
+    const directUserOverride = todayOverrides.find((s) => s.userId === cashier.uid);
 
+    if (directUserOverride) {
+      hasScheduleToday = true;
+      todaySchedule = {
+        id: directUserOverride.id,
+        date: dateParam,
+        shiftType: directUserOverride.shiftType || 'SHIFT_PAGI',
+        startTime: directUserOverride.startTime || (directUserOverride.shiftType === 'SHIFT_SORE' ? '15:00' : '07:00'),
+        endTime: directUserOverride.endTime || (directUserOverride.shiftType === 'SHIFT_SORE' ? '23:00' : '15:00'),
+        userId: cashier.uid,
+        userName: directUserOverride.userName || cashier.displayName,
+        notes: directUserOverride.notes || 'Pengecualian Jadwal Tanggal (Tukar/Manual)',
+        isOverride: true,
+        source: 'OVERRIDE',
+        createdAt: directUserOverride.createdAt?.toDate ? directUserOverride.createdAt.toDate().toISOString() : directUserOverride.createdAt,
+      };
+    } else {
+      // 2. Fallback ke Master Default Template (/schedule_templates/default)
+      try {
+        const templateDoc = await adminDb.collection('schedule_templates').doc('default').get();
+        if (templateDoc.exists) {
+          const templateData = templateDoc.data();
+          const dayTemplate = templateData?.days?.[dayOfWeekName];
+
+          if (dayTemplate) {
+            // Cek apakah kasir terdaftar di Shift Pagi pada template
+            const isAssignedPagi = dayTemplate.pagi?.userId === cashier.uid;
+            // Cek apakah shift pagi tanggal ini sudah diganti/dioverride oleh kasir lain
+            const isPagiOverriddenByOther = todayOverrides.some((s) => s.shiftType === 'SHIFT_PAGI' && s.userId !== cashier.uid);
+
+            // Cek apakah kasir terdaftar di Shift Sore pada template
+            const isAssignedSore = dayTemplate.sore?.userId === cashier.uid;
+            // Cek apakah shift sore tanggal ini sudah diganti/dioverride oleh kasir lain
+            const isSoreOverriddenByOther = todayOverrides.some((s) => s.shiftType === 'SHIFT_SORE' && s.userId !== cashier.uid);
+
+            if (isAssignedPagi && !isPagiOverriddenByOther) {
+              hasScheduleToday = true;
+              const pagiInfo = dayTemplate.pagi;
+              todaySchedule = {
+                id: `SCH_TMPL_${dateParam.replace(/-/g, '')}_PAGI_${cashier.uid.substring(0, 6)}`,
+                date: dateParam,
+                shiftType: 'SHIFT_PAGI',
+                startTime: pagiInfo.startTime || '07:00',
+                endTime: pagiInfo.endTime || '15:00',
+                userId: cashier.uid,
+                userName: pagiInfo.userName || cashier.displayName,
+                notes: pagiInfo.notes || 'Jadwal Tetap Kasir (Shift Pagi)',
+                isOverride: false,
+                source: 'TEMPLATE',
+              };
+            } else if (isAssignedSore && !isSoreOverriddenByOther) {
+              hasScheduleToday = true;
+              const soreInfo = dayTemplate.sore;
+              todaySchedule = {
+                id: `SCH_TMPL_${dateParam.replace(/-/g, '')}_SORE_${cashier.uid.substring(0, 6)}`,
+                date: dateParam,
+                shiftType: 'SHIFT_SORE',
+                startTime: soreInfo.startTime || '15:00',
+                endTime: soreInfo.endTime || '23:00',
+                userId: cashier.uid,
+                userName: soreInfo.userName || cashier.displayName,
+                notes: soreInfo.notes || 'Jadwal Tetap Kasir (Shift Sore)',
+                isOverride: false,
+                source: 'TEMPLATE',
+              };
+            }
+          }
+        }
+      } catch (tmplErr) {
+        console.warn('[Cashier Shift Template Fallback Warning]:', tmplErr);
+      }
+    }
+
+    if (hasScheduleToday && todaySchedule) {
       // Validasi toleransi waktu jam shift (30 menit sebelum shift)
-      const tolerance = checkTimeTolerance(schedData.startTime || '07:00', schedData.endTime || '15:00');
+      const tolerance = checkTimeTolerance(todaySchedule.startTime || '07:00', todaySchedule.endTime || '15:00');
       isWithinShiftTolerance = tolerance.isWithin;
       toleranceMessage = tolerance.message || '';
     }

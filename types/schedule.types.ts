@@ -1,5 +1,37 @@
 export type ShiftType = 'SHIFT_PAGI' | 'SHIFT_SORE';
 
+export type DayOfWeek =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
+
+export interface ShiftAssignment {
+  userId: string;
+  userName: string;
+  userEmail?: string;
+  startTime?: string;
+  endTime?: string;
+  notes?: string;
+}
+
+export interface DayScheduleTemplate {
+  pagi: ShiftAssignment | null;
+  sore: ShiftAssignment | null;
+}
+
+export interface ScheduleTemplate {
+  id?: string;
+  days: Record<DayOfWeek, DayScheduleTemplate>;
+  updatedBy?: string;
+  updatedByName?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
 export interface Schedule {
   id: string;
   date: string; // YYYY-MM-DD
@@ -10,6 +42,8 @@ export interface Schedule {
   userName: string;
   userEmail?: string;
   notes?: string;
+  isOverride?: boolean;
+  source?: 'TEMPLATE' | 'OVERRIDE';
   updatedBy?: string;
   updatedByName?: string;
   createdAt?: string | Date;
@@ -51,3 +85,4 @@ export interface ScheduleApiResponse<T = any> {
   message?: string;
   data?: T;
 }
+
