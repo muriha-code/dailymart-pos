@@ -76,6 +76,39 @@ function checkTimeTolerance(startTimeStr: string, endTimeStr: string): { isWithi
   }
 }
 
+// Helper aman untuk query transaksi shift dengan penanganan indeks Firestore
+async function calculateShiftTransactions(cashierId: string, openedAtDate: Date) {
+  let totalCashSales = 0;
+  let totalNonCashSales = 0;
+  let totalTransactionsCount = 0;
+
+  try {
+    const trxSnapshot = await adminDb
+      .collection('transactions')
+      .where('cashierId', '==', cashierId)
+      .where('createdAt', '>=', openedAtDate)
+      .get();
+
+    trxSnapshot.forEach((doc) => {
+      const trx = doc.data();
+      totalTransactionsCount += 1;
+      if (trx.paymentMethod === 'CASH') {
+        totalCashSales += Number(trx.total || 0);
+      } else {
+        totalNonCashSales += Number(trx.total || 0);
+      }
+    });
+  } catch (err: any) {
+    console.error('[Shift Transactions Query Error]: Index mungkin belum siap.', err?.message);
+    if (err?.code === 9 || err?.message?.includes('requires an index')) {
+      throw new Error('Firestore Index belum dikonfigurasi. Harap buat composite index untuk koleksi transactions (cashierId ASC, createdAt ASC).');
+    }
+    throw err;
+  }
+
+  return { totalCashSales, totalNonCashSales, totalTransactionsCount };
+}
+
 // GET /api/cashier/shifts -> Check Active Shift & Today's Schedule
 export async function GET(req: NextRequest) {
   try {
@@ -137,25 +170,9 @@ export async function GET(req: NextRequest) {
       // Hitung live cash & non-cash transactions sejak openedAt
       const openedAtDate = shiftData.openedAt?.toDate ? shiftData.openedAt.toDate() : new Date(shiftData.openedAt);
 
-      const trxSnapshot = await adminDb
-        .collection('transactions')
-        .where('cashierId', '==', cashier.uid)
-        .where('createdAt', '>=', openedAtDate)
-        .get();
+      const { totalCashSales, totalNonCashSales, totalTransactionsCount } =
+        await calculateShiftTransactions(cashier.uid, openedAtDate);
 
-      let totalCashSales = 0;
-      let totalNonCashSales = 0;
-      let totalTransactionsCount = 0;
-
-      trxSnapshot.forEach((doc) => {
-        const trx = doc.data();
-        totalTransactionsCount += 1;
-        if (trx.paymentMethod === 'CASH') {
-          totalCashSales += Number(trx.total || 0);
-        } else {
-          totalNonCashSales += Number(trx.total || 0);
-        }
-      });
 
       const startingCash = Number(shiftData.startingCash || 0);
       const expectedCash = startingCash + totalCashSales;
@@ -466,25 +483,9 @@ export async function PATCH(req: NextRequest) {
     // Hitung total transaksi kasir selama shift ini
     const openedAtDate = shiftData.openedAt?.toDate ? shiftData.openedAt.toDate() : new Date(shiftData.openedAt);
 
-    const trxSnapshot = await adminDb
-      .collection('transactions')
-      .where('cashierId', '==', shiftData.userId)
-      .where('createdAt', '>=', openedAtDate)
-      .get();
+    const { totalCashSales, totalNonCashSales, totalTransactionsCount } =
+      await calculateShiftTransactions(shiftData.userId, openedAtDate);
 
-    let totalCashSales = 0;
-    let totalNonCashSales = 0;
-    let totalTransactionsCount = 0;
-
-    trxSnapshot.forEach((doc) => {
-      const trx = doc.data();
-      totalTransactionsCount += 1;
-      if (trx.paymentMethod === 'CASH') {
-        totalCashSales += Number(trx.total || 0);
-      } else {
-        totalNonCashSales += Number(trx.total || 0);
-      }
-    });
 
     const startingCash = Number(shiftData.startingCash || 0);
     const expectedCash = startingCash + totalCashSales;

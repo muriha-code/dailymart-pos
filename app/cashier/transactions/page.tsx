@@ -16,6 +16,10 @@ import {
   BlockedShiftScreen,
   ShiftReceiptModal,
 } from "@/components/cashier/CashierShiftModal";
+import { ReceiptPreviewCard } from "@/components/pos/ReceiptPrint";
+import { executeThermalPrint } from "@/components/receipt/PrintReceipt";
+import { ReceiptData, ReceiptPaperSize } from "@/types/receipt";
+import { settingsService } from "@/services/settings.service";
 
 // ==========================================
 // TYPES & INTERFACES
@@ -230,8 +234,26 @@ export default function CashierTransactionsPage() {
   const [debitRefNumber, setDebitRefNumber] = useState<string>("");
   const [isProcessingCheckout, setIsProcessingCheckout] = useState<boolean>(false);
 
-  // State Transaksi Selesai
+  // Struk / Thermal Print State
   const [lastTransaction, setLastTransaction] = useState<TransactionSummary | null>(null);
+  const [receiptPaperSize, setReceiptPaperSize] = useState<ReceiptPaperSize>("58mm");
+
+  // Load saved paper size preference
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dailymart_pos_paper_size") as ReceiptPaperSize;
+      if (saved === "58mm" || saved === "80mm") {
+        setReceiptPaperSize(saved);
+      }
+    } catch {}
+  }, []);
+
+  const handlePaperSizeChange = (size: ReceiptPaperSize) => {
+    setReceiptPaperSize(size);
+    try {
+      localStorage.setItem("dailymart_pos_paper_size", size);
+    } catch {}
+  };
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
 
   // Live Clock Kasir
@@ -542,8 +564,46 @@ export default function CashierTransactionsPage() {
     }, 100);
   };
 
-  const handlePrintReceipt = () => {
-    window.print();
+  const handlePrintReceipt = async () => {
+    if (!lastTransaction) return;
+    try {
+      const storeSettings = await settingsService.getSettings().catch(() => null);
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" });
+      const timeStr = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+      const receiptData: ReceiptData = {
+        storeName: storeSettings?.storeName || "DAILYMART POS",
+        storeBranch: storeSettings?.storeBranch ? `Cabang ${storeSettings.storeBranch}` : "Cabang Utama",
+        storeAddress: storeSettings?.storeAddress || "Jl. Retail Utama No. 88, Bogor",
+        storePhone: storeSettings?.storePhone || "0251-8339988",
+        transactionNumber: lastTransaction.invoiceNumber,
+        date: dateStr,
+        time: timeStr,
+        cashierName: cashierUser?.displayName || "Kasir",
+        items: lastTransaction.items.map((it: CartItem) => ({
+          name: it.product.name,
+          quantity: it.quantity,
+          price: it.unitPrice,
+          subtotal: it.subtotal,
+          discount: it.totalDiscount || 0,
+        })),
+        subtotal: lastTransaction.subtotal,
+        discount: lastTransaction.discountTotal,
+        tax: 0,
+        total: lastTransaction.grandTotal,
+        paymentMethod: lastTransaction.paymentMethod,
+        paidAmount: lastTransaction.amountPaid,
+        change: lastTransaction.changeAmount,
+        footerMessage: storeSettings?.receiptFooterNote || "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan.",
+        version: "v1.0",
+      };
+
+      executeThermalPrint(receiptData, receiptPaperSize);
+    } catch (err) {
+      console.error("Gagal mencetak struk thermal:", err);
+      toast.error("Gagal mencetak struk");
+    }
   };
 
   // ==========================================
@@ -1456,213 +1516,72 @@ export default function CashierTransactionsPage() {
       {/* 5. MODAL / STRUK TRANSAKSI BERHASIL & THERMAL PRINT RECEIPT                 */}
       {/* ========================================================================= */}
       {isSuccessModalOpen && lastTransaction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4">
-          {/* Style Khusus @media print untuk Printer Thermal (58mm/80mm) */}
-          <style jsx global>{`
-            @media print {
-              body * {
-                visibility: hidden !important;
-              }
-              #thermal-receipt,
-              #thermal-receipt * {
-                visibility: visible !important;
-              }
-              #thermal-receipt {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 80mm !important;
-                margin: 0 !important;
-                padding: 10px !important;
-                background: white !important;
-                color: black !important;
-                font-family: monospace !important;
-                font-size: 11px !important;
-                line-height: 1.2 !important;
-              }
-            }
-          `}</style>
-
-          {/* Thermal Receipt Print Area (Hanya Muncul Saat Print / window.print()) */}
-          <div
-            id="thermal-receipt"
-            className="hidden print:block font-mono text-black text-xs leading-tight w-[80mm] p-2 bg-white"
-          >
-            <div className="text-center font-bold text-sm uppercase">DAILYMART POS</div>
-            <div className="text-center text-[10px]">Minimarket & Retail POS System</div>
-            <div className="text-center text-[10px]">Jl. Sudirman No. 123, Jakarta</div>
-            <div className="text-center text-[10px]">Telp: (021) 555-0199</div>
-            <div className="my-1 text-center overflow-hidden">----------------------------------------</div>
-            <div className="text-[10px] space-y-0.5">
-              <div>No. Invoice : {lastTransaction.invoiceNumber}</div>
-              <div>Tanggal     : {lastTransaction.date}</div>
-              <div>Kasir       : {cashierUser?.displayName || "Kasir POS"}</div>
-              <div>Metode      : {lastTransaction.paymentMethod}</div>
-            </div>
-            <div className="my-1 text-center overflow-hidden">----------------------------------------</div>
-
-            {/* Daftar Produk */}
-            <div className="space-y-1 my-1">
-              {lastTransaction.items.map((it) => (
-                <div key={it.product.id || it.product.sku} className="text-[10px]">
-                  <div className="font-bold truncate">{it.product.name}</div>
-                  <div className="flex justify-between pl-2">
-                    <span>
-                      {it.quantity} x {formatRupiah(it.unitPrice)}
-                    </span>
-                    <span>{formatRupiah(it.subtotal)}</span>
-                  </div>
-                  {it.totalDiscount > 0 && (
-                    <div className="flex justify-between pl-2 text-[9px] italic">
-                      <span>  Diskon Item</span>
-                      <span>- {formatRupiah(it.totalDiscount)}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="my-1 text-center overflow-hidden">----------------------------------------</div>
-
-            {/* Ringkasan Pembayaran */}
-            <div className="space-y-0.5 text-[10px]">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>{formatRupiah(lastTransaction.subtotal)}</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-3 sm:p-4 animate-in fade-in duration-150">
+          {/* On-screen UI Modal (Neo-Brutalism Industrial Cyber Punch) */}
+          <div className="print:hidden bg-white dark:bg-slate-900 rounded-2xl border-4 border-[#0A0A0A] dark:border-slate-100 shadow-[8px_8px_0px_0px_rgba(10,10,10,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] w-full max-w-sm max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 transition-colors">
+            {/* Header Sukses (Sticky Top) */}
+            <div className="shrink-0 p-3.5 bg-[#00FF41] dark:bg-emerald-600 text-[#0A0A0A] dark:text-white border-b-4 border-[#0A0A0A] dark:border-slate-100 text-center flex items-center justify-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-white border-2 border-[#0A0A0A] shadow-[1.5px_1.5px_0px_0px_#0A0A0A] text-[#0A0A0A] flex items-center justify-center font-black text-xs">
+                ✓
               </div>
-              {lastTransaction.discountTotal > 0 && (
-                <div className="flex justify-between">
-                  <span>Total Diskon</span>
-                  <span>- {formatRupiah(lastTransaction.discountTotal)}</span>
-                </div>
-              )}
-              <div className="flex justify-between font-bold text-xs pt-1 border-t border-dashed border-black">
-                <span>TOTAL BAYAR</span>
-                <span>{formatRupiah(lastTransaction.grandTotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Dibayar ({lastTransaction.paymentMethod})</span>
-                <span>{formatRupiah(lastTransaction.amountPaid)}</span>
-              </div>
-              <div className="flex justify-between font-bold">
-                <span>Kembalian</span>
-                <span>{formatRupiah(lastTransaction.changeAmount)}</span>
-              </div>
-            </div>
-
-            <div className="my-2 text-center overflow-hidden">----------------------------------------</div>
-            <div className="text-center text-[10px] space-y-0.5">
-              <div>*** TERIMA KASIH ***</div>
-              <div>Selamat Berbelanja Kembali</div>
-              <div className="text-[8px] mt-1 text-gray-500">DailyMart POS System v1.0</div>
-            </div>
-          </div>
-
-          {/* On-screen UI Modal */}
-          <div className="print:hidden bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150 transition-colors">
-            {/* Header Sukses */}
-            <div className="p-6 bg-[#065F46] text-white border-b-2 border-slate-900 dark:border-slate-100 text-center flex flex-col items-center">
-              <div className="w-12 h-12 rounded-xl bg-white border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] text-[#065F46] flex items-center justify-center mb-2">
-                <svg
-                  className="w-7 h-7"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="3"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-black tracking-tight">
-                Transaksi Berhasil!
+              <h3 className="text-xs font-black tracking-tight uppercase">
+                Transaksi Berhasil Diproses!
               </h3>
-              <p className="text-xs font-mono font-bold text-emerald-200 mt-0.5">
-                {lastTransaction.invoiceNumber}
-              </p>
             </div>
 
-            {/* Receipt Summary Body */}
-            <div className="p-6 space-y-4 text-xs">
-              <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] space-y-2 font-mono transition-colors">
-                <div className="flex justify-between text-slate-600 dark:text-slate-400 text-[11px] font-bold">
-                  <span>Waktu:</span>
-                  <span>{lastTransaction.date}</span>
-                </div>
-                <div className="flex justify-between text-slate-600 dark:text-slate-400 text-[11px] font-bold">
-                  <span>Metode:</span>
-                  <span className="font-black text-slate-900 dark:text-slate-100">
-                    {lastTransaction.paymentMethod}
-                  </span>
-                </div>
-                <div className="h-px bg-slate-300 dark:bg-slate-700 my-1" />
-                <div className="flex justify-between font-black text-slate-900 dark:text-slate-100 text-sm">
-                  <span>Total Tagihan:</span>
-                  <span>{formatRupiah(lastTransaction.grandTotal)}</span>
-                </div>
-                <div className="flex justify-between text-slate-700 dark:text-slate-300 text-xs font-bold">
-                  <span>Dibayar ({lastTransaction.paymentMethod}):</span>
-                  <span>{formatRupiah(lastTransaction.amountPaid)}</span>
-                </div>
-                <div className="flex justify-between font-black text-[#065F46] dark:text-emerald-300 text-sm bg-emerald-100 dark:bg-emerald-950/60 p-1.5 rounded border border-emerald-300 dark:border-emerald-700">
-                  <span>Kembalian:</span>
-                  <span>{formatRupiah(lastTransaction.changeAmount)}</span>
-                </div>
-              </div>
-
-              {/* Rincian Barang */}
-              <div>
-                <span className="text-[10px] font-black text-slate-700 dark:text-slate-300 block mb-1 uppercase tracking-wider">
-                  Rincian Barang ({lastTransaction.items.length} jenis)
+            {/* Receipt Preview Card Body (Full Pure White Thermal Paper) */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 bg-white dark:bg-slate-900">
+              {/* Paper Size Switcher */}
+              <div className="mb-3 flex items-center justify-between bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 text-slate-600 dark:text-slate-400">
+                  Ukuran:
                 </span>
-                <div className="max-h-32 overflow-y-auto space-y-1 text-slate-800 dark:text-slate-200 pr-1">
-                  {lastTransaction.items.map((it) => (
-                    <div
-                      key={it.product.id || it.product.sku}
-                      className="flex justify-between text-[11px] py-0.5 border-b border-slate-200 dark:border-slate-800 font-bold"
-                    >
-                      <span className="truncate pr-2">
-                        {it.product.name} (x{it.quantity})
-                      </span>
-                      <span className="font-mono shrink-0">
-                        {formatRupiah(it.subtotal)}
-                      </span>
-                    </div>
-                  ))}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handlePaperSizeChange("58mm")}
+                    className={`px-2.5 py-0.5 text-[11px] font-black rounded-lg border transition-all cursor-pointer ${
+                      receiptPaperSize === "58mm"
+                        ? "bg-[#FFB800] text-black border-slate-900 shadow-[1px_1px_0px_0px_#000]"
+                        : "bg-transparent text-slate-600 dark:text-slate-400 border-transparent"
+                    }`}
+                  >
+                    58mm (Standar)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handlePaperSizeChange("80mm")}
+                    className={`px-2.5 py-0.5 text-[11px] font-black rounded-lg border transition-all cursor-pointer ${
+                      receiptPaperSize === "80mm"
+                        ? "bg-[#FFB800] text-black border-slate-900 shadow-[1px_1px_0px_0px_#000]"
+                        : "bg-transparent text-slate-600 dark:text-slate-400 border-transparent"
+                    }`}
+                  >
+                    80mm (Lebar)
+                  </button>
                 </div>
               </div>
+
+              <ReceiptPreviewCard
+                transaction={lastTransaction}
+                cashierName={cashierUser?.displayName}
+              />
             </div>
 
-            {/* Footer Buttons */}
-            <div className="p-4 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-900 dark:border-slate-100 flex items-center gap-2 transition-colors">
+            {/* Footer Buttons (Sticky / Fixed at Bottom, Always Visible) */}
+            <div className="shrink-0 p-3.5 bg-white dark:bg-slate-900 border-t-4 border-[#0A0A0A] dark:border-slate-100 flex items-center gap-2.5 z-20 transition-colors">
               <button
                 type="button"
                 onClick={handlePrintReceipt}
-                className="flex-1 py-2.5 px-3 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
+                className="flex-1 py-2.5 px-3 rounded-xl border-2 border-[#0A0A0A] dark:border-slate-100 bg-[#FF8C00] hover:bg-[#E67E00] text-black font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow-[3px_3px_0px_0px_#0A0A0A] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
               >
-                <svg
-                  className="w-4 h-4 text-slate-900 dark:text-slate-100"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2.5"
-                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-                  />
-                </svg>
-                <span>Cetak Struk</span>
+                <span>🖨️ Cetak Struk ({receiptPaperSize})</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleNewTransaction}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] text-white border-2 border-slate-900 dark:border-slate-100 font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] cursor-pointer"
+                className="flex-1 py-2.5 px-3 rounded-xl bg-[#6366F1] hover:bg-[#4F46E5] text-white border-2 border-[#0A0A0A] dark:border-slate-100 font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow-[3px_3px_0px_0px_#0A0A0A] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
               >
                 <span>Transaksi Baru</span>
                 <span className="px-1 py-0.2 rounded bg-slate-900 text-white font-mono text-[10px]">

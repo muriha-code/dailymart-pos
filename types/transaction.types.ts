@@ -20,6 +20,7 @@ export interface Transaction {
   items: TransactionItem[];
   subtotal: number;
   discount: number;
+  tax?: number;
   total: number;
   paymentMethod: PaymentMethod;
   paidAmount: number;

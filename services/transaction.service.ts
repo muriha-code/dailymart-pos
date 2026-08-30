@@ -86,4 +86,36 @@ export const transactionService = {
 
     return result.data;
   },
+
+  /**
+   * Mengambil detail satu transaksi berdasarkan ID atau Nomor Transaksi
+   */
+  async getTransactionById(id: string): Promise<Transaction> {
+    const response = await fetch(`/api/transactions/${encodeURIComponent(id)}`, {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    let result: TransactionApiResponse<Transaction>;
+
+    try {
+      result = await response.json();
+    } catch {
+      throw new Error(
+        `HTTP Error ${response.status}: Gagal memproses respons server.`
+      );
+    }
+
+    if (!response.ok || !result.success || !result.data) {
+      throw new Error(
+        result.message || `Transaksi "${id}" tidak ditemukan.`
+      );
+    }
+
+    return result.data;
+  },
 };
+

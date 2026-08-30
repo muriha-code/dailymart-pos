@@ -588,6 +588,9 @@ export function BlockedShiftScreen({
   );
 }
 
+import { executeShiftThermalPrint } from "@/components/receipt/PrintReceipt";
+import { ReceiptPaperSize } from "@/types/receipt";
+
 // ==========================================
 // 4. STRUK RINGKASAN TUTUP SHIFT THERMAL
 // ==========================================
@@ -598,88 +601,26 @@ interface ShiftReceiptModalProps {
 }
 
 export function ShiftReceiptModal({ isOpen, shift, onDone }: ShiftReceiptModalProps) {
+  const [paperSize, setPaperSize] = useState<ReceiptPaperSize>("58mm");
+  const [isPrinting, setIsPrinting] = useState<boolean>(false);
+
   if (!isOpen) return null;
 
   const handlePrint = () => {
-    window.print();
+    setIsPrinting(true);
+    try {
+      executeShiftThermalPrint(shift, paperSize);
+    } catch (err) {
+      console.error("Gagal mencetak struk shift:", err);
+    } finally {
+      setIsPrinting(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-      <style jsx global>{`
-        @media print {
-          body * {
-            visibility: hidden !important;
-          }
-          #thermal-shift-receipt,
-          #thermal-shift-receipt * {
-            visibility: visible !important;
-          }
-          #thermal-shift-receipt {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 80mm !important;
-            margin: 0 !important;
-            padding: 10px !important;
-            background: white !important;
-            color: black !important;
-            font-family: monospace !important;
-            font-size: 11px !important;
-            line-height: 1.2 !important;
-          }
-        }
-      `}</style>
-
-      {/* Hidden Print Content */}
-      <div id="thermal-shift-receipt" className="hidden print:block font-mono text-black text-xs leading-tight w-[80mm] p-2 bg-white">
-        <div className="text-center font-bold text-sm uppercase">DAILYMART POS</div>
-        <div className="text-center text-[10px]">LAPORAN PENUTUPAN SHIFT KASIR</div>
-        <div className="my-1 text-center overflow-hidden">----------------------------------------</div>
-        <div className="text-[10px] space-y-0.5">
-          <div>Tanggal     : {shift.date}</div>
-          <div>Kasir       : {shift.userName}</div>
-          <div>Shift       : {shift.shiftType}</div>
-          <div>Clock In    : {new Date(shift.openedAt).toLocaleTimeString("id-ID")}</div>
-          <div>Clock Out   : {shift.closedAt ? new Date(shift.closedAt).toLocaleTimeString("id-ID") : "-"}</div>
-        </div>
-        <div className="my-1 text-center overflow-hidden">----------------------------------------</div>
-        <div className="space-y-0.5 text-[10px]">
-          <div className="flex justify-between">
-            <span>Modal Awal Kas</span>
-            <span>{formatRupiah(shift.startingCash)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Total Tunai ({shift.totalTransactionsCount || 0} trx)</span>
-            <span>{formatRupiah(shift.totalCashTransactions || 0)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Total Non-Tunai</span>
-            <span>{formatRupiah(shift.totalNonCashTransactions || 0)}</span>
-          </div>
-          <div className="my-1 border-t border-dashed border-black" />
-          <div className="flex justify-between font-bold">
-            <span>TARGET KAS (EXPECTED)</span>
-            <span>{formatRupiah(shift.expectedCash)}</span>
-          </div>
-          <div className="flex justify-between font-bold">
-            <span>FISIK KAS (ACTUAL)</span>
-            <span>{formatRupiah(shift.actualCash)}</span>
-          </div>
-          <div className="flex justify-between font-bold">
-            <span>SELISIH (VARIANCE)</span>
-            <span>{shift.cashVariance >= 0 ? `+ ${formatRupiah(shift.cashVariance)}` : `- ${formatRupiah(Math.abs(shift.cashVariance))}`}</span>
-          </div>
-          {shift.reconciliationNotes && (
-            <div className="text-[9px] italic mt-1">Catatan: {shift.reconciliationNotes}</div>
-          )}
-        </div>
-        <div className="my-2 text-center overflow-hidden">----------------------------------------</div>
-        <div className="text-center text-[9px]">Shift telah ditutup secara sah. Terima kasih.</div>
-      </div>
-
       {/* Screen Modal Dialog */}
-      <div className="print:hidden bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-sm p-6 text-center space-y-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-sm p-6 text-center space-y-4">
         <div className="w-12 h-12 mx-auto rounded-xl bg-emerald-100 dark:bg-emerald-950/60 border-2 border-slate-900 text-emerald-600 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
@@ -691,6 +632,32 @@ export function ShiftReceiptModal({ isOpen, shift, onDone }: ShiftReceiptModalPr
           <p className="text-xs font-bold text-slate-600 dark:text-slate-400 mt-0.5">
             Rekonsiliasi kas telah tersimpan di sistem.
           </p>
+        </div>
+
+        {/* Paper Size Selector */}
+        <div className="flex items-center justify-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+          <button
+            type="button"
+            onClick={() => setPaperSize("58mm")}
+            className={`flex-1 py-1 text-xs font-black rounded-lg border transition-all cursor-pointer ${
+              paperSize === "58mm"
+                ? "bg-[#FFB800] text-black border-slate-900 shadow-[1.5px_1.5px_0px_0px_#000]"
+                : "bg-transparent text-slate-600 dark:text-slate-400 border-transparent"
+            }`}
+          >
+            58mm
+          </button>
+          <button
+            type="button"
+            onClick={() => setPaperSize("80mm")}
+            className={`flex-1 py-1 text-xs font-black rounded-lg border transition-all cursor-pointer ${
+              paperSize === "80mm"
+                ? "bg-[#FFB800] text-black border-slate-900 shadow-[1.5px_1.5px_0px_0px_#000]"
+                : "bg-transparent text-slate-600 dark:text-slate-400 border-transparent"
+            }`}
+          >
+            80mm
+          </button>
         </div>
 
         <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono space-y-1 text-left">
@@ -714,9 +681,10 @@ export function ShiftReceiptModal({ isOpen, shift, onDone }: ShiftReceiptModalPr
           <button
             type="button"
             onClick={handlePrint}
-            className="flex-1 py-2.5 px-3 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-900 dark:text-slate-100 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
+            disabled={isPrinting}
+            className="flex-1 py-2.5 px-3 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-[#FF8C00] hover:bg-[#E67E00] text-black font-black text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer flex items-center justify-center gap-1"
           >
-            Cetak Struk 🖨️
+            <span>{isPrinting ? "Mencetak..." : `🖨️ Cetak (${paperSize})`}</span>
           </button>
           <button
             type="button"
@@ -730,3 +698,4 @@ export function ShiftReceiptModal({ isOpen, shift, onDone }: ShiftReceiptModalPr
     </div>
   );
 }
+
