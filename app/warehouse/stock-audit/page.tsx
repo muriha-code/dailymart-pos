@@ -8,6 +8,8 @@ import { productService } from "@/services/product.service";
 import { stockAuditService } from "@/services/stockAudit.service";
 import { getThisWeekDateRange, formatIndonesianDate } from "@/lib/utils/date";
 import Pagination from "@/components/common/Pagination";
+import EvidenceImageUploader from "@/components/warehouse/EvidenceImageUploader";
+import EvidenceLightboxModal from "@/components/warehouse/EvidenceLightboxModal";
 
 // Helper Format Date Time
 const formatDate = (dateInput: Date | string): string => {
@@ -64,8 +66,14 @@ export default function StockAuditPage() {
   const [physicalStockInput, setPhysicalStockInput] = useState<string>("");
   const [reasonInput, setReasonInput] = useState<AuditReason | string>("Stok Cocok");
   const [notesInput, setNotesInput] = useState<string>("");
+  const [evidenceImagesInput, setEvidenceImagesInput] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Lightbox Gallery States
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number>(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
 
   // Product pencarian di dalam modal
   const [productSearchModal, setProductSearchModal] = useState<string>("");
@@ -212,6 +220,7 @@ export default function StockAuditPage() {
     }
     setReasonInput("Stok Cocok");
     setNotesInput("");
+    setEvidenceImagesInput([]);
     setProductSearchModal("");
     setIsModalOpen(true);
   };
@@ -267,6 +276,7 @@ export default function StockAuditPage() {
         physicalStock: numericPhysicalStock,
         reason: reasonInput,
         notes: notesInput,
+        evidenceImages: evidenceImagesInput,
       });
 
       toast.success("Hasil audit stok berhasil diverifikasi");
@@ -502,6 +512,7 @@ export default function StockAuditPage() {
                     <th className="py-2 px-3 text-center">Stok Fisik</th>
                     <th className="py-2 px-3 text-center">Selisih</th>
                     <th className="py-2 px-3">Alasan & Catatan</th>
+                    <th className="py-2 px-3 text-center">Bukti Foto</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs text-slate-900 dark:text-slate-100 font-bold">
@@ -509,6 +520,7 @@ export default function StockAuditPage() {
                     const isMatch = log.difference === 0;
                     const isDeficit = log.difference < 0;
                     const isSurplus = log.difference > 0;
+                    const hasEvidence = Boolean(log.evidenceImages && log.evidenceImages.length > 0);
 
                     return (
                       <tr
@@ -580,6 +592,27 @@ export default function StockAuditPage() {
                             <div className="text-[10px] italic font-medium text-slate-600 dark:text-slate-400 truncate max-w-xs">
                               &quot;{log.notes}&quot;
                             </div>
+                          )}
+                        </td>
+
+                        {/* Bukti Foto Column */}
+                        <td className="py-2 px-3 text-center whitespace-nowrap">
+                          {hasEvidence ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setLightboxImages(log.evidenceImages || []);
+                                setLightboxIndex(0);
+                                setIsLightboxOpen(true);
+                              }}
+                              className="inline-flex items-center gap-1 bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-black text-[10px] px-2 py-0.5 rounded-lg hover:scale-105 transition-transform cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
+                              title="Lihat Foto Bukti Physical Audit"
+                            >
+                              <span>📷</span>
+                              <span>{log.evidenceImages?.length} Foto</span>
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-slate-400 font-medium italic">-</span>
                           )}
                         </td>
                       </tr>
@@ -824,7 +857,14 @@ export default function StockAuditPage() {
                 </select>
               </div>
 
-              {/* 6. Catatan Tambahan */}
+              {/* 6. Upload Bukti Foto Fisik Pendukung Opname */}
+              <EvidenceImageUploader
+                images={evidenceImagesInput}
+                onChange={setEvidenceImagesInput}
+                disabled={isSubmitting || isSelectedProductAuditedThisWeek}
+              />
+
+              {/* 7. Catatan Tambahan */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
                   Catatan Tambahan (Opsional)
@@ -866,6 +906,15 @@ export default function StockAuditPage() {
           </div>
         </div>
       )}
+
+      {/* Lightbox Pop-up Gallery */}
+      <EvidenceLightboxModal
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+        images={lightboxImages}
+        initialIndex={lightboxIndex}
+        title="Galeri Foto Bukti Stock Opname"
+      />
     </div>
   );
 }

@@ -82,6 +82,7 @@ export async function POST(req: NextRequest) {
       physicalStock,
       reason,
       notes,
+      evidenceImages,
       auditorId: bodyAuditorId,
       auditorName: bodyAuditorName,
     } = body;
@@ -172,6 +173,7 @@ export async function POST(req: NextRequest) {
         difference,
         reason: String(reason),
         notes: String(notes || ""),
+        evidenceImages: Array.isArray(evidenceImages) ? evidenceImages : [],
         auditorId: String(auditorId),
         auditorName: String(auditorName),
         createdAt: now,

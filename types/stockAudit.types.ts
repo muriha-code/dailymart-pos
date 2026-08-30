@@ -17,6 +17,7 @@ export interface StockAuditRecord {
   difference: number;
   reason: AuditReason | string;
   notes?: string;
+  evidenceImages?: string[];
   auditorId: string;
   auditorName: string;
   createdAt: string | Date;
@@ -27,6 +28,7 @@ export interface AuditSubmissionPayload {
   physicalStock: number;
   reason: AuditReason | string;
   notes?: string;
+  evidenceImages?: string[];
   auditorId?: string;
   auditorName?: string;
 }

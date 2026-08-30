@@ -17,6 +17,8 @@ import {
   SearchableSelectOption,
 } from "@/components/common/SearchableSelect";
 import Pagination from "@/components/common/Pagination";
+import EvidenceImageUploader from "@/components/warehouse/EvidenceImageUploader";
+import EvidenceLightboxModal from "@/components/warehouse/EvidenceLightboxModal";
 
 // Helper Format Date Time
 const formatDate = (dateInput: Date | string): string => {
@@ -78,8 +80,15 @@ export default function StockReturnsPage() {
   const [reasonInput, setReasonInput] = useState<ReturnReason | string>("PACKAGING_DAMAGED");
   const [supplierNameInput, setSupplierNameInput] = useState<string>("");
   const [notesInput, setNotesInput] = useState<string>("");
+  const [evidenceImagesInput, setEvidenceImagesInput] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Detail Modal & Lightbox Gallery States
+  const [selectedReturnDetail, setSelectedReturnDetail] = useState<StockReturnRecord | null>(null);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number>(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
 
   // Search filter inside modal for products
   const [productSearchModal, setProductSearchModal] = useState<string>("");
@@ -203,6 +212,7 @@ export default function StockReturnsPage() {
     setReasonInput("PACKAGING_DAMAGED");
     setSupplierNameInput("");
     setNotesInput("");
+    setEvidenceImagesInput([]);
     setProductSearchModal("");
     setIsModalOpen(true);
   };
@@ -252,6 +262,7 @@ export default function StockReturnsPage() {
         reason: reasonInput,
         supplierName: returnType === "RETURN_TO_SUPPLIER" ? supplierNameInput : undefined,
         notes: notesInput,
+        evidenceImages: evidenceImagesInput,
       });
 
       toast.success("Laporan retur / pemusnahan barang berhasil dicatat");
@@ -453,18 +464,21 @@ export default function StockReturnsPage() {
                     <th className="py-3 px-3 text-center">Jumlah</th>
                     <th className="py-3 px-3">Tipe & Alasan</th>
                     <th className="py-3 px-3">Supplier / Keterangan</th>
-                    <th className="py-3 px-3.5 text-right">Status</th>
+                    <th className="py-3 px-3 text-center">Bukti Foto</th>
+                    <th className="py-3 px-3.5 text-right">Aksi / Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs text-slate-900 dark:text-slate-100 font-bold">
                   {paginatedLogs.map((log) => {
                     const isSupplierReturn = log.type === "RETURN_TO_SUPPLIER";
                     const reasonText = REASON_LABELS[log.reason] || log.reason;
+                    const hasEvidence = Boolean(log.evidenceImages && log.evidenceImages.length > 0);
 
                     return (
                       <tr
                         key={log.id || log.returnCode}
-                        className="hover:bg-slate-50/80 dark:hover:bg-slate-800/80 transition-colors border-b border-slate-200 dark:border-slate-800"
+                        onClick={() => setSelectedReturnDetail(log)}
+                        className="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors border-b border-slate-200 dark:border-slate-800 cursor-pointer"
                       >
                         {/* 1. Waktu & Kode Retur */}
                         <td className="py-3 px-3.5 align-top whitespace-nowrap">
@@ -530,21 +544,56 @@ export default function StockReturnsPage() {
                           )}
                         </td>
 
-                        {/* 6. Status Badges */}
-                        <td className="py-3 px-3.5 align-top text-right whitespace-nowrap">
-                          {log.actionStatus === 'COMPLETED' ? (
-                            <span className="bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
-                              ✓ Selesai
-                            </span>
-                          ) : log.actionStatus === 'DISPOSED' ? (
-                            <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
-                              🔥 Dimusnahkan
-                            </span>
+                        {/* 6. Bukti Foto Thumbnail / Badge */}
+                        <td className="py-3 px-3 align-top text-center whitespace-nowrap">
+                          {hasEvidence ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setLightboxImages(log.evidenceImages || []);
+                                setLightboxIndex(0);
+                                setIsLightboxOpen(true);
+                              }}
+                              className="inline-flex items-center gap-1 bg-[#EEF2FF] dark:bg-indigo-950/60 text-[#4338CA] dark:text-indigo-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-black text-[10px] px-2 py-1 rounded-lg hover:scale-105 transition-transform cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]"
+                              title="Lihat Galeri Foto Bukti"
+                            >
+                              <span>📷</span>
+                              <span>{log.evidenceImages?.length} Foto</span>
+                            </button>
                           ) : (
-                            <span className="bg-[#FEF3C7] dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
-                              ⏳ Menunggu
-                            </span>
+                            <span className="text-[10px] text-slate-400 font-medium italic">-</span>
                           )}
+                        </td>
+
+                        {/* 7. Status & Detail Action */}
+                        <td className="py-3 px-3.5 align-top text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-2">
+                            {log.actionStatus === 'COMPLETED' ? (
+                              <span className="bg-[#D1FAE5] dark:bg-emerald-950/60 text-[#065F46] dark:text-emerald-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                                ✓ Selesai
+                              </span>
+                            ) : log.actionStatus === 'DISPOSED' ? (
+                              <span className="bg-[#FFE4E6] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                                🔥 Dimusnahkan
+                              </span>
+                            ) : (
+                              <span className="bg-[#FEF3C7] dark:bg-amber-950/60 text-[#B45309] dark:text-amber-300 border-1.5 border-slate-900 dark:border-slate-100 font-mono font-bold text-[10px] px-2 py-0.5 rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] inline-block">
+                                ⏳ Menunggu
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedReturnDetail(log);
+                              }}
+                              className="px-2 py-0.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border-1.5 border-slate-900 dark:border-slate-100 font-black text-[10px] rounded-md shadow-[1px_1px_0px_0px_rgba(15,23,42,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-transform hover:scale-105 cursor-pointer"
+                              title="Lihat Detail Retur"
+                            >
+                              Detail
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -781,7 +830,14 @@ export default function StockReturnsPage() {
                 </div>
               )}
 
-              {/* 7. Catatan Tambahan (Opsional) */}
+              {/* 7. Upload Bukti Foto Fisik */}
+              <EvidenceImageUploader
+                images={evidenceImagesInput}
+                onChange={setEvidenceImagesInput}
+                disabled={isSubmitting}
+              />
+
+              {/* 8. Catatan Tambahan (Opsional) */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
                   Catatan Kondisi Barang (Opsional)
@@ -828,6 +884,172 @@ export default function StockReturnsPage() {
           </div>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* 6. MODAL POP-UP DETAIL RETUR & BARANG RUSAK WITH GALLERY                 */}
+      {/* ========================================================================= */}
+      {selectedReturnDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] transition-colors">
+            {/* Modal Header */}
+            <div className="px-5 py-4 bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-sm font-black text-slate-900 dark:text-slate-50 flex items-center gap-2">
+                  <span>Detail Retur Barcode</span>
+                  <span className="font-mono text-xs px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700">
+                    {selectedReturnDetail.returnCode}
+                  </span>
+                </h3>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 font-mono font-bold mt-0.5">
+                  Dicatat pada: {formatDate(selectedReturnDetail.createdAt)}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedReturnDetail(null)}
+                className="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 flex items-center justify-center font-black text-xs cursor-pointer shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
+              {/* Product Info Card */}
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-slate-900 dark:border-slate-100 space-y-1">
+                <div className="font-black text-sm text-slate-900 dark:text-slate-100">
+                  {selectedReturnDetail.productName}
+                </div>
+                <div className="flex items-center gap-2 text-[11px] font-mono text-slate-600 dark:text-slate-400">
+                  <span>SKU: {selectedReturnDetail.sku}</span>
+                  {selectedReturnDetail.category && <span>• {selectedReturnDetail.category}</span>}
+                </div>
+              </div>
+
+              {/* Status & Type Details */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-300 dark:border-slate-700">
+                  <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                    Tipe & Jumlah
+                  </span>
+                  <div className="font-bold text-slate-900 dark:text-slate-100">
+                    {selectedReturnDetail.type === "RETURN_TO_SUPPLIER" ? "📦 Retur ke Supplier" : "🗑️ Pemusnahan Rusak"}
+                  </div>
+                  <div className="font-mono font-black text-rose-600 dark:text-rose-400 mt-0.5">
+                    -{selectedReturnDetail.quantity} Unit
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-300 dark:border-slate-700">
+                  <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block mb-1">
+                    Status Dokumen
+                  </span>
+                  <div className="font-bold">
+                    {selectedReturnDetail.actionStatus === "COMPLETED" ? (
+                      <span className="text-emerald-600 dark:text-emerald-400 font-mono font-black">✓ Selesai</span>
+                    ) : selectedReturnDetail.actionStatus === "DISPOSED" ? (
+                      <span className="text-rose-600 dark:text-rose-400 font-mono font-black">🔥 Dimusnahkan</span>
+                    ) : (
+                      <span className="text-amber-600 dark:text-amber-400 font-mono font-black">⏳ Menunggu Pickup</span>
+                    )}
+                  </div>
+                  <div className="text-[10px] font-bold text-slate-600 dark:text-slate-400 mt-0.5">
+                    Pelapor: {selectedReturnDetail.reportedBy}
+                  </div>
+                </div>
+              </div>
+
+              {/* Alasan & Supplier */}
+              <div className="space-y-2 p-3.5 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-300 dark:border-slate-700">
+                <div>
+                  <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block">
+                    Alasan Kerusakan / Retur:
+                  </span>
+                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                    {REASON_LABELS[selectedReturnDetail.reason] || selectedReturnDetail.reason}
+                  </span>
+                </div>
+                {selectedReturnDetail.supplierName && (
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block">
+                      Supplier / Vendor:
+                    </span>
+                    <span className="font-bold text-slate-900 dark:text-slate-100">
+                      {selectedReturnDetail.supplierName}
+                    </span>
+                  </div>
+                )}
+                {selectedReturnDetail.notes && (
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 block">
+                      Catatan Tambahan:
+                    </span>
+                    <p className="italic text-slate-700 dark:text-slate-300 font-medium">
+                      &quot;{selectedReturnDetail.notes}&quot;
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Evidence Photo Gallery */}
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block mb-2">
+                  Foto Bukti Kondisi Fisik ({selectedReturnDetail.evidenceImages?.length || 0} Foto)
+                </span>
+                {selectedReturnDetail.evidenceImages && selectedReturnDetail.evidenceImages.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {selectedReturnDetail.evidenceImages.map((imgUrl, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => {
+                          setLightboxImages(selectedReturnDetail.evidenceImages || []);
+                          setLightboxIndex(i);
+                          setIsLightboxOpen(true);
+                        }}
+                        className="relative aspect-square rounded-xl overflow-hidden border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] group cursor-pointer"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={imgUrl}
+                          alt={`Bukti ${i + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-black text-[10px]">
+                          🔍 Perbesar
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400 font-medium italic">
+                    Tidak ada foto bukti fisik yang dilampirkan.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setSelectedReturnDetail(null)}
+                className="px-4 py-2 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-black text-xs rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:scale-105 transition-transform cursor-pointer"
+              >
+                Tutup Detail
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Pop-up Gallery */}
+      <EvidenceLightboxModal
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+        images={lightboxImages}
+        initialIndex={lightboxIndex}
+      />
     </div>
   );
 }

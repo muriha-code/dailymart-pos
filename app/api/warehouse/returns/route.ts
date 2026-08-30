@@ -112,6 +112,7 @@ export async function POST(req: NextRequest) {
       reason,
       supplierName,
       notes,
+      evidenceImages,
       reportedBy: bodyReportedBy,
       reporterId: bodyReporterId,
     } = body;
@@ -220,6 +221,7 @@ export async function POST(req: NextRequest) {
         supplierName: type === "RETURN_TO_SUPPLIER" ? String(supplierName).trim() : null,
         actionStatus,
         notes: String(notes || ""),
+        evidenceImages: Array.isArray(evidenceImages) ? evidenceImages : [],
         reportedBy: String(reportedBy),
         reporterId: String(reporterId),
         createdAt: now,

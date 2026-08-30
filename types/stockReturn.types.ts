@@ -22,6 +22,7 @@ export interface StockReturnRecord {
   supplierName?: string;
   actionStatus: ReturnActionStatus | string;
   notes?: string;
+  evidenceImages?: string[];
   reportedBy: string;
   reporterId: string;
   createdAt: string | Date;
@@ -34,6 +35,7 @@ export interface CreateReturnPayload {
   reason: ReturnReason | string;
   supplierName?: string;
   notes?: string;
+  evidenceImages?: string[];
   reportedBy?: string;
   reporterId?: string;
 }
