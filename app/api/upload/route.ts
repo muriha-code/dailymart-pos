@@ -17,6 +17,8 @@ cloudinary.config({
  */
 function resolveProductFolder(category?: string | null, folderType?: string | null): string {
   if (folderType === 'store') return 'dailymart-pos/store';
+  if (folderType === 'returns' || folderType === 'evidence/returns') return 'dailymart-pos/evidence/returns';
+  if (folderType === 'audits' || folderType === 'evidence/audits') return 'dailymart-pos/evidence/audits';
   if (folderType === 'evidence' || folderType?.startsWith('evidence')) return 'dailymart-pos/evidence';
   if (folderType && folderType.startsWith('dailymart-pos/')) return folderType;
 

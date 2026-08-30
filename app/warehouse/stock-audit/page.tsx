@@ -10,6 +10,7 @@ import { getThisWeekDateRange, formatIndonesianDate } from "@/lib/utils/date";
 import Pagination from "@/components/common/Pagination";
 import EvidenceImageUploader from "@/components/warehouse/EvidenceImageUploader";
 import EvidenceLightboxModal from "@/components/warehouse/EvidenceLightboxModal";
+import { uploadDeferredImages } from "@/lib/utils/uploadDeferred";
 
 // Helper Format Date Time
 const formatDate = (dateInput: Date | string): string => {
@@ -271,12 +272,19 @@ export default function StockAuditPage() {
     setSubmitError(null);
 
     try {
+      // 1. Eksekusi Upload Deferred seluruh gambar draf ke Cloudinary (Target folder: audits)
+      const uploadedCloudinaryUrls = await uploadDeferredImages(
+        evidenceImagesInput,
+        "audits"
+      );
+
+      // 2. Simpan dokumen verifikasi stock opname ke Firestore
       await stockAuditService.submitStockAudit({
         productId: selectedProduct.id || selectedProduct.sku,
         physicalStock: numericPhysicalStock,
         reason: reasonInput,
         notes: notesInput,
-        evidenceImages: evidenceImagesInput,
+        evidenceImages: uploadedCloudinaryUrls,
       });
 
       toast.success("Hasil audit stok berhasil diverifikasi");

@@ -19,6 +19,7 @@ import {
 import Pagination from "@/components/common/Pagination";
 import EvidenceImageUploader from "@/components/warehouse/EvidenceImageUploader";
 import EvidenceLightboxModal from "@/components/warehouse/EvidenceLightboxModal";
+import { uploadDeferredImages } from "@/lib/utils/uploadDeferred";
 
 // Helper Format Date Time
 const formatDate = (dateInput: Date | string): string => {
@@ -255,6 +256,13 @@ export default function StockReturnsPage() {
     setSubmitError(null);
 
     try {
+      // 1. Eksekusi Upload Deferredseluruh gambar draf ke Cloudinary (Target folder: returns)
+      const uploadedCloudinaryUrls = await uploadDeferredImages(
+        evidenceImagesInput,
+        "returns"
+      );
+
+      // 2. Simpan dokumen transaksi retur ke Firestore
       await stockReturnService.createStockReturn({
         productId: selectedProduct.id || selectedProduct.sku,
         quantity: numericQty,
@@ -262,7 +270,7 @@ export default function StockReturnsPage() {
         reason: reasonInput,
         supplierName: returnType === "RETURN_TO_SUPPLIER" ? supplierNameInput : undefined,
         notes: notesInput,
-        evidenceImages: evidenceImagesInput,
+        evidenceImages: uploadedCloudinaryUrls,
       });
 
       toast.success("Laporan retur / pemusnahan barang berhasil dicatat");
