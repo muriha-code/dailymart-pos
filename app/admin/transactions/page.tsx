@@ -205,9 +205,9 @@ export default function AdminTransactionsHistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-200">
+    <div className="min-h-screen w-full min-w-0 bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-200">
       {/* Konten Halaman Utama */}
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl w-full min-w-0 mx-auto">
         {/* ========================================================================= */}
         {/* 1. PAGE HEADER                                                            */}
         {/* ========================================================================= */}
@@ -448,18 +448,18 @@ export default function AdminTransactionsHistoryPage() {
             </p>
           </div>
         ) : (
-          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+          <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden transition-colors w-full">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full min-w-[850px] text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-100 dark:bg-slate-800 border-b-2 border-slate-900 dark:border-slate-100 text-[11px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
-                    <th className="py-3.5 px-4">No. Invoice</th>
-                    <th className="py-3.5 px-4">Waktu Transaksi</th>
-                    <th className="py-3.5 px-4">Kasir</th>
-                    <th className="py-3.5 px-4">Ringkasan Item</th>
-                    <th className="py-3.5 px-4 text-center">Metode</th>
-                    <th className="py-3.5 px-4 text-right">Total Belanja</th>
-                    <th className="py-3.5 px-4 text-center">Aksi</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">No. Invoice</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Waktu Transaksi</th>
+                    <th className="py-3.5 px-4 whitespace-nowrap">Kasir</th>
+                    <th className="py-3.5 px-4 min-w-[200px]">Ringkasan Item</th>
+                    <th className="py-3.5 px-4 text-center whitespace-nowrap">Metode</th>
+                    <th className="py-3.5 px-4 text-right whitespace-nowrap">Total Belanja</th>
+                    <th className="py-3.5 px-4 text-center whitespace-nowrap">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs text-slate-900 dark:text-slate-100 font-bold">
@@ -490,11 +490,14 @@ export default function AdminTransactionsHistoryPage() {
                         </td>
 
                         {/* Ringkasan Item */}
-                        <td className="py-3.5 px-4">
-                          <div className="font-black text-slate-900 dark:text-slate-100">
+                        <td className="py-3.5 px-4 min-w-[200px]">
+                          <div className="font-black text-slate-900 dark:text-slate-100 whitespace-nowrap">
                             {totalQty} item ({trx.items.length} jenis)
                           </div>
-                          <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate max-w-xs">
+                          <div
+                            className="text-[11px] font-medium text-slate-500 dark:text-slate-400 line-clamp-1 max-w-xs"
+                            title={itemNames}
+                          >
                             {itemNames}
                           </div>
                         </td>

@@ -218,6 +218,16 @@ export default function Sidebar() {
     fetchUserData();
   }, [fetchUserData]);
 
+  // Auto-expand accordion jika rute aktif berada di dalam submenu grup tersebut
+  useEffect(() => {
+    if (pathname.startsWith("/admin/transactions") || pathname.startsWith("/cashier")) {
+      setOpenKasir(true);
+    }
+    if (pathname.startsWith("/warehouse")) {
+      setOpenGudang(true);
+    }
+  }, [pathname]);
+
   // Logout Handler
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -326,15 +336,6 @@ export default function Sidebar() {
           ),
         },
         {
-          title: "Riwayat Transaksi & Struk",
-          href: "/admin/transactions",
-          icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-          ),
-        },
-        {
           title: "Laporan Penjualan",
           href: "/admin/reports/sales",
           icon: (
@@ -392,6 +393,16 @@ export default function Sidebar() {
               icon: (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              ),
+            },
+            {
+              title: "Riwayat Transaksi",
+              href: "/admin/transactions",
+              isQuickAccess: true,
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               ),
             },
