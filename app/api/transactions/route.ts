@@ -31,6 +31,9 @@ const VALID_PAYMENT_METHODS: PaymentMethod[] = [
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search")?.toLowerCase();
+  const cashierId = searchParams.get("cashierId");
+  const date = searchParams.get("date");
+  const method = searchParams.get("method")?.toUpperCase();
 
   try {
     const snapshot = await adminDb
@@ -49,12 +52,38 @@ export async function GET(req: NextRequest) {
       };
     });
 
+    // Filter by cashierId if provided and not ALL
+    if (cashierId && cashierId !== "ALL") {
+      transactions = transactions.filter((trx) => trx.cashierId === cashierId);
+    }
+
+    // Filter by date if provided (YYYY-MM-DD)
+    if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      const [year, month, day] = date.split("-").map(Number);
+      const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+      const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
+
+      transactions = transactions.filter((trx) => {
+        const trxDate = new Date(trx.createdAt);
+        return trxDate >= startOfDay && trxDate <= endOfDay;
+      });
+    }
+
+    // Filter by payment method
+    if (method && method !== "ALL") {
+      transactions = transactions.filter((trx) => trx.paymentMethod === method);
+    }
+
+    // Filter by search query
     if (search) {
       transactions = transactions.filter(
         (trx) =>
           trx.transactionNumber?.toLowerCase().includes(search) ||
           trx.cashierId?.toLowerCase().includes(search) ||
-          trx.cashierName?.toLowerCase().includes(search)
+          trx.cashierName?.toLowerCase().includes(search) ||
+          trx.items?.some((item: any) =>
+            item.productName?.toLowerCase().includes(search)
+          )
       );
     }
 

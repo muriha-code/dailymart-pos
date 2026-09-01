@@ -198,18 +198,23 @@ export function ReceiptPreviewCard({
       <div className="border-b border-dashed border-gray-400 my-2.5"></div>
 
       {/* Metadata Transaksi */}
-      <div className="space-y-1 text-xs">
-        <div className="flex justify-between">
+      <div className="space-y-0.5 text-xs">
+        <div className="flex justify-between items-center whitespace-nowrap">
           <span className="text-[#3A3A3A]">No. TRX:</span>
           <span className="font-bold text-[#0A0A0A]">{invoiceNo}</span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-[#3A3A3A]">Tanggal:</span>
-          <span className="text-[#0A0A0A]">{formatReceiptDate(trxDate)}</span>
+        <div className="text-right text-[#0A0A0A]">
+          {formatReceiptDate(trxDate)}
         </div>
-        <div className="flex justify-between">
-          <span className="text-[#3A3A3A]">Kasir:</span>
-          <span className="text-[#0A0A0A]">{cashier}</span>
+        <div className="flex justify-between items-center">
+          <span>
+            <span className="text-[#3A3A3A]">Kasir:</span>{" "}
+            <span className="text-[#0A0A0A]">{cashier}</span>
+          </span>
+          <span>
+            <span className="text-[#3A3A3A]">Bayar:</span>{" "}
+            <span className="text-[#0A0A0A]">{payMethod}</span>
+          </span>
         </div>
       </div>
 
@@ -355,18 +360,17 @@ export default function ReceiptPrint({
         <div className="border-b border-dashed border-gray-400 my-2"></div>
 
         {/* Metadata Transaksi */}
-        <div className="space-y-1 text-xs">
-          <div className="flex justify-between">
+        <div className="space-y-0.5 text-xs">
+          <div className="flex justify-between items-center whitespace-nowrap">
             <span>No. TRX:</span>
             <span className="font-bold text-black">{invoiceNo}</span>
           </div>
-          <div className="flex justify-between">
-            <span>Tanggal:</span>
-            <span>{formatReceiptDate(trxDate)}</span>
+          <div className="text-right text-black">
+            {formatReceiptDate(trxDate)}
           </div>
-          <div className="flex justify-between">
-            <span>Kasir:</span>
-            <span>{cashier}</span>
+          <div className="flex justify-between items-center">
+            <span>Kasir: {cashier}</span>
+            <span>Bayar: {payMethod}</span>
           </div>
         </div>
 

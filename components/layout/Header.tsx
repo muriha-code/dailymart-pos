@@ -10,6 +10,7 @@ export default function Header() {
 
   const getPageTitle = (path: string) => {
     if (path.startsWith("/admin/dashboard")) return "Dashboard & Analitik Admin";
+    if (path.startsWith("/admin/transactions")) return "Semua Riwayat Transaksi & Struk";
     if (path.startsWith("/admin/products")) return "Katalog Produk Ritel";
     if (path.startsWith("/admin/users")) return "Kelola Akses Pengguna";
     if (path.startsWith("/admin/reports/sales")) return "Laporan Penjualan & Performa";

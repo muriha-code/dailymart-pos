@@ -147,21 +147,24 @@ export default function PrintReceipt({
 
         {/* Metadata Transaksi */}
         <div className="space-y-0.5 text-xs">
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center whitespace-nowrap">
             <span className="text-[#3A3A3A]">No. TRX:</span>
             <span className="font-bold text-[#0A0A0A]">
               {receipt.transactionNumber}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-[#3A3A3A]">Tanggal:</span>
-            <span className="text-[#0A0A0A]">
-              {receipt.date} {receipt.time}
-            </span>
+          <div className="text-right text-[#0A0A0A]">
+            {receipt.date} {receipt.time}
           </div>
-          <div className="flex justify-between">
-            <span className="text-[#3A3A3A]">Kasir:</span>
-            <span className="text-[#0A0A0A]">{receipt.cashierName}</span>
+          <div className="flex justify-between items-center">
+            <span>
+              <span className="text-[#3A3A3A]">Kasir:</span>{" "}
+              <span className="text-[#0A0A0A]">{receipt.cashierName}</span>
+            </span>
+            <span>
+              <span className="text-[#3A3A3A]">Bayar:</span>{" "}
+              <span className="text-[#0A0A0A]">{receipt.paymentMethod}</span>
+            </span>
           </div>
         </div>
 

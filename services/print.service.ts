@@ -165,9 +165,12 @@ export function generateThermalReceiptHtml(
 
           <div class="divider"></div>
 
-          <div class="meta-row">
-            <span>No: ${receipt.transactionNumber}</span>
-            <span>${receipt.date} ${receipt.time}</span>
+          <div class="meta-row" style="white-space: nowrap;">
+            <span>No. TRX:</span>
+            <span class="font-bold">${receipt.transactionNumber}</span>
+          </div>
+          <div class="text-right" style="margin-bottom: 2px; font-size: ${is58mm ? "8.5px" : "10px"};">
+            ${receipt.date} ${receipt.time}
           </div>
           <div class="meta-row">
             <span>Kasir: ${receipt.cashierName}</span>

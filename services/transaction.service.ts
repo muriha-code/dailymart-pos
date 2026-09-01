@@ -11,11 +11,35 @@ import {
 export const transactionService = {
   /**
    * Fetch transaction history
+   * Menerima parameter opsional cashierId, search, date, method.
+   * Jika cashierId tidak dikirim atau bernilai "ALL", ambil seluruh transaksi kasir.
    */
-  async getTransactions(params?: { search?: string }): Promise<Transaction[]> {
+  async getTransactions(params?: {
+    search?: string;
+    cashierId?: string;
+    date?: string;
+    method?: string;
+  }): Promise<Transaction[]> {
     const searchParams = new URLSearchParams();
     if (params?.search && params.search.trim() !== "") {
       searchParams.append("search", params.search.trim());
+    }
+    if (
+      params?.cashierId &&
+      params.cashierId !== "ALL" &&
+      params.cashierId.trim() !== ""
+    ) {
+      searchParams.append("cashierId", params.cashierId.trim());
+    }
+    if (params?.date && params.date.trim() !== "") {
+      searchParams.append("date", params.date.trim());
+    }
+    if (
+      params?.method &&
+      params.method !== "ALL" &&
+      params.method.trim() !== ""
+    ) {
+      searchParams.append("method", params.method.trim());
     }
 
     const queryString = searchParams.toString();
