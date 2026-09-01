@@ -205,8 +205,13 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // 2. Jika user adalah ADMIN / SUPER_ADMIN -> Bypass jadwal secara penuh
-    if (isAdmin) {
+    // 2. Jika user adalah ADMIN / SUPER_ADMIN atau dalam mode DEVELOPMENT / BYPASS -> Bypass jadwal dan toleransi secara penuh
+    const isDevBypass =
+      process.env.NODE_ENV === 'development' ||
+      process.env.NEXT_PUBLIC_BYPASS_SHIFT_CHECK === 'true' ||
+      process.env.BYPASS_SHIFT_CHECK === 'true';
+
+    if (isAdmin || isDevBypass) {
       return NextResponse.json({
         success: true,
         data: {
@@ -214,14 +219,17 @@ export async function GET(req: NextRequest) {
           activeShift: null,
           hasScheduleToday: true,
           todaySchedule: {
-            id: `SCH_EMERGENCY_${dateParam.replace(/-/g, '')}_${cashier.uid.substring(0, 6)}`,
+            id: `SCH_DEV_${dateParam.replace(/-/g, '')}_${cashier.uid.substring(0, 6)}`,
             date: dateParam,
             shiftType: 'SHIFT_PAGI',
             startTime: '00:00',
             endTime: '23:59',
             userId: cashier.uid,
             userName: cashier.displayName,
-            notes: 'Akses Darurat Admin / Super Admin (Bypass Jadwal)',
+            notes: isAdmin
+              ? 'Akses Darurat Admin / Super Admin (Bypass Jadwal)'
+              : 'Development Mode Shift Bypass (Bebas Testing Kasir)',
+            source: isDevBypass ? 'DEV_BYPASS' : 'ADMIN_BYPASS',
           },
           isWithinShiftTolerance: true,
           toleranceMessage: '',

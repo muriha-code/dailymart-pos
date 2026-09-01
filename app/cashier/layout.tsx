@@ -34,9 +34,12 @@ export default function CashierLayout({
 
   const userRole = (user?.role || "CASHIER").toUpperCase();
   const isAdmin = userRole === "ADMIN" || userRole === "SUPER_ADMIN";
+  const isDevBypass =
+    process.env.NODE_ENV === "development" ||
+    process.env.NEXT_PUBLIC_BYPASS_SHIFT_CHECK === "true";
 
-  // 1. Role ADMIN / SUPER_ADMIN -> Bypass layout lock secara penuh
-  if (isAdmin) {
+  // 1. Role ADMIN / SUPER_ADMIN atau Development Bypass -> Bypass layout lock secara penuh
+  if (isAdmin || isDevBypass) {
     return <>{children}</>;
   }
 

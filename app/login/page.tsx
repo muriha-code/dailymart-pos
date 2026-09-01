@@ -136,7 +136,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row bg-slate-100 dark:bg-[#0F172A] overflow-hidden selection:bg-slate-900 selection:text-white font-sans transition-colors duration-200">
-      
+
       {/* LEFT PANEL: VISUAL & BRANDING HERO (NEO-BRUTALISM VECTOR ISOMETRIC RETAIL) */}
       <div className="hidden md:flex md:w-1/2 lg:w-7/12 bg-[#EEF2FF] dark:bg-slate-950 relative overflow-hidden flex-col justify-between p-8 lg:p-12 border-r-3 border-slate-900 dark:border-slate-100 select-none transition-colors">
         {/* Pattern Overlay: Dot Matrix */}
@@ -151,7 +151,7 @@ export default function LoginPage() {
         <div className="bg-white dark:bg-slate-900 border-3 border-slate-900 dark:border-slate-100 rounded-2xl p-6 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] my-auto relative overflow-hidden flex flex-col justify-between items-center z-10 w-full min-h-[340px] transition-colors">
           {/* Background Grid Pattern inside Container */}
           <div className="absolute inset-0 bg-[radial-gradient(#CBD5E1_1px,transparent_1px)] [background-size:12px_12px] opacity-30 pointer-events-none" />
-          
+
           {/* Top In-Card Header Bar */}
           <div className="flex items-center justify-between w-full relative z-20 mb-2">
             <span className="text-[#6366F1] dark:text-indigo-400 font-mono font-black text-[10px] select-none tracking-wider uppercase">
@@ -170,7 +170,7 @@ export default function LoginPage() {
               {/* Decorative Geometric Accents */}
               <rect x="15" y="15" width="26" height="26" rx="6" fill="#FFB800" stroke="#0F172A" strokeWidth="2.5" />
               <path d="M23 23L33 33M33 23L23 33" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
-              
+
               <rect x="375" y="180" width="30" height="30" rx="8" fill="#EC4899" stroke="#0F172A" strokeWidth="2.5" />
               <circle cx="390" cy="195" r="5" fill="#FFF" stroke="#0F172A" strokeWidth="2" />
 
@@ -183,7 +183,7 @@ export default function LoginPage() {
                 <rect x="235" y="130" width="80" height="50" rx="8" fill="#1E293B" stroke="#0F172A" strokeWidth="3.5" />
                 <rect x="210" y="55" width="130" height="85" rx="10" fill="#6366F1" stroke="#0F172A" strokeWidth="3.5" />
                 <rect x="220" y="65" width="110" height="65" rx="6" fill="#EEF2FF" />
-                
+
                 <rect x="228" y="73" width="56" height="10" rx="3" fill="#6366F1" />
                 <rect x="228" y="87" width="40" height="7" rx="2" fill="#10B981" />
                 <rect x="228" y="98" width="48" height="7" rx="2" fill="#FFB800" />
@@ -202,11 +202,11 @@ export default function LoginPage() {
                 <rect x="50" y="40" width="130" height="140" rx="12" fill="#FFF" stroke="#0F172A" strokeWidth="3.5" />
                 <line x1="50" y1="87" x2="180" y2="87" stroke="#0F172A" strokeWidth="3.5" />
                 <line x1="50" y1="133" x2="180" y2="133" stroke="#0F172A" strokeWidth="3.5" />
-                
+
                 <rect x="64" y="51" width="26" height="28" rx="5" fill="#FFB800" stroke="#0F172A" strokeWidth="2.5" />
                 <rect x="98" y="48" width="30" height="31" rx="5" fill="#EC4899" stroke="#0F172A" strokeWidth="2.5" />
                 <rect x="136" y="53" width="26" height="26" rx="5" fill="#10B981" stroke="#0F172A" strokeWidth="2.5" />
-                
+
                 <rect x="66" y="96" width="32" height="30" rx="5" fill="#3B82F6" stroke="#0F172A" strokeWidth="2.5" />
                 <rect x="106" y="99" width="24" height="27" rx="5" fill="#FFB800" stroke="#0F172A" strokeWidth="2.5" />
                 <rect x="138" y="95" width="28" height="31" rx="5" fill="#8B5CF6" stroke="#0F172A" strokeWidth="2.5" />
@@ -264,7 +264,7 @@ export default function LoginPage() {
       {/* RIGHT PANEL: FORM AUTHENTICATION (NEO-BRUTALISM OVERHAUL) */}
       <div className="w-full md:w-1/2 lg:w-5/12 flex-1 flex flex-col justify-center items-center p-6 sm:p-8 lg:p-12 bg-slate-50 dark:bg-[#0F172A] relative transition-colors">
         <div className="bg-white dark:bg-slate-900 border-3 border-slate-900 dark:border-slate-100 rounded-2xl p-8 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] max-w-md w-full transition-colors">
-          
+
           {/* Mobile Header Branding */}
           <div className="md:hidden text-center mb-6 pb-4 border-b-2 border-slate-900 dark:border-slate-100">
             <div className="bg-[#FFB800] text-slate-950 font-black text-xs px-3.5 py-1.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] uppercase tracking-wider inline-block mb-2">
@@ -280,7 +280,7 @@ export default function LoginPage() {
 
           <div>
             <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">
-              Masuk ke Sistem
+              Welcome
             </h2>
             <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-6 mt-1">
               Masukkan akun staf yang terdaftar untuk memulai sesi kerja.
