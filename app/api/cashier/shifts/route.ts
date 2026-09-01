@@ -212,6 +212,9 @@ export async function GET(req: NextRequest) {
       process.env.BYPASS_SHIFT_CHECK === 'true';
 
     if (isAdmin || isDevBypass) {
+      const currentHour = new Date().getHours();
+      const autoShiftType = currentHour >= 14 ? 'SHIFT_SORE' : 'SHIFT_PAGI';
+
       return NextResponse.json({
         success: true,
         data: {
@@ -221,14 +224,14 @@ export async function GET(req: NextRequest) {
           todaySchedule: {
             id: `SCH_DEV_${dateParam.replace(/-/g, '')}_${cashier.uid.substring(0, 6)}`,
             date: dateParam,
-            shiftType: 'SHIFT_PAGI',
+            shiftType: autoShiftType,
             startTime: '00:00',
             endTime: '23:59',
             userId: cashier.uid,
             userName: cashier.displayName,
             notes: isAdmin
               ? 'Akses Darurat Admin / Super Admin (Bypass Jadwal)'
-              : 'Development Mode Shift Bypass (Bebas Testing Kasir)',
+              : `Development Mode Shift Bypass (${autoShiftType === 'SHIFT_PAGI' ? 'Shift Pagi' : 'Shift Sore'})`,
             source: isDevBypass ? 'DEV_BYPASS' : 'ADMIN_BYPASS',
           },
           isWithinShiftTolerance: true,

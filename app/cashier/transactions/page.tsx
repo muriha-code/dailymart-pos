@@ -15,6 +15,9 @@ import {
   CloseShiftModal,
   BlockedShiftScreen,
   ShiftReceiptModal,
+  formatShiftTime,
+  getDynamicShiftLabel,
+  getShiftLabel,
 } from "@/components/cashier/CashierShiftModal";
 import { ReceiptPreviewCard } from "@/components/pos/ReceiptPrint";
 import { executeThermalPrint } from "@/components/receipt/PrintReceipt";
@@ -117,6 +120,7 @@ export default function CashierTransactionsPage() {
   const [isCheckingShift, setIsCheckingShift] = useState<boolean>(true);
   const [activeShift, setActiveShift] = useState<CashierShift | null>(null);
   const [isOpenShiftModalOpen, setIsOpenShiftModalOpen] = useState<boolean>(false);
+  const [isConfirmCloseShiftOpen, setIsConfirmCloseShiftOpen] = useState<boolean>(false);
   const [isCloseShiftModalOpen, setIsCloseShiftModalOpen] = useState<boolean>(false);
   const [completedShiftForReceipt, setCompletedShiftForReceipt] = useState<CashierShift | null>(null);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false);
@@ -722,31 +726,18 @@ export default function CashierTransactionsPage() {
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex items-center gap-2">
             <span
-              className={`w-2.5 h-2.5 rounded-full ${
+              className={`w-2.5 h-2.5 rounded-full shrink-0 ${
                 activeShift ? "bg-emerald-500 animate-pulse" : "bg-amber-400"
               }`}
             />
-            <span className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide">
-              {activeShift
-                ? activeShift.shiftType === "SHIFT_PAGI"
-                  ? "SHIFT PAGI"
-                  : "SHIFT SORE"
-                : "SHIFT POS"}
-            </span>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 truncate">
-              Kasir: <strong>{cashierUser?.displayName || "Kasir POS"}</strong>
-            </span>
           </div>
 
-          {activeShift && (
-            <div className="hidden md:flex items-center gap-3 text-[11px] font-bold text-slate-600 dark:text-slate-400">
+          {activeShift ? (
+            <div className="flex items-center gap-3 text-[11px] font-bold text-slate-600 dark:text-slate-400">
               <span>
                 Clock In:{" "}
                 <strong className="font-mono text-slate-900 dark:text-slate-100">
-                  {new Date(activeShift.openedAt).toLocaleTimeString("id-ID", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatShiftTime(activeShift.openedAt)}
                 </strong>
               </span>
               <span>
@@ -755,17 +746,11 @@ export default function CashierTransactionsPage() {
                   {formatRupiah(activeShift.startingCash)}
                 </strong>
               </span>
-              <span>
-                Est. Kas di Laci:{" "}
-                <strong className="font-mono text-emerald-600 dark:text-emerald-400">
-                  {formatRupiah(
-                    activeShift.expectedCash ||
-                      activeShift.startingCash +
-                        (activeShift.totalCashTransactions || 0)
-                  )}
-                </strong>
-              </span>
             </div>
+          ) : (
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+              Sesi Shift Belum Dibuka
+            </span>
           )}
         </div>
 
@@ -776,18 +761,18 @@ export default function CashierTransactionsPage() {
           {activeShift ? (
             <button
               type="button"
-              onClick={() => setIsCloseShiftModalOpen(true)}
-              className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg border-2 border-slate-900 dark:border-slate-100 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer transition-all flex items-center gap-1.5"
+              onClick={() => setIsConfirmCloseShiftOpen(true)}
+              className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg border-2 border-slate-900 dark:border-slate-100 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer transition-all flex items-center gap-1.5"
             >
-              <span>🚪 Tutup Kasir / End Shift</span>
+              <span>Tutup Kasir</span>
             </button>
           ) : (
             <button
               type="button"
               onClick={() => setIsOpenShiftModalOpen(true)}
-              className="px-3 py-1.5 bg-[#6366F1] hover:bg-[#4F46E5] text-white rounded-lg border-2 border-slate-900 dark:border-slate-100 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer transition-all flex items-center gap-1.5"
+              className="px-3.5 py-1.5 bg-[#6366F1] hover:bg-[#4F46E5] text-white rounded-lg border-2 border-slate-900 dark:border-slate-100 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] cursor-pointer transition-all flex items-center gap-1.5"
             >
-              <span>⏱️ Buka Shift Kasir</span>
+              <span>Buka Shift Kasir</span>
             </button>
           )}
         </div>
@@ -1633,6 +1618,92 @@ export default function CashierTransactionsPage() {
                 className="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
               >
                 Ya, Kosongkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 6.5. MODAL KONFIRMASI TUTUP KASIR (POP-UP PERINGATAN SEBELUM REKONSILIASI) */}
+      {/* ========================================================================= */}
+      {isConfirmCloseShiftOpen && activeShift && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] max-w-md w-full p-6 text-center space-y-4 transition-colors">
+            {/* Warning Icon with Neo-Brutalist Styling */}
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-[#FFB800] border-2 border-slate-900 dark:border-slate-100 text-slate-950 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] flex items-center justify-center shrink-0">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+
+            <div className="space-y-1.5">
+              <h3 className="text-base font-black text-slate-900 dark:text-slate-50 tracking-tight uppercase">
+                Konfirmasi Tutup Sesi Kasir
+              </h3>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-400 leading-relaxed">
+                Apakah Anda yakin ingin mengakhiri sesi shift dan melanjutkan ke proses rekonsiliasi kas (Clock Out)?
+              </p>
+            </div>
+
+            {/* Quick Shift Summary */}
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/90 rounded-xl border-2 border-slate-900 dark:border-slate-100 text-xs text-left space-y-1.5 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 dark:text-slate-400 font-bold">Shift & Kasir:</span>
+                <span className="font-black text-slate-900 dark:text-slate-100">
+                  {getShiftLabel(activeShift)} ({activeShift.userName})
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 dark:text-slate-400 font-bold">Waktu Clock In:</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
+                  {formatShiftTime(activeShift.openedAt)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 dark:text-slate-400 font-bold">Total Transaksi:</span>
+                <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                  {activeShift.totalTransactionsCount || 0} transaksi
+                </span>
+              </div>
+              <div className="flex justify-between items-center pt-1 border-t border-slate-200 dark:border-slate-700">
+                <span className="text-slate-700 dark:text-slate-300 font-black">Est. Kas di Laci:</span>
+                <span className="font-mono font-black text-emerald-600 dark:text-emerald-400">
+                  {formatRupiah(
+                    activeShift.expectedCash ||
+                      activeShift.startingCash + (activeShift.totalCashTransactions || 0)
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="p-2.5 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-300 dark:border-amber-800 text-[11px] font-bold text-amber-800 dark:text-amber-300 text-left">
+              ⚠️ Pastikan seluruh transaksi pembeli yang sedang antre saat ini telah selesai sebelum melakukan penutupan kasir.
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => setIsConfirmCloseShiftOpen(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border-2 border-slate-900 dark:border-slate-100 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 font-bold text-xs shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
+              >
+                Batal / Lanjut Kasir
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsConfirmCloseShiftOpen(false);
+                  setIsCloseShiftModalOpen(true);
+                }}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Lanjut Tutup Shift →</span>
               </button>
             </div>
           </div>

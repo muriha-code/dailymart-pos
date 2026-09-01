@@ -8,6 +8,77 @@ const formatRupiah = (amount: number): string => {
   return "Rp " + (amount || 0).toLocaleString("id-ID");
 };
 
+export const formatShiftTime = (timeInput: any): string => {
+  if (!timeInput) return "-";
+  try {
+    let dateObj: Date;
+    if (typeof timeInput?.toDate === "function") {
+      dateObj = timeInput.toDate();
+    } else if (typeof timeInput === "object" && "_seconds" in timeInput) {
+      dateObj = new Date(timeInput._seconds * 1000);
+    } else if (typeof timeInput === "object" && "seconds" in timeInput) {
+      dateObj = new Date(timeInput.seconds * 1000);
+    } else if (timeInput instanceof Date) {
+      dateObj = timeInput;
+    } else if (typeof timeInput === "string" || typeof timeInput === "number") {
+      dateObj = new Date(timeInput);
+    } else {
+      return "-";
+    }
+
+    if (isNaN(dateObj.getTime())) return "-";
+
+    return dateObj.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "-";
+  }
+};
+
+export const getDynamicShiftLabel = (activeShift?: any): string => {
+  // 1. Ambil dari field database (shiftName, shiftType, shift, atau name)
+  const rawShift =
+    activeShift?.shiftName ||
+    activeShift?.shiftType ||
+    activeShift?.shift ||
+    activeShift?.name;
+
+  if (rawShift) {
+    const clean = String(rawShift).trim().toUpperCase();
+    if (clean === "SHIFT_PAGI" || clean === "PAGI") return "SHIFT PAGI";
+    if (clean === "SHIFT_SORE" || clean === "SORE") return "SHIFT SORE";
+    if (clean === "SHIFT_MALAM" || clean === "MALAM") return "SHIFT MALAM";
+    if (clean.startsWith("SHIFT")) return clean;
+    return `SHIFT ${clean}`;
+  }
+
+  // 2. Jika kosong/undefined (bypass dev), tentukan otomatis dari jam login/saat ini
+  let hour = new Date().getHours();
+  if (activeShift?.openedAt) {
+    try {
+      if (typeof activeShift.openedAt?.toDate === "function") {
+        hour = activeShift.openedAt.toDate().getHours();
+      } else if (activeShift.openedAt.seconds) {
+        hour = new Date(activeShift.openedAt.seconds * 1000).getHours();
+      } else {
+        const d = new Date(activeShift.openedAt);
+        if (!isNaN(d.getTime())) hour = d.getHours();
+      }
+    } catch {}
+  }
+
+  // Jam 07.00 - 15.00 -> "SHIFT PAGI", jam 15.00 - 23.00 (dan sisanya) -> "SHIFT SORE"
+  if (hour >= 7 && hour < 15) {
+    return "SHIFT PAGI";
+  }
+
+  return "SHIFT SORE";
+};
+
+export const getShiftLabel = getDynamicShiftLabel;
+
 // ==========================================
 // 1. MODAL OPEN SHIFT (CLOCK IN)
 // ==========================================
@@ -39,16 +110,23 @@ export function OpenShiftModal({
   onOpenShift,
   onLogout,
 }: OpenShiftModalProps) {
+  const getInitialShiftType = (): ShiftType => {
+    if (todaySchedule?.shiftType) return todaySchedule.shiftType;
+    const currentHour = new Date().getHours();
+    return currentHour >= 14 ? "SHIFT_SORE" : "SHIFT_PAGI";
+  };
+
   const [startingCashInput, setStartingCashInput] = useState<string>("100000");
-  const [selectedShiftType, setSelectedShiftType] = useState<ShiftType>(
-    todaySchedule?.shiftType || "SHIFT_PAGI"
-  );
+  const [selectedShiftType, setSelectedShiftType] = useState<ShiftType>(getInitialShiftType);
   const [useCarryOverCash, setUseCarryOverCash] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     if (todaySchedule?.shiftType) {
       setSelectedShiftType(todaySchedule.shiftType);
+    } else {
+      const currentHour = new Date().getHours();
+      setSelectedShiftType(currentHour >= 14 ? "SHIFT_SORE" : "SHIFT_PAGI");
     }
   }, [todaySchedule]);
 
@@ -102,17 +180,41 @@ export function OpenShiftModal({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Jadwal Info Card */}
-          <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] space-y-2 text-xs">
+          <div className="p-3.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border-2 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] space-y-2.5 text-xs">
             <div className="flex justify-between items-center">
               <span className="font-bold text-slate-500 dark:text-slate-400">Kasir Bertugas:</span>
               <span className="font-black text-slate-900 dark:text-slate-100">{cashierName}</span>
             </div>
-            <div className="flex justify-between items-center">
+            
+            {/* Pilihan / Penyesuaian Shift Pagi / Sore */}
+            <div className="flex justify-between items-center gap-2">
               <span className="font-bold text-slate-500 dark:text-slate-400">Jadwal Shift:</span>
-              <span className="font-black font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800">
-                {selectedShiftType === "SHIFT_PAGI" ? "PAGI" : "SORE"}
-              </span>
+              <div className="flex items-center gap-1 p-0.5 bg-slate-200 dark:bg-slate-700/80 rounded-lg border border-slate-300 dark:border-slate-600">
+                <button
+                  type="button"
+                  onClick={() => setSelectedShiftType("SHIFT_PAGI")}
+                  className={`px-2.5 py-1 text-[11px] font-black rounded-md transition-all cursor-pointer ${
+                    selectedShiftType === "SHIFT_PAGI"
+                      ? "bg-[#FFB800] text-slate-950 border border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  ☀️ PAGI
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedShiftType("SHIFT_SORE")}
+                  className={`px-2.5 py-1 text-[11px] font-black rounded-md transition-all cursor-pointer ${
+                    selectedShiftType === "SHIFT_SORE"
+                      ? "bg-[#6366F1] text-white border border-slate-900 shadow-[1px_1px_0px_0px_rgba(15,23,42,1)]"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  🌙 SORE
+                </button>
+              </div>
             </div>
+
             {todaySchedule?.notes && (
               <div className="text-[11px] text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-1.5 rounded border border-amber-200 dark:border-amber-800">
                 📌 Catatan Admin: {todaySchedule.notes}
@@ -323,13 +425,13 @@ export function CloseShiftModal({
             <div className="flex justify-between items-center">
               <span className="font-bold text-slate-500 dark:text-slate-400">Kasir / Shift:</span>
               <span className="font-black text-slate-900 dark:text-slate-100">
-                {shift.userName} ({shift.shiftType === "SHIFT_PAGI" ? "Pagi" : "Sore"})
+                {shift.userName} ({getShiftLabel(shift)})
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="font-bold text-slate-500 dark:text-slate-400">Jam Buka (Clock In):</span>
               <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
-                {new Date(shift.openedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                {formatShiftTime(shift.openedAt)}
               </span>
             </div>
             <div className="h-px bg-slate-200 dark:bg-slate-700 my-1" />

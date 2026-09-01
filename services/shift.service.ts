@@ -35,6 +35,8 @@ export const shiftService = {
       if (isDevMode) {
         console.warn('[shiftService] Dev mode bypass activated on fetch error:', err?.message);
         const todayStr = params?.date || new Date().toISOString().split('T')[0];
+        const currentHour = new Date().getHours();
+        const autoShiftType = currentHour >= 14 ? 'SHIFT_SORE' : 'SHIFT_PAGI';
         return {
           hasActiveShift: false,
           activeShift: null,
@@ -42,7 +44,7 @@ export const shiftService = {
           todaySchedule: {
             id: `SCH_DEV_FALLBACK_${todayStr.replace(/-/g, '')}`,
             date: todayStr,
-            shiftType: 'SHIFT_PAGI',
+            shiftType: autoShiftType,
             startTime: '00:00',
             endTime: '23:59',
             userName: 'Dev Cashier',
