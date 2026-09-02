@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/src/lib/firebase-admin';
+import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { AppUser, UserRole } from '@/types/auth.types';
 
 // Duration: 5 days in milliseconds

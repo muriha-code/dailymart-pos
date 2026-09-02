@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/src/lib/firebase-admin';
+import { adminAuth, adminDb } from '@/lib/firebase/admin';
 import { OpenShiftPayload, CloseShiftPayload } from '@/types/shift.types';
 import { processAutoCloseStaleShifts } from '@/app/api/cron/auto-close-shifts/route';
 
