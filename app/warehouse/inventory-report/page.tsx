@@ -83,7 +83,6 @@ export default function InventoryReportPage() {
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [seedingLoading, setSeedingLoading] = useState<boolean>(false);
 
   // Dropdown & Action State
   const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
@@ -163,19 +162,6 @@ export default function InventoryReportPage() {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return records.slice(start, start + ITEMS_PER_PAGE);
   }, [records, currentPage]);
-
-  // Handle Seeder Trigger
-  const handleTriggerSeeder = async () => {
-    setSeedingLoading(true);
-    try {
-      await inventoryReportService.seedInventoryReport();
-      await loadInventoryReport();
-    } catch (err: any) {
-      alert("Gagal seeding data inventaris: " + (err.message || err));
-    } finally {
-      setSeedingLoading(false);
-    }
-  };
 
   // Tutup dropdown jika klik di luar area
   useEffect(() => {
@@ -617,19 +603,8 @@ export default function InventoryReportPage() {
                 Belum ada data rekapitulasi mutasi stok inventaris.
               </p>
               <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
-                Klik tombol seeder di bawah untuk mengisi data sampel rekap mutasi.
+                Data mutasi stok akan terakumulasi otomatis dari aktivitas penerimaan barang, penjualan, dan penyesuaian opname.
               </p>
-              <button
-                type="button"
-                onClick={handleTriggerSeeder}
-                disabled={seedingLoading}
-                className="px-4 py-2 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-950 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
-              >
-                {seedingLoading && (
-                  <div className="w-3.5 h-3.5 border-2 border-white dark:border-slate-950 border-t-transparent rounded-full animate-spin" />
-                )}
-                <span>Generate Data Dummy (Seeder)</span>
-              </button>
             </div>
           ) : (
             <div className="w-full overflow-x-auto">

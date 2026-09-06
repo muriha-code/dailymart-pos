@@ -63,7 +63,6 @@ export default function RestockRequestsPage() {
   const [reasonNotesInput, setReasonNotesInput] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [seedingLoading, setSeedingLoading] = useState<boolean>(false);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -187,19 +186,6 @@ export default function RestockRequestsPage() {
       setSubmitError(err.message || "Gagal menyimpan tiket pengajuan restok.");
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  // Trigger Seeder Handler
-  const handleTriggerSeeder = async () => {
-    setSeedingLoading(true);
-    try {
-      await restockRequestService.seedRestockRequests();
-      await loadRestockRequests();
-    } catch (err: any) {
-      alert("Gagal seeding data: " + (err.message || err));
-    } finally {
-      setSeedingLoading(false);
     }
   };
 
@@ -388,19 +374,8 @@ export default function RestockRequestsPage() {
                 Belum ada data tiket pengajuan restok barang.
               </p>
               <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
-                Klik tombol &quot;Buat Pengajuan Baru&quot; atau tambahkan sampel data awal.
+                Klik tombol &quot;Buat Pengajuan Baru&quot; di atas untuk mengajukan permintaan restok barang ke supplier.
               </p>
-              <button
-                type="button"
-                onClick={handleTriggerSeeder}
-                disabled={seedingLoading}
-                className="px-4 py-2 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-950 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer inline-flex items-center gap-2 disabled:opacity-50"
-              >
-                {seedingLoading && (
-                  <div className="w-3.5 h-3.5 border-2 border-white dark:border-slate-950 border-t-transparent rounded-full animate-spin" />
-                )}
-                <span>Generate Data Dummy (Seeder)</span>
-              </button>
             </div>
           ) : (
             <div className="w-full overflow-x-auto">

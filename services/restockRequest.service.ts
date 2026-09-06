@@ -99,18 +99,5 @@ export const restockRequestService = {
 
     return result.data;
   },
-
-  /**
-   * Trigger seeder data dummy restock request
-   */
-  async seedRestockRequests(): Promise<void> {
-    const response = await fetch("/api/seed/restock-requests", {
-      method: "POST",
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Seeding gagal dengan HTTP Status: ${response.status}`);
-    }
-  },
 };
+

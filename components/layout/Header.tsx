@@ -24,6 +24,7 @@ export default function Header() {
     if (path.startsWith("/warehouse/restock-requests")) return "Permintaan Restok Barang";
     if (path.startsWith("/warehouse/returns")) return "Retur & Barang Rusak";
     if (path.startsWith("/warehouse/stock-alerts")) return "Peringatan Stok & Min. Level";
+    if (path.startsWith("/manual")) return "Panduan Pengguna & Pusat Bantuan";
     return "DailyMart POS System";
   };
 

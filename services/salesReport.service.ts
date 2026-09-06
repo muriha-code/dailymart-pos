@@ -47,18 +47,5 @@ export const salesReportService = {
 
     return json.data;
   },
-
-  /**
-   * Menjalankan seeder sampel transaksi
-   */
-  async seedTransactions(): Promise<void> {
-    const res = await fetch('/api/seed/transactions', {
-      method: 'POST',
-    });
-    const json = await res.json();
-
-    if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Gagal membuat data transaksi sampel.');
-    }
-  },
 };
+

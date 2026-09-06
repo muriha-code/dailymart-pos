@@ -31,19 +31,5 @@ export const inventoryReportService = {
 
     return res.json();
   },
-
-  /**
-   * Trigger Seeder Data Dummy Inventaris
-   */
-  async seedInventoryReport(): Promise<void> {
-    const res = await fetch('/api/seed/inventory-report', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || 'Gagal melakukan seeding data inventaris.');
-    }
-  },
 };
+

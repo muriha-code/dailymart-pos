@@ -27,18 +27,5 @@ export const stockOpnameReportService = {
 
     return json.data;
   },
-
-  /**
-   * Menjalankan seeder sampel audit stok
-   */
-  async seedStockAudits(): Promise<void> {
-    const res = await fetch('/api/seed/stock-audits', {
-      method: 'POST',
-    });
-    const json = await res.json();
-
-    if (!res.ok || !json.success) {
-      throw new Error(json.message || 'Gagal melakukan seeding data audit stok.');
-    }
-  },
 };
+
