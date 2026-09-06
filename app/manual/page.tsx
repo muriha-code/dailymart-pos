@@ -3,7 +3,45 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { MANUAL_DATA, ManualGuide, FAQItem } from "@/constants/manual-data";
+import { MANUAL_DATA } from "@/constants/manual-data";
+
+// ============================================================================
+// HIGHLIGHT TEXT COMPONENT
+// ============================================================================
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function HighlightText({ text, query }: { text: string | undefined | null; query: string }) {
+  if (!text) return null;
+  const trimmed = query.trim();
+  if (!trimmed) return <>{text}</>;
+
+  try {
+    const escaped = escapeRegExp(trimmed);
+    const regex = new RegExp(`(${escaped})`, "gi");
+    const parts = text.split(regex);
+
+    return (
+      <>
+        {parts.map((part, index) =>
+          part.toLowerCase() === trimmed.toLowerCase() ? (
+            <mark
+              key={index}
+              className="bg-amber-300 text-slate-900 font-semibold px-0.5 rounded"
+            >
+              {part}
+            </mark>
+          ) : (
+            <React.Fragment key={index}>{part}</React.Fragment>
+          )
+        )}
+      </>
+    );
+  } catch {
+    return <>{text}</>;
+  }
+}
 
 // ============================================================================
 // INLINE ICONS
@@ -102,59 +140,65 @@ function RenderIcon({ name, className = "w-5 h-5" }: { name: string; className?:
 export default function ManualPage() {
   const { user } = useAuth();
 
-  // Normalize current user's role
+  // Normalize current user's role strictly
   const normalizedUserRole = useMemo(() => {
-    const role = (user?.role || "ADMIN").toLowerCase();
+    const role = (user?.role || "CASHIER").toLowerCase();
     if (role.includes("super_admin") || role.includes("admin")) return "admin";
     if (role.includes("warehouse")) return "warehouse";
     return "cashier";
   }, [user?.role]);
 
-  // Is Admin or Super Admin (can view any manual role view)
+  // Is Admin or Super Admin (can view other role preview tabs)
   const canSwitchRole = normalizedUserRole === "admin";
 
-  // Selected manual view tab
+  // Selected manual view tab (defaults to current user role)
   const [selectedRole, setSelectedRole] = useState<string>(normalizedUserRole);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
   const [expandedGuides, setExpandedGuides] = useState<Record<string, boolean>>({});
   const [expandedFaqs, setExpandedFaqs] = useState<Record<number, boolean>>({});
 
-  // Active Role Manual Configuration
+  // Role Isolation Guardrail:
+  // If the logged-in user is NOT admin, they are strictly locked to their own active role
+  const effectiveRole = canSwitchRole ? selectedRole : normalizedUserRole;
+
+  // Active Role Manual Configuration (Strict Role Isolation)
   const currentManual = useMemo(() => {
-    return MANUAL_DATA[selectedRole] || MANUAL_DATA.cashier;
-  }, [selectedRole]);
+    return MANUAL_DATA[effectiveRole] || MANUAL_DATA[normalizedUserRole] || MANUAL_DATA.cashier;
+  }, [effectiveRole, normalizedUserRole]);
 
-  // Available Categories for the selected role
-  const availableCategories = useMemo(() => {
-    const cats = new Set<string>();
-    currentManual.guides.forEach((g) => cats.add(g.category));
-    return ["Semua", ...Array.from(cats)];
-  }, [currentManual]);
-
-  // Filtered Guides
+  // Realtime Filtered Guides (Searching Category, Title, Summary, Steps, and Tips within current role)
   const filteredGuides = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return currentManual.guides;
+
     return currentManual.guides.filter((guide) => {
-      // Category match
-      const matchCategory = selectedCategory === "Semua" || guide.category === selectedCategory;
-
-      // Query match (searches title, summary, category, steps)
-      const q = searchQuery.toLowerCase().trim();
-      if (!q) return matchCategory;
-
+      const matchCategory = guide.category.toLowerCase().includes(q);
       const matchTitle = guide.title.toLowerCase().includes(q);
       const matchSummary = guide.summary.toLowerCase().includes(q);
-      const matchCategoryText = guide.category.toLowerCase().includes(q);
-      const matchSteps = guide.steps.some(
-        (s) =>
-          s.title.toLowerCase().includes(q) ||
-          s.description.toLowerCase().includes(q) ||
-          s.subSteps?.some((sub) => sub.toLowerCase().includes(q))
-      );
+      const matchBadge = guide.badge?.toLowerCase().includes(q) || false;
 
-      return matchCategory && (matchTitle || matchSummary || matchCategoryText || matchSteps);
+      // Search through steps (title, description, sub-steps, warnings/tips)
+      const matchSteps = guide.steps.some((step) => {
+        const matchStepTitle = step.title.toLowerCase().includes(q);
+        const matchStepDesc = step.description.toLowerCase().includes(q);
+        const matchSubSteps = step.subSteps?.some((sub) => sub.toLowerCase().includes(q)) || false;
+        const matchWarningTip = step.warningOrTip?.text.toLowerCase().includes(q) || false;
+        return matchStepTitle || matchStepDesc || matchSubSteps || matchWarningTip;
+      });
+
+      // Search through quickTips
+      const matchQuickTips = guide.quickTips?.some((tip) => tip.toLowerCase().includes(q)) || false;
+
+      return (
+        matchCategory ||
+        matchTitle ||
+        matchSummary ||
+        matchBadge ||
+        matchSteps ||
+        matchQuickTips
+      );
     });
-  }, [currentManual, selectedCategory, searchQuery]);
+  }, [currentManual, searchQuery]);
 
   // Toggle guide expansion
   const toggleGuide = (guideId: string) => {
@@ -170,15 +214,6 @@ export default function ManualPage() {
       ...prev,
       [index]: !prev[index],
     }));
-  };
-
-  // Expand all / Collapse all guides
-  const handleToggleAllGuides = (expand: boolean) => {
-    const nextState: Record<string, boolean> = {};
-    currentManual.guides.forEach((g) => {
-      nextState[g.id] = expand;
-    });
-    setExpandedGuides(nextState);
   };
 
   return (
@@ -212,25 +247,10 @@ export default function ManualPage() {
                 {currentManual.roleDescription}
               </p>
             </div>
-
-            {/* Print / Action helper */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border-2 border-slate-900 dark:border-slate-100 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
-                title="Cetak panduan ini"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Cetak Panduan
-              </button>
-            </div>
           </div>
 
           {/* =============================================================== */}
-          {/* ROLE SWITCHER TABS (For Admin/Super Admin or Quick Switch) */}
+          {/* ROLE SWITCHER TABS (For Admin/Super Admin only) */}
           {/* =============================================================== */}
           {canSwitchRole && (
             <div className="mt-6 pt-5 border-t-2 border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -240,10 +260,7 @@ export default function ManualPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedRole("admin");
-                    setSelectedCategory("Semua");
-                  }}
+                  onClick={() => setSelectedRole("admin")}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black border-2 transition-all cursor-pointer ${
                     selectedRole === "admin"
                       ? "bg-purple-600 text-white border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
@@ -254,10 +271,7 @@ export default function ManualPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedRole("cashier");
-                    setSelectedCategory("Semua");
-                  }}
+                  onClick={() => setSelectedRole("cashier")}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black border-2 transition-all cursor-pointer ${
                     selectedRole === "cashier"
                       ? "bg-emerald-600 text-white border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
@@ -268,10 +282,7 @@ export default function ManualPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedRole("warehouse");
-                    setSelectedCategory("Semua");
-                  }}
+                  onClick={() => setSelectedRole("warehouse")}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-black border-2 transition-all cursor-pointer ${
                     selectedRole === "warehouse"
                       ? "bg-amber-500 text-slate-950 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
@@ -286,78 +297,39 @@ export default function ManualPage() {
         </div>
 
         {/* ================================================================= */}
-        {/* SEARCH & CATEGORY FILTER CONTROLS */}
+        {/* FULL-WIDTH REALTIME SEARCH CONTAINER */}
         {/* ================================================================= */}
-        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-2xl p-4 sm:p-5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            {/* Realtime Search Bar */}
-            <div className="relative flex-1">
-              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-2xl p-4 sm:p-5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]">
+          <div className="relative w-full">
+            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari topik, kategori, langkah kerja, atau tips panduan..."
+              className="w-full pl-10 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-slate-400 transition-all shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                title="Hapus pencarian"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
-              </span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari topik, istilah, atau langkah panduan (misal: modal awal, barcode, retur)..."
-                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100 rounded-xl text-sm font-semibold text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-400 placeholder-slate-400 transition-all shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                  title="Hapus pencarian"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            {/* Quick Expand / Collapse All */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => handleToggleAllGuides(true)}
-                className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 border-2 border-slate-900 dark:border-slate-100 text-xs font-bold text-slate-900 dark:text-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
-              >
-                Buka Semua
               </button>
-              <button
-                type="button"
-                onClick={() => handleToggleAllGuides(false)}
-                className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 border-2 border-slate-900 dark:border-slate-100 text-xs font-bold text-slate-900 dark:text-slate-100 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
-              >
-                Tutup Semua
-              </button>
-            </div>
-          </div>
-
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 no-scrollbar">
-            {availableCategories.map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setSelectedCategory(category)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider border-2 shrink-0 transition-all cursor-pointer ${
-                  selectedCategory === category
-                    ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 border-slate-900 dark:border-slate-100 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
-                    : "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-900 dark:border-slate-700 hover:bg-slate-100"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+            )}
           </div>
         </div>
 
         {/* ================================================================= */}
-        {/* SHORTCUTS CHEAT SHEET (IF APPLICABLE) */}
+        {/* SHORTCUTS CHEAT SHEET */}
         {/* ================================================================= */}
         {currentManual.shortcuts && currentManual.shortcuts.length > 0 && (
           <div className="bg-amber-50 dark:bg-amber-950/40 border-2 border-slate-900 dark:border-amber-400 rounded-2xl p-4 sm:p-5 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] dark:shadow-[3px_3px_0px_0px_rgba(251,191,36,1)]">
@@ -379,7 +351,7 @@ export default function ManualPage() {
                   className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-700 rounded-xl p-2.5 flex items-center justify-between gap-2 shadow-[1.5px_1.5px_0px_0px_rgba(15,23,42,1)]"
                 >
                   <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    {sc.description}
+                    <HighlightText text={sc.description} query={searchQuery} />
                   </span>
                   <div className="flex items-center gap-1 shrink-0">
                     {sc.keys.map((k, ki) => (
@@ -402,26 +374,26 @@ export default function ManualPage() {
         {/* ================================================================= */}
         <div className="space-y-5">
           {filteredGuides.length === 0 ? (
-            <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-2xl p-10 text-center shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-900 border-2 border-slate-900 mx-auto flex items-center justify-center font-black text-xl">
+            /* Fallback State for No Results */
+            <div className="bg-white dark:bg-slate-900 border-2 border-slate-900 dark:border-slate-100 rounded-2xl p-8 sm:p-10 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 border-2 border-slate-900 dark:border-slate-100 mx-auto flex items-center justify-center font-black text-xl shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
                 🔍
               </div>
-              <h3 className="text-base font-black text-slate-900 dark:text-white">
-                Tidak ada topik panduan yang cocok
+              <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                Tidak ada topik panduan yang ditemukan
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                Coba gunakan kata kunci pencarian yang lain atau pilih kategori &quot;Semua&quot;.
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                Tidak ditemukan panduan yang cocok dengan kata kunci &ldquo;<span className="font-bold text-slate-900 dark:text-slate-100">{searchQuery}</span>&rdquo; untuk peran <strong className="text-slate-900 dark:text-slate-100">{currentManual.roleName}</strong>.
               </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory("Semua");
-                }}
-                className="px-4 py-2 rounded-xl bg-amber-300 text-slate-900 border-2 border-slate-900 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] cursor-pointer"
-              >
-                Reset Filter
-              </button>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="px-4 py-2 rounded-xl bg-amber-300 hover:bg-amber-400 text-slate-950 border-2 border-slate-900 text-xs font-black shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[0.5px] hover:translate-y-[0.5px] transition-all cursor-pointer"
+                >
+                  Reset Pencarian
+                </button>
+              </div>
             </div>
           ) : (
             filteredGuides.map((guide) => {
@@ -446,11 +418,11 @@ export default function ManualPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-900 dark:border-slate-600">
-                            {guide.category}
+                            <HighlightText text={guide.category} query={searchQuery} />
                           </span>
                           {guide.badge && (
                             <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider border border-slate-900 ${guide.badgeColor || "bg-emerald-100 text-emerald-900"}`}>
-                              {guide.badge}
+                              <HighlightText text={guide.badge} query={searchQuery} />
                             </span>
                           )}
                           <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -459,11 +431,11 @@ export default function ManualPage() {
                         </div>
 
                         <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-50">
-                          {guide.title}
+                          <HighlightText text={guide.title} query={searchQuery} />
                         </h2>
 
                         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                          {guide.summary}
+                          <HighlightText text={guide.summary} query={searchQuery} />
                         </p>
                       </div>
                     </div>
@@ -525,10 +497,10 @@ export default function ManualPage() {
 
                               <div className="space-y-1 flex-1">
                                 <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">
-                                  {step.title}
+                                  <HighlightText text={step.title} query={searchQuery} />
                                 </h4>
                                 <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                                  {step.description}
+                                  <HighlightText text={step.description} query={searchQuery} />
                                 </p>
                               </div>
                             </div>
@@ -538,7 +510,7 @@ export default function ManualPage() {
                               <ul className="ml-10 space-y-1.5 list-disc list-outside text-xs text-slate-600 dark:text-slate-300 pl-2">
                                 {step.subSteps.map((sub, sIdx) => (
                                   <li key={sIdx} className="leading-relaxed">
-                                    {sub}
+                                    <HighlightText text={sub} query={searchQuery} />
                                   </li>
                                 ))}
                               </ul>
@@ -560,7 +532,7 @@ export default function ManualPage() {
                                   <strong className="font-bold">
                                     {step.warningOrTip.type === "warning" ? "Peringatan: " : "Tips: "}
                                   </strong>
-                                  {step.warningOrTip.text}
+                                  <HighlightText text={step.warningOrTip.text} query={searchQuery} />
                                 </div>
                               </div>
                             )}
@@ -576,7 +548,9 @@ export default function ManualPage() {
                           </div>
                           <ul className="space-y-1 text-xs text-emerald-950 dark:text-emerald-100 list-disc list-inside">
                             {guide.quickTips.map((tip, tIdx) => (
-                              <li key={tIdx}>{tip}</li>
+                              <li key={tIdx}>
+                                <HighlightText text={tip} query={searchQuery} />
+                              </li>
                             ))}
                           </ul>
                         </div>
@@ -623,7 +597,7 @@ export default function ManualPage() {
                     >
                       <span className="flex items-center gap-2">
                         <span className="text-amber-500 font-black">Q:</span>
-                        {faq.question}
+                        <HighlightText text={faq.question} query={searchQuery} />
                       </span>
                       <svg
                         className={`w-4 h-4 transform transition-transform duration-200 shrink-0 ${
@@ -641,7 +615,7 @@ export default function ManualPage() {
                     {isFaqOpen && (
                       <div className="p-3.5 pt-0 text-xs sm:text-sm text-slate-700 dark:text-slate-300 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 leading-relaxed">
                         <span className="text-emerald-600 dark:text-emerald-400 font-bold mr-1.5">Jawab:</span>
-                        {faq.answer}
+                        <HighlightText text={faq.answer} query={searchQuery} />
                       </div>
                     )}
                   </div>
