@@ -7,6 +7,7 @@ import { productService } from "@/services/product.service";
 import { transactionService } from "@/services/transaction.service";
 import { CreateTransactionPayload } from "@/types/transaction.types";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useShift } from "@/context/ShiftContext";
 import { shiftService } from "@/services/shift.service";
 import { CashierShift, ShiftValidationResult } from "@/types/shift.types";
 import { ShiftType } from "@/types/schedule.types";
@@ -115,81 +116,41 @@ export default function CashierTransactionsPage() {
     initials: string;
   } | null>(null);
 
-  // Shift Management States
-  const [shiftValidation, setShiftValidation] = useState<ShiftValidationResult | null>(null);
-  const [isCheckingShift, setIsCheckingShift] = useState<boolean>(true);
-  const [activeShift, setActiveShift] = useState<CashierShift | null>(null);
-  const [isOpenShiftModalOpen, setIsOpenShiftModalOpen] = useState<boolean>(false);
-  const [isConfirmCloseShiftOpen, setIsConfirmCloseShiftOpen] = useState<boolean>(false);
-  const [isCloseShiftModalOpen, setIsCloseShiftModalOpen] = useState<boolean>(false);
-  const [completedShiftForReceipt, setCompletedShiftForReceipt] = useState<CashierShift | null>(null);
-  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false);
-
-  // Check shift status from server
-  const checkCashierShift = useCallback(async () => {
-    setIsCheckingShift(true);
-    try {
-      const result = await shiftService.checkShiftStatus();
-      setShiftValidation(result);
-
-      if (result.hasActiveShift && result.activeShift) {
-        setActiveShift(result.activeShift);
-        setIsOpenShiftModalOpen(false);
-      } else {
-        setActiveShift(null);
-        if (result.hasScheduleToday && result.isWithinShiftTolerance) {
-          setIsOpenShiftModalOpen(true);
-        }
-      }
-    } catch (err: any) {
-      console.warn("Gagal mengecek status shift kasir:", err);
-    } finally {
-      setIsCheckingShift(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkCashierShift();
-  }, [checkCashierShift]);
+  // Shift Management States from ShiftContext
+  const {
+    activeShift,
+    shiftValidation,
+    isCheckingShift,
+    isOpenShiftModalOpen,
+    setIsOpenShiftModalOpen,
+    isConfirmCloseShiftOpen,
+    setIsConfirmCloseShiftOpen,
+    isCloseShiftModalOpen,
+    setIsCloseShiftModalOpen,
+    completedShiftForReceipt,
+    setCompletedShiftForReceipt,
+    isReceiptModalOpen,
+    setIsReceiptModalOpen,
+    openShift,
+    closeShift,
+    checkShiftStatus: checkCashierShift,
+    clearActiveShift,
+  } = useShift();
 
   const handleOpenShift = async (startingCash: number, shiftType: ShiftType) => {
-    try {
-      const newShift = await shiftService.openShift({
-        startingCash,
-        shiftType,
-        scheduleId: shiftValidation?.todaySchedule?.id,
-        userId: cashierUser?.uid,
-        userName: cashierUser?.displayName,
-      });
-      setActiveShift(newShift);
-      setIsOpenShiftModalOpen(false);
-      toast.success(`Shift ${shiftType === 'SHIFT_PAGI' ? 'Pagi' : 'Sore'} berhasil dibuka! Selamat bertugas.`);
-    } catch (err: any) {
-      toast.error(err.message || "Gagal membuka shift kasir.");
-      throw err;
-    }
+    await openShift(startingCash, shiftType, {
+      uid: cashierUser?.uid,
+      displayName: cashierUser?.displayName,
+    });
   };
 
   const handleCloseShift = async (actualCash: number, notes: string) => {
-    if (!activeShift) return;
-    try {
-      const closedShift = await shiftService.closeShift({
-        shiftId: activeShift.id,
-        actualCash,
-        reconciliationNotes: notes,
-      });
-      setIsCloseShiftModalOpen(false);
-      setCompletedShiftForReceipt(closedShift);
-      setIsReceiptModalOpen(true);
-      toast.success("Shift kasir berhasil ditutup dan direkonsiliasi.");
-    } catch (err: any) {
-      toast.error(err.message || "Gagal menutup shift.");
-      throw err;
-    }
+    await closeShift(actualCash, notes);
   };
 
   const handleDoneReceipt = async () => {
     setIsReceiptModalOpen(false);
+    clearActiveShift();
     if (logout) {
       await logout("shift_completed");
     } else {

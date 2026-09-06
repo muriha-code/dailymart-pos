@@ -1,36 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { shiftService } from "@/services/shift.service";
-import { ShiftValidationResult } from "@/types/shift.types";
 import { BlockedShiftScreen } from "@/components/cashier/CashierShiftModal";
+import { ShiftProvider, useShift } from "@/context/ShiftContext";
 
-export default function CashierLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function CashierLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
-
-  const [shiftValidation, setShiftValidation] = useState<ShiftValidationResult | null>(null);
-  const [isCheckingShift, setIsCheckingShift] = useState<boolean>(true);
-
-  const checkShiftStatus = useCallback(async () => {
-    setIsCheckingShift(true);
-    try {
-      const result = await shiftService.checkShiftStatus();
-      setShiftValidation(result);
-    } catch (err: any) {
-      console.warn("[Cashier Layout Guard] Gagal mengecek status shift kasir:", err);
-    } finally {
-      setIsCheckingShift(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkShiftStatus();
-  }, [checkShiftStatus]);
+  const { activeShift, shiftValidation, isCheckingShift, checkShiftStatus } = useShift();
 
   const userRole = (user?.role || "CASHIER").toUpperCase();
   const isAdmin = userRole === "ADMIN" || userRole === "SUPER_ADMIN";
@@ -43,8 +20,8 @@ export default function CashierLayout({
     return <>{children}</>;
   }
 
-  // 2. Loading State saat verifikasi jadwal & shift kasir berlangsung
-  if (isCheckingShift) {
+  // 2. Loading State saat verifikasi jadwal & shift kasir berlangsung (hanya jika belum ada activeShift tersimpan)
+  if (isCheckingShift && !activeShift) {
     return (
       <div className="h-screen w-full flex items-center justify-center p-6 bg-slate-100 dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 font-sans">
         <div className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-slate-900 dark:border-slate-100 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] p-8 text-center space-y-3 max-w-sm w-full">
@@ -66,9 +43,10 @@ export default function CashierLayout({
 
   // 3. Validasi Shift: Kasir harus memiliki shift OPEN atau Memiliki Jadwal hari ini dalam rentang toleransi
   const isShiftValid =
-    shiftValidation &&
-    (shiftValidation.hasActiveShift ||
-      (shiftValidation.hasScheduleToday && shiftValidation.isWithinShiftTolerance));
+    activeShift ||
+    (shiftValidation &&
+      (shiftValidation.hasActiveShift ||
+        (shiftValidation.hasScheduleToday && shiftValidation.isWithinShiftTolerance)));
 
   // 4. Jika TIDAK memiliki Shift / Jadwal Valid -> Timpa area konten utama dengan BlockedShiftScreen
   if (!isShiftValid && shiftValidation) {
@@ -84,4 +62,12 @@ export default function CashierLayout({
 
   // 5. Akses Diberikan -> Render konten halaman kasir ({children})
   return <>{children}</>;
+}
+
+export default function CashierLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ShiftProvider>
+      <CashierLayoutContent>{children}</CashierLayoutContent>
+    </ShiftProvider>
+  );
 }

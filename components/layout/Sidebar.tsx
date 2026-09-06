@@ -238,8 +238,9 @@ export default function Sidebar() {
       } else {
         try {
           sessionStorage.removeItem("pos_tab_active");
+          sessionStorage.removeItem("dailymart_active_shift");
         } catch (sErr) {
-          console.warn("Gagal menghapus pos_tab_active dari sessionStorage:", sErr);
+          console.warn("Gagal menghapus storage dari sessionStorage:", sErr);
         }
         await fetch("/api/auth/logout", { method: "POST" });
         await fetch("/api/auth/session", { method: "DELETE" });

@@ -62,6 +62,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const clearTabActive = useCallback(() => {
     try {
       sessionStorage.removeItem('pos_tab_active');
+      sessionStorage.removeItem('dailymart_active_shift');
     } catch (e) {
       console.warn('Failed to access sessionStorage:', e);
     }
@@ -92,6 +93,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       setTheme('light');
       try {
         localStorage.removeItem('theme');
+        sessionStorage.removeItem('dailymart_active_shift');
       } catch (e) {
         console.warn('Failed clearing theme in localStorage:', e);
       }
